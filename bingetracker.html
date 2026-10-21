@@ -9,7 +9,6 @@
     <meta name="theme-color" content="#0B0F19">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22BingeTracker%22%2C%22short_name%22%3A%22BingeTracker%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230B0F19%22%2C%22theme_color%22%3A%22%230B0F19%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzBCOEYxOSIvPjwvc3ZnPg%3D%3D%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
 
     <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -366,12 +365,32 @@
 
     <!-- PWA Service Worker Registration -->
     <script>
+        // Dynamically create manifest to fix the 404 error on Desktop PWA
+        const currentUrl = window.location.href.split('#')[0].split('?')[0]; // Gets the exact file path
+        const manifestJSON = {
+            "name": "BingeTracker",
+            "short_name": "BingeTracker",
+            "start_url": currentUrl,
+            "display": "standalone",
+            "background_color": "#0B0F19",
+            "theme_color": "#0B0F19",
+            "icons": [{
+                "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzBCOEYxOSIvPjwvc3ZnPg==",
+                "sizes": "192x192",
+                "type": "image/svg+xml"
+            }]
+        };
+        const manifestBlob = new Blob([JSON.stringify(manifestJSON)], {type: 'application/manifest+json'});
+        const manifestLink = document.createElement('link');
+        manifestLink.rel = 'manifest';
+        manifestLink.href = URL.createObjectURL(manifestBlob);
+        document.head.appendChild(manifestLink);
+
         const swCode = `
-            const CACHE_NAME = 'bingetracker-v1';
+            const CACHE_NAME = 'bingetracker-v2';
             self.addEventListener('install', (e) => self.skipWaiting());
             self.addEventListener('activate', (e) => self.clients.claim());
             self.addEventListener('fetch', (e) => {
-                // basic network-first or pass-through for PWA install criteria
                 e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
             });
         `;
@@ -528,11 +547,16 @@
         // --- Core Status & API Logic ---
         async function fetchTVMaze(showId) {
             if(tvmazeCache[showId]) return tvmazeCache[showId];
-            const res = await fetch(`https://api.tvmaze.com/shows/${showId}?embed=episodes`);
-            if(!res.ok) return null;
-            const data = await res.json();
-            tvmazeCache[showId] = data;
-            return data;
+            try {
+                const res = await fetch(`https://api.tvmaze.com/shows/${showId}?embed=episodes`);
+                if(!res.ok) return null;
+                const data = await res.json();
+                tvmazeCache[showId] = data;
+                return data;
+            } catch (err) {
+                console.error("TVMaze API Fetch Error:", err);
+                return null;
+            }
         }
 
         // Auto Calculate Status based on reality
@@ -585,86 +609,99 @@
             let hasContinue = false;
             let upcomingEvents = [];
 
-            // Fetch data for dashboard (Sequential to respect limits, using cache)
-            for(let dbShow of allShows) {
-                const apiData = await fetchTVMaze(dbShow.showId);
-                if(!apiData) continue;
-                
-                // 1. Calculate and update status automatically
-                const actualStatus = await calculateShowStatus(dbShow.showId, apiData._embedded.episodes, dbShow);
+            try {
+                // Fetch data for dashboard (Sequential to respect limits, using cache)
+                for(let dbShow of allShows) {
+                    try {
+                        const apiData = await fetchTVMaze(dbShow.showId);
+                        if(!apiData) continue;
+                        
+                        // 1. Calculate and update status automatically
+                        const actualStatus = await calculateShowStatus(dbShow.showId, apiData._embedded.episodes, dbShow);
 
-                // 2. Continuar Viendo (Only for 'watching' after recalc)
-                if (actualStatus === 'watching') {
-                    const today = new Date();
-                    const aired = apiData._embedded.episodes.filter(ep => ep.airdate && new Date(ep.airdate) <= today);
-                    const map = dbShow.episodesWatched || {};
-                    // Find first unwatched
-                    const nextEp = aired.find(ep => (map[ep.id] || 0) === 0);
-                    
-                    if (nextEp) {
-                        hasContinue = true;
-                        const card = document.createElement('div');
-                        card.className = "flex-none w-64 glass-card rounded-2xl overflow-hidden snap-start relative group cursor-pointer";
-                        const img = nextEp.image?.medium || apiData.image?.medium || 'https://placehold.co/300x170/1F293F/ffffff?text=Ep';
-                        card.innerHTML = `
-                            <div class="h-36 overflow-hidden relative" onclick="openShowDetail(${dbShow.showId})">
-                                <img src="${img}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                                <div class="absolute inset-0 bg-gradient-to-t from-dark-900 to-transparent"></div>
-                                <div class="absolute bottom-2 left-3">
-                                    <h4 class="font-bold text-sm line-clamp-1">${dbShow.name}</h4>
-                                    <span class="text-xs text-accent-emerald font-bold bg-black/50 px-1.5 rounded">T${String(nextEp.season).padStart(2,'0')}E${String(nextEp.number).padStart(2,'0')}</span>
-                                </div>
+                        // 2. Continuar Viendo (Only for 'watching' after recalc)
+                        if (actualStatus === 'watching') {
+                            const today = new Date();
+                            const aired = apiData._embedded.episodes.filter(ep => ep.airdate && new Date(ep.airdate) <= today);
+                            const map = dbShow.episodesWatched || {};
+                            // Find first unwatched
+                            const nextEp = aired.find(ep => (map[ep.id] || 0) === 0);
+                            
+                            if (nextEp) {
+                                hasContinue = true;
+                                const card = document.createElement('div');
+                                card.className = "flex-none w-64 glass-card rounded-2xl overflow-hidden snap-start relative group cursor-pointer";
+                                const img = nextEp.image?.medium || apiData.image?.medium || 'https://placehold.co/300x170/1F293F/ffffff?text=Ep';
+                                card.innerHTML = `
+                                    <div class="h-36 overflow-hidden relative" onclick="openShowDetail(${dbShow.showId})">
+                                        <img src="${img}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                        <div class="absolute inset-0 bg-gradient-to-t from-dark-900 to-transparent"></div>
+                                        <div class="absolute bottom-2 left-3">
+                                            <h4 class="font-bold text-sm line-clamp-1">${dbShow.name}</h4>
+                                            <span class="text-xs text-accent-emerald font-bold bg-black/50 px-1.5 rounded">T${String(nextEp.season).padStart(2,'0')}E${String(nextEp.number).padStart(2,'0')}</span>
+                                        </div>
+                                    </div>
+                                    <div class="p-3 flex items-center justify-between">
+                                        <p class="text-xs text-gray-400 line-clamp-1 flex-1 pr-2">${nextEp.name}</p>
+                                        <button onclick="quickMarkWatch('${dbShow.showId}', '${nextEp.id}')" class="bg-white/10 hover:bg-accent-emerald hover:text-white text-emerald-400 w-8 h-8 rounded-full flex items-center justify-center transition shrink-0"><i class="ph-bold ph-check"></i></button>
+                                    </div>
+                                `;
+                                continueGrid.appendChild(card);
+                            }
+                        }
+
+                        // 3. Próximos Estrenos
+                        if (actualStatus !== 'dropped') {
+                            const todayStr = new Date().toISOString().split('T')[0];
+                            const futureEps = apiData._embedded.episodes.filter(ep => ep.airdate && ep.airdate > todayStr);
+                            if(futureEps.length > 0) {
+                                const nextFuture = futureEps[0];
+                                upcomingEvents.push({ showName: dbShow.name, showId: dbShow.showId, ep: nextFuture });
+                            }
+                        }
+                    } catch (itemErr) {
+                        console.warn(`Error al cargar datos del show ${dbShow.showId}:`, itemErr);
+                        // Continue to next show if one fails
+                    }
+                }
+
+                // Render Upcoming
+                if(upcomingEvents.length > 0) {
+                    upcomingEvents.sort((a,b) => new Date(a.ep.airdate) - new Date(b.ep.airdate)).slice(0,6).forEach(ev => {
+                        const el = document.createElement('div');
+                        el.className = "glass-panel p-4 rounded-xl flex items-center gap-4 cursor-pointer hover:bg-white/5 transition";
+                        el.onclick = () => openShowDetail(ev.showId);
+                        
+                        const dateObj = new Date(ev.ep.airdate);
+                        const day = dateObj.toLocaleDateString('es-ES', { weekday:'short', day:'numeric' });
+                        
+                        el.innerHTML = `
+                            <div class="bg-accent-purple/20 text-accent-purple rounded-lg p-2 flex flex-col items-center justify-center min-w-[3.5rem] border border-accent-purple/30">
+                                <span class="text-xs uppercase font-bold">${day.split(',')[0]}</span>
+                                <span class="text-lg font-black leading-none">${dateObj.getDate()}</span>
                             </div>
-                            <div class="p-3 flex items-center justify-between">
-                                <p class="text-xs text-gray-400 line-clamp-1 flex-1 pr-2">${nextEp.name}</p>
-                                <button onclick="quickMarkWatch('${dbShow.showId}', '${nextEp.id}')" class="bg-white/10 hover:bg-accent-emerald hover:text-white text-emerald-400 w-8 h-8 rounded-full flex items-center justify-center transition shrink-0"><i class="ph-bold ph-check"></i></button>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="font-bold text-sm truncate text-white">${ev.showName}</h4>
+                                <p class="text-xs text-gray-400 truncate">T${ev.ep.season}E${ev.ep.number}: ${ev.ep.name}</p>
                             </div>
                         `;
-                        continueGrid.appendChild(card);
-                    }
+                        upcomingList.appendChild(el);
+                    });
+                    $('dash-upcoming-empty').classList.add('hidden');
+                } else {
+                    $('dash-upcoming-empty').classList.remove('hidden');
                 }
 
-                // 3. Próximos Estrenos
-                if (actualStatus !== 'dropped') {
-                    const todayStr = new Date().toISOString().split('T')[0];
-                    const futureEps = apiData._embedded.episodes.filter(ep => ep.airdate && ep.airdate > todayStr);
-                    if(futureEps.length > 0) {
-                        const nextFuture = futureEps[0];
-                        upcomingEvents.push({ showName: dbShow.name, showId: dbShow.showId, ep: nextFuture });
-                    }
-                }
+                $('dash-continue-empty').classList.toggle('hidden', !hasContinue);
+                
+            } catch (globalErr) {
+                console.error("Error global renderizando dashboard:", globalErr);
+                showToast("Error de conexión. Inténtalo de nuevo.", "error");
+            } finally {
+                // Guaranteed to execute, hiding the infinite spinner
+                $('dash-loading').classList.add('hidden');
+                $('dash-content').classList.remove('hidden');
             }
-
-            // Render Upcoming
-            if(upcomingEvents.length > 0) {
-                upcomingEvents.sort((a,b) => new Date(a.ep.airdate) - new Date(b.ep.airdate)).slice(0,6).forEach(ev => {
-                    const el = document.createElement('div');
-                    el.className = "glass-panel p-4 rounded-xl flex items-center gap-4 cursor-pointer hover:bg-white/5 transition";
-                    el.onclick = () => openShowDetail(ev.showId);
-                    
-                    const dateObj = new Date(ev.ep.airdate);
-                    const day = dateObj.toLocaleDateString('es-ES', { weekday:'short', day:'numeric' });
-                    
-                    el.innerHTML = `
-                        <div class="bg-accent-purple/20 text-accent-purple rounded-lg p-2 flex flex-col items-center justify-center min-w-[3.5rem] border border-accent-purple/30">
-                            <span class="text-xs uppercase font-bold">${day.split(',')[0]}</span>
-                            <span class="text-lg font-black leading-none">${dateObj.getDate()}</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-bold text-sm truncate text-white">${ev.showName}</h4>
-                            <p class="text-xs text-gray-400 truncate">T${ev.ep.season}E${ev.ep.number}: ${ev.ep.name}</p>
-                        </div>
-                    `;
-                    upcomingList.appendChild(el);
-                });
-                $('dash-upcoming-empty').classList.add('hidden');
-            } else {
-                $('dash-upcoming-empty').classList.remove('hidden');
-            }
-
-            $('dash-continue-empty').classList.toggle('hidden', hasContinue);
-            $('dash-loading').classList.add('hidden');
-            $('dash-content').classList.remove('hidden');
         }
 
         window.quickMarkWatch = async (showId, epId) => {
