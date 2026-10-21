@@ -163,6 +163,28 @@
         <p class="mt-4 text-gray-400 text-sm">Authenticating...</p>
     </div>
 
+    <!-- Auth Screen -->
+    <div id="auth-screen" class="fixed inset-0 z-[60] bg-dark-900 flex flex-col items-center justify-center transition-opacity duration-500 hidden">
+        <div class="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] bg-accent-purple/20 blur-[120px] rounded-full pointer-events-none z-[-1]"></div>
+        <div class="fixed bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-accent-emerald/10 blur-[120px] rounded-full pointer-events-none z-[-1]"></div>
+        
+        <div class="glass-card p-8 rounded-3xl w-[90%] max-w-md flex flex-col relative z-10 animate-slide-up">
+            <div class="flex justify-center mb-4">
+                <i class="ph-fill ph-television-simple text-5xl text-accent-emerald"></i>
+            </div>
+            <h2 class="text-3xl font-bold mb-6 text-center text-white" id="auth-title">Welcome Back</h2>
+            <form id="auth-form" class="flex flex-col gap-4">
+                <input type="email" id="auth-email" placeholder="Email Address" class="w-full bg-dark-800/80 border border-white/10 focus:border-accent-purple focus:ring-1 focus:ring-accent-purple rounded-xl py-3 px-4 text-white placeholder-gray-500 outline-none transition-all" required>
+                <input type="password" id="auth-password" placeholder="Password" class="w-full bg-dark-800/80 border border-white/10 focus:border-accent-purple focus:ring-1 focus:ring-accent-purple rounded-xl py-3 px-4 text-white placeholder-gray-500 outline-none transition-all" required>
+                <button type="submit" id="auth-submit-btn" class="bg-gradient-to-r from-accent-purple to-indigo-600 hover:from-accent-purple/80 hover:to-indigo-600/80 text-white py-3 rounded-xl font-bold mt-2 shadow-lg shadow-accent-purple/20 transition-all active:scale-[0.98]">Sign In</button>
+            </form>
+            <div class="mt-6 text-center text-sm text-gray-400">
+                <span id="auth-toggle-text">Don't have an account?</span> 
+                <button id="auth-toggle-btn" class="text-accent-emerald hover:text-emerald-400 font-semibold ml-1 transition-colors outline-none">Sign Up</button>
+            </div>
+        </div>
+    </div>
+
     <div id="app-container" class="hidden opacity-0 transition-opacity duration-500">
         
         <!-- Navigation -->
@@ -193,12 +215,18 @@
                 <div class="absolute left-0 h-8 w-1 rounded-r-full bg-blue-400 scale-y-0 group-[.active]:scale-y-100 transition-transform hidden md:block"></div>
             </button>
 
-            <!-- User Info spacer -->
-            <div class="md:mt-auto hidden md:flex p-4">
+            <!-- User Info spacer (Desktop) -->
+            <div class="md:mt-auto hidden md:flex flex-col items-center gap-4 p-4">
                 <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-accent-purple to-accent-emerald flex items-center justify-center text-white font-bold shadow-lg" id="user-avatar">
-                    <i class="ph ph-user"></i>
+                    <span id="user-avatar-text"><i class="ph ph-user"></i></span>
                 </div>
             </div>
+
+            <!-- Sign Out (Mobile & Desktop) -->
+            <button onclick="handleSignOut()" class="nav-btn flex flex-col items-center gap-1 p-3 text-red-400/70 hover:text-red-400 transition-colors md:mb-4">
+                <i class="ph ph-sign-out text-2xl"></i>
+                <span class="text-[10px] font-medium tracking-wider uppercase md:block hidden">Exit</span>
+            </button>
         </nav>
 
         <!-- Main Content -->
@@ -393,14 +421,17 @@
     <!-- Firebase SDK Imports -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, deleteField } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Global State & Config
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'bingetracker-1';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            // Fallback mock config to prevent total crash if missing, though it won't connect.
-            apiKey: "mock", authDomain: "mock", projectId: "mock"
+        const firebaseConfig = {
+            apiKey: "AIzaSyBttVULbQniX91bFT1bbk7D9O523GfXZAA",
+            authDomain: "bingetracker-669c9.firebaseapp.com",
+            projectId: "bingetracker-669c9",
+            storageBucket: "bingetracker-669c9.firebasestorage.app",
+            messagingSenderId: "483090339853",
+            appId: "1:483090339853:web:8a77c757213888410edd44"
         };
         
         let app, db, auth, user = null;
@@ -437,38 +468,46 @@
         };
 
         // --- Initialization ---
+        let isLoginMode = true;
+
         async function initApp() {
             try {
                 app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
                 auth = getAuth(app);
 
-                // Strict Rule: Await Auth BEFORE queries
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    const cred = await signInWithCustomToken(auth, __initial_auth_token);
-                    user = cred.user;
-                } else {
-                    const cred = await signInAnonymously(auth);
-                    user = cred.user;
-                }
-                
-                // Set Avatar Initial (Mock logic)
-                $('user-avatar').innerHTML = `<span class="uppercase">${user.uid.substring(0,2)}</span>`;
+                // Setup Auth UI Listeners
+                $('auth-toggle-btn').addEventListener('click', toggleAuthMode);
+                $('auth-form').addEventListener('submit', handleAuthSubmit);
 
-                // Start listening to data
-                startDataSync();
+                // Listen for auth state changes
+                onAuthStateChanged(auth, (currentUser) => {
+                    if (currentUser) {
+                        user = currentUser;
+                        
+                        // Update UI
+                        const avatarText = user.email ? user.email.substring(0,2).toUpperCase() : 'U';
+                        const avatarEl = $('user-avatar-text');
+                        if(avatarEl) avatarEl.innerText = avatarText;
 
-                // Reveal UI
-                $('init-screen').classList.add('opacity-0');
-                setTimeout(() => {
-                    $('init-screen').classList.add('hidden');
-                    $('app-container').classList.remove('hidden');
-                    // Add small delay for smoother transition
-                    setTimeout(() => $('app-container').classList.remove('opacity-0'), 50);
-                    
-                    // Initial View setup
-                    window.switchView('library');
-                }, 500);
+                        $('auth-screen').classList.add('hidden');
+                        $('init-screen').classList.add('hidden');
+                        $('app-container').classList.remove('hidden');
+                        setTimeout(() => $('app-container').classList.remove('opacity-0'), 50);
+                        
+                        window.switchView('library');
+                        startDataSync();
+                    } else {
+                        user = null;
+                        if (firestoreUnsubscribe) {
+                            firestoreUnsubscribe();
+                            firestoreUnsubscribe = null;
+                        }
+                        $('init-screen').classList.add('hidden');
+                        $('app-container').classList.add('hidden', 'opacity-0');
+                        $('auth-screen').classList.remove('hidden');
+                    }
+                });
 
             } catch (error) {
                 console.error("Initialization Error:", error);
@@ -481,12 +520,65 @@
             }
         }
 
+        // --- Auth Operations ---
+        function toggleAuthMode(e) {
+            e.preventDefault();
+            isLoginMode = !isLoginMode;
+            $('auth-title').innerText = isLoginMode ? "Welcome Back" : "Create Account";
+            $('auth-submit-btn').innerText = isLoginMode ? "Sign In" : "Sign Up";
+            $('auth-toggle-text').innerText = isLoginMode ? "Don't have an account?" : "Already have an account?";
+            $('auth-toggle-btn').innerText = isLoginMode ? "Sign Up" : "Sign In";
+        }
+
+        async function handleAuthSubmit(e) {
+            e.preventDefault();
+            const email = $('auth-email').value;
+            const password = $('auth-password').value;
+            const btn = $('auth-submit-btn');
+            
+            const originalText = btn.innerText;
+            btn.innerHTML = `<div class="spinner border-t-white w-5 h-5 mx-auto"></div>`;
+            btn.disabled = true;
+
+            try {
+                if (isLoginMode) {
+                    await signInWithEmailAndPassword(auth, email, password);
+                    showToast("Logged in successfully", "success");
+                } else {
+                    await createUserWithEmailAndPassword(auth, email, password);
+                    showToast("Account created successfully", "success");
+                }
+                $('auth-form').reset();
+            } catch (error) {
+                console.error("Auth Error:", error);
+                let msg = error.message;
+                if(error.code === 'auth/invalid-credential') msg = "Invalid email or password.";
+                if(error.code === 'auth/email-already-in-use') msg = "Email already in use.";
+                if(error.code === 'auth/weak-password') msg = "Password is too weak.";
+                showToast(msg, "error");
+            } finally {
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        window.handleSignOut = async function() {
+            try {
+                await signOut(auth);
+                showToast("Signed out", "info");
+                trackedShows = {};
+            } catch (error) {
+                console.error("Sign Out Error:", error);
+                showToast("Failed to sign out", "error");
+            }
+        };
+
         // --- Firebase Data Sync ---
         function startDataSync() {
             if (!user) return;
             
-            // STRICT RULE: Path must be exactly this structure
-            const showsRef = collection(db, 'artifacts', appId, 'users', user.uid, 'shows');
+            // Connected to user's personalized database configuration
+            const showsRef = collection(db, 'users', user.uid, 'shows');
             
             firestoreUnsubscribe = onSnapshot(showsRef, (snapshot) => {
                 trackedShows = {};
@@ -858,7 +950,7 @@
             btn.disabled = true;
 
             try {
-                const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'shows', showData.id.toString());
+                const docRef = doc(db, 'users', user.uid, 'shows', showData.id.toString());
                 await setDoc(docRef, {
                     showId: showData.id,
                     name: showData.name,
@@ -884,10 +976,9 @@
 
         window.removeShow = async function(showId) {
             if(!user) return;
-            if(!confirm("Are you sure you want to remove this show and all watch history?")) return;
 
             try {
-                const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'shows', showId.toString());
+                const docRef = doc(db, 'users', user.uid, 'shows', showId.toString());
                 await deleteDoc(docRef);
                 showToast("Show removed.", "info");
                 openShowDetail(showId); // Refresh view
@@ -913,7 +1004,7 @@
             if(countEl) countEl.innerText = newCount;
             
             try {
-                const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'shows', showId.toString());
+                const docRef = doc(db, 'users', user.uid, 'shows', showId.toString());
                 
                 // Using dot notation field path to update nested map map cleanly
                 const fieldPath = `episodesWatched.${episodeId}`;
