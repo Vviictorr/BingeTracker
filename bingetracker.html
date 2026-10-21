@@ -152,6 +152,18 @@
     <div class="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] bg-accent-purple/20 blur-[120px] rounded-full pointer-events-none z-[-1]"></div>
     <div class="fixed bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-accent-emerald/10 blur-[120px] rounded-full pointer-events-none z-[-1]"></div>
 
+    <!-- Custom Confirm Modal -->
+    <div id="confirm-modal" class="fixed inset-0 z-[70] bg-dark-900/80 backdrop-blur-sm flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+        <div class="glass-card p-6 rounded-2xl w-[90%] max-w-sm transform scale-95 transition-transform duration-300" id="confirm-modal-content">
+            <h3 class="text-xl font-bold mb-2 text-white" id="confirm-title">Confirmar</h3>
+            <p class="text-gray-300 mb-6 text-sm leading-relaxed" id="confirm-message">¿Estás seguro?</p>
+            <div class="flex justify-end gap-3">
+                <button id="confirm-btn-cancel" class="px-4 py-2 rounded-xl text-gray-300 hover:bg-white/10 transition text-sm font-medium">Cancelar</button>
+                <button id="confirm-btn-ok" class="px-5 py-2 rounded-xl bg-accent-emerald text-white font-medium hover:bg-emerald-500 transition shadow-lg shadow-emerald-500/20 text-sm">Aceptar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Notification Container -->
     <div id="toast-container" class="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
@@ -160,7 +172,7 @@
         <i class="ph-fill ph-television-simple text-6xl text-accent-purple mb-4 animate-pulse"></i>
         <h1 class="text-3xl font-bold text-gradient mb-6">BingeTracker</h1>
         <div class="spinner"></div>
-        <p class="mt-4 text-gray-400 text-sm">Authenticating...</p>
+        <p class="mt-4 text-gray-400 text-sm">Autenticando...</p>
     </div>
 
     <!-- Auth Screen -->
@@ -172,15 +184,15 @@
             <div class="flex justify-center mb-4">
                 <i class="ph-fill ph-television-simple text-5xl text-accent-emerald"></i>
             </div>
-            <h2 class="text-3xl font-bold mb-6 text-center text-white" id="auth-title">Welcome Back</h2>
+            <h2 class="text-3xl font-bold mb-6 text-center text-white" id="auth-title">Bienvenido</h2>
             <form id="auth-form" class="flex flex-col gap-4">
-                <input type="email" id="auth-email" placeholder="Email Address" class="w-full bg-dark-800/80 border border-white/10 focus:border-accent-purple focus:ring-1 focus:ring-accent-purple rounded-xl py-3 px-4 text-white placeholder-gray-500 outline-none transition-all" required>
-                <input type="password" id="auth-password" placeholder="Password" class="w-full bg-dark-800/80 border border-white/10 focus:border-accent-purple focus:ring-1 focus:ring-accent-purple rounded-xl py-3 px-4 text-white placeholder-gray-500 outline-none transition-all" required>
-                <button type="submit" id="auth-submit-btn" class="bg-gradient-to-r from-accent-purple to-indigo-600 hover:from-accent-purple/80 hover:to-indigo-600/80 text-white py-3 rounded-xl font-bold mt-2 shadow-lg shadow-accent-purple/20 transition-all active:scale-[0.98]">Sign In</button>
+                <input type="email" id="auth-email" placeholder="Correo Electrónico" class="w-full bg-dark-800/80 border border-white/10 focus:border-accent-purple focus:ring-1 focus:ring-accent-purple rounded-xl py-3 px-4 text-white placeholder-gray-500 outline-none transition-all" required>
+                <input type="password" id="auth-password" placeholder="Contraseña" class="w-full bg-dark-800/80 border border-white/10 focus:border-accent-purple focus:ring-1 focus:ring-accent-purple rounded-xl py-3 px-4 text-white placeholder-gray-500 outline-none transition-all" required>
+                <button type="submit" id="auth-submit-btn" class="bg-gradient-to-r from-accent-purple to-indigo-600 hover:from-accent-purple/80 hover:to-indigo-600/80 text-white py-3 rounded-xl font-bold mt-2 shadow-lg shadow-accent-purple/20 transition-all active:scale-[0.98]">Entrar</button>
             </form>
             <div class="mt-6 text-center text-sm text-gray-400">
-                <span id="auth-toggle-text">Don't have an account?</span> 
-                <button id="auth-toggle-btn" class="text-accent-emerald hover:text-emerald-400 font-semibold ml-1 transition-colors outline-none">Sign Up</button>
+                <span id="auth-toggle-text">¿No tienes cuenta?</span> 
+                <button id="auth-toggle-btn" class="text-accent-emerald hover:text-emerald-400 font-semibold ml-1 transition-colors outline-none">Registrarse</button>
             </div>
         </div>
     </div>
@@ -196,21 +208,21 @@
 
             <button onclick="switchView('library')" id="nav-library" class="nav-btn flex flex-col items-center gap-1 p-3 text-gray-400 hover:text-white transition-colors relative group">
                 <i class="ph ph-books text-2xl group-[.active]:text-accent-emerald group-[.active]:ph-fill transition-all"></i>
-                <span class="text-[10px] font-medium tracking-wider uppercase group-[.active]:text-white">Library</span>
+                <span class="text-[10px] font-medium tracking-wider uppercase group-[.active]:text-white">Biblioteca</span>
                 <div class="absolute top-0 w-8 h-1 rounded-b-full bg-accent-emerald scale-x-0 group-[.active]:scale-x-100 transition-transform md:hidden"></div>
                 <div class="absolute left-0 h-8 w-1 rounded-r-full bg-accent-emerald scale-y-0 group-[.active]:scale-y-100 transition-transform hidden md:block"></div>
             </button>
             
             <button onclick="switchView('search')" id="nav-search" class="nav-btn flex flex-col items-center gap-1 p-3 text-gray-400 hover:text-white transition-colors relative group">
                 <i class="ph ph-magnifying-glass text-2xl group-[.active]:text-accent-purple group-[.active]:ph-fill transition-all"></i>
-                <span class="text-[10px] font-medium tracking-wider uppercase group-[.active]:text-white">Search</span>
+                <span class="text-[10px] font-medium tracking-wider uppercase group-[.active]:text-white">Buscar</span>
                 <div class="absolute top-0 w-8 h-1 rounded-b-full bg-accent-purple scale-x-0 group-[.active]:scale-x-100 transition-transform md:hidden"></div>
                 <div class="absolute left-0 h-8 w-1 rounded-r-full bg-accent-purple scale-y-0 group-[.active]:scale-y-100 transition-transform hidden md:block"></div>
             </button>
             
             <button onclick="switchView('stats')" id="nav-stats" class="nav-btn flex flex-col items-center gap-1 p-3 text-gray-400 hover:text-white transition-colors relative group">
                 <i class="ph ph-chart-line-up text-2xl group-[.active]:text-blue-400 group-[.active]:ph-fill transition-all"></i>
-                <span class="text-[10px] font-medium tracking-wider uppercase group-[.active]:text-white">Stats</span>
+                <span class="text-[10px] font-medium tracking-wider uppercase group-[.active]:text-white">Estadísticas</span>
                 <div class="absolute top-0 w-8 h-1 rounded-b-full bg-blue-400 scale-x-0 group-[.active]:scale-x-100 transition-transform md:hidden"></div>
                 <div class="absolute left-0 h-8 w-1 rounded-r-full bg-blue-400 scale-y-0 group-[.active]:scale-y-100 transition-transform hidden md:block"></div>
             </button>
@@ -225,7 +237,7 @@
             <!-- Sign Out (Mobile & Desktop) -->
             <button onclick="handleSignOut()" class="nav-btn flex flex-col items-center gap-1 p-3 text-red-400/70 hover:text-red-400 transition-colors md:mb-4">
                 <i class="ph ph-sign-out text-2xl"></i>
-                <span class="text-[10px] font-medium tracking-wider uppercase md:block hidden">Exit</span>
+                <span class="text-[10px] font-medium tracking-wider uppercase md:block hidden">Salir</span>
             </button>
         </nav>
 
@@ -234,25 +246,34 @@
             
             <!-- View: Library (Home) -->
             <section id="view-library" class="view-section hidden p-4 md:p-8 animate-fade-in w-full max-w-7xl mx-auto">
-                <header class="mb-8 flex justify-between items-end">
+                <header class="mb-4 flex flex-col gap-4">
                     <div>
-                        <h1 class="text-3xl md:text-4xl font-bold mb-2">Your <span class="text-gradient">Library</span></h1>
-                        <p class="text-gray-400 text-sm">Keep track of everything you are watching.</p>
+                        <h1 class="text-3xl md:text-4xl font-bold mb-2">Tu <span class="text-gradient">Biblioteca</span></h1>
+                        <p class="text-gray-400 text-sm">Lleva el control de todas tus series y animes.</p>
+                    </div>
+                    
+                    <!-- Status Tabs -->
+                    <div class="flex gap-2 overflow-x-auto no-scrollbar pb-2 border-b border-white/10 w-full" id="library-tabs">
+                        <button onclick="setLibraryFilter('all')" class="tab-btn bg-white/10 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap" data-status="all">Todos</button>
+                        <button onclick="setLibraryFilter('watching')" class="tab-btn text-gray-400 hover:text-white hover:bg-white/5 px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap" data-status="watching">Viendo</button>
+                        <button onclick="setLibraryFilter('planned')" class="tab-btn text-gray-400 hover:text-white hover:bg-white/5 px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap" data-status="planned">Sin comenzar</button>
+                        <button onclick="setLibraryFilter('completed')" class="tab-btn text-gray-400 hover:text-white hover:bg-white/5 px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap" data-status="completed">Terminado</button>
+                        <button onclick="setLibraryFilter('dropped')" class="tab-btn text-gray-400 hover:text-white hover:bg-white/5 px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap" data-status="dropped">Abandonado</button>
                     </div>
                 </header>
 
                 <div id="library-loading" class="hidden justify-center py-12"><div class="spinner border-t-accent-emerald"></div></div>
                 
-                <div id="library-empty" class="hidden flex-col items-center justify-center py-20 text-center bg-dark-800/30 rounded-3xl border border-white/5 border-dashed">
+                <div id="library-empty" class="hidden flex-col items-center justify-center py-20 text-center bg-dark-800/30 rounded-3xl border border-white/5 border-dashed mt-4">
                     <i class="ph-duotone ph-popcorn text-6xl text-gray-600 mb-4"></i>
-                    <h3 class="text-xl font-semibold mb-2">Your library is empty</h3>
-                    <p class="text-gray-400 max-w-sm mb-6">Search for your favorite TV shows and anime to start tracking your progress.</p>
+                    <h3 class="text-xl font-semibold mb-2">No hay series aquí</h3>
+                    <p class="text-gray-400 max-w-sm mb-6">Busca o filtra tus series y animes favoritos para empezar a seguirlos.</p>
                     <button onclick="switchView('search')" class="bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-xl font-medium transition-colors flex items-center gap-2">
-                        <i class="ph ph-magnifying-glass"></i> Find Shows
+                        <i class="ph ph-magnifying-glass"></i> Buscar Series
                     </button>
                 </div>
 
-                <div id="library-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+                <div id="library-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6 mt-4">
                     <!-- Dynamic Library Items -->
                 </div>
             </section>
@@ -260,10 +281,10 @@
             <!-- View: Search -->
             <section id="view-search" class="view-section hidden p-4 md:p-8 animate-fade-in w-full max-w-7xl mx-auto">
                 <header class="mb-8 relative z-10">
-                    <h1 class="text-3xl md:text-4xl font-bold mb-6">Discover <span class="text-gradient">Shows</span></h1>
+                    <h1 class="text-3xl md:text-4xl font-bold mb-6">Descubrir <span class="text-gradient">Series</span></h1>
                     <div class="relative max-w-2xl">
                         <i class="ph ph-magnifying-glass absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl"></i>
-                        <input type="text" id="search-input" placeholder="Search for TV shows, anime..." class="w-full bg-dark-800/80 border border-white/10 focus:border-accent-purple focus:ring-1 focus:ring-accent-purple rounded-2xl py-4 pl-12 pr-4 text-white placeholder-gray-500 outline-none transition-all shadow-lg backdrop-blur-md text-lg">
+                        <input type="text" id="search-input" placeholder="Buscar series, anime (soporta español)..." class="w-full bg-dark-800/80 border border-white/10 focus:border-accent-purple focus:ring-1 focus:ring-accent-purple rounded-2xl py-4 pl-12 pr-4 text-white placeholder-gray-500 outline-none transition-all shadow-lg backdrop-blur-md text-lg">
                         <button id="search-clear" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-white hidden"><i class="ph-fill ph-x-circle text-xl"></i></button>
                     </div>
                 </header>
@@ -272,12 +293,12 @@
                 
                 <div id="search-initial" class="flex flex-col items-center justify-center py-20 text-center opacity-50">
                     <i class="ph-duotone ph-television text-6xl mb-4"></i>
-                    <p>Type above to search the TVMaze database.</p>
+                    <p>Escribe arriba para buscar en la base de datos.</p>
                 </div>
 
                 <div id="search-no-results" class="hidden flex-col items-center justify-center py-20 text-center">
                     <i class="ph-duotone ph-ghost text-6xl text-gray-500 mb-4"></i>
-                    <p class="text-lg text-gray-400">No shows found. Try a different term.</p>
+                    <p class="text-lg text-gray-400">No se encontraron resultados. Intenta con otro nombre.</p>
                 </div>
 
                 <div id="search-results" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6 mt-4">
@@ -288,8 +309,8 @@
             <!-- View: Stats -->
             <section id="view-stats" class="view-section hidden p-4 md:p-8 animate-fade-in w-full max-w-5xl mx-auto">
                 <header class="mb-8">
-                    <h1 class="text-3xl md:text-4xl font-bold mb-2">Your <span class="text-gradient">Statistics</span></h1>
-                    <p class="text-gray-400 text-sm">A summary of your binge-watching journey.</p>
+                    <h1 class="text-3xl md:text-4xl font-bold mb-2">Tus <span class="text-gradient">Estadísticas</span></h1>
+                    <p class="text-gray-400 text-sm">Un resumen de tu trayectoria de maratones.</p>
                 </header>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -297,7 +318,7 @@
                     <div class="glass-card rounded-3xl p-6 relative overflow-hidden group">
                         <div class="absolute top-[-20%] right-[-10%] w-32 h-32 bg-blue-500/10 rounded-full blur-2xl group-hover:bg-blue-500/20 transition-colors"></div>
                         <i class="ph-duotone ph-television text-4xl text-blue-400 mb-4"></i>
-                        <p class="text-gray-400 text-sm font-medium uppercase tracking-wider mb-1">Shows Tracked</p>
+                        <p class="text-gray-400 text-sm font-medium uppercase tracking-wider mb-1">Series Seguidas</p>
                         <h2 id="stat-shows" class="text-4xl md:text-5xl font-bold">0</h2>
                     </div>
                     
@@ -305,7 +326,7 @@
                     <div class="glass-card rounded-3xl p-6 relative overflow-hidden group">
                         <div class="absolute top-[-20%] right-[-10%] w-32 h-32 bg-accent-emerald/10 rounded-full blur-2xl group-hover:bg-accent-emerald/20 transition-colors"></div>
                         <i class="ph-duotone ph-play-circle text-4xl text-accent-emerald mb-4"></i>
-                        <p class="text-gray-400 text-sm font-medium uppercase tracking-wider mb-1">Episodes Watched</p>
+                        <p class="text-gray-400 text-sm font-medium uppercase tracking-wider mb-1">Episodios Vistos</p>
                         <h2 id="stat-episodes" class="text-4xl md:text-5xl font-bold">0</h2>
                     </div>
 
@@ -313,10 +334,10 @@
                     <div class="glass-card rounded-3xl p-6 relative overflow-hidden group">
                         <div class="absolute top-[-20%] right-[-10%] w-32 h-32 bg-accent-purple/10 rounded-full blur-2xl group-hover:bg-accent-purple/20 transition-colors"></div>
                         <i class="ph-duotone ph-hourglass-high text-4xl text-accent-purple mb-4"></i>
-                        <p class="text-gray-400 text-sm font-medium uppercase tracking-wider mb-1">Time Watched</p>
+                        <p class="text-gray-400 text-sm font-medium uppercase tracking-wider mb-1">Tiempo Visto</p>
                         <div class="flex items-baseline gap-2">
                             <h2 id="stat-time-days" class="text-4xl md:text-5xl font-bold">0</h2>
-                            <span class="text-gray-400 font-medium">Days</span>
+                            <span class="text-gray-400 font-medium">Días</span>
                             <h2 id="stat-time-hours" class="text-3xl md:text-4xl font-bold ml-2">0</h2>
                             <span class="text-gray-400 font-medium">Hrs</span>
                         </div>
@@ -327,9 +348,9 @@
                 <div class="bg-dark-800/50 border border-blue-500/20 rounded-2xl p-6 flex gap-4 items-start">
                     <i class="ph-fill ph-info text-blue-400 text-2xl shrink-0 mt-1"></i>
                     <div>
-                        <h4 class="font-semibold text-blue-100 mb-1">How is time calculated?</h4>
+                        <h4 class="font-semibold text-blue-100 mb-1">¿Cómo se calcula el tiempo?</h4>
                         <p class="text-sm text-blue-200/70 leading-relaxed">
-                            Total time is estimated by multiplying your individual episode view counts by the show's average runtime. Re-watching an episode increments your total time!
+                            El tiempo total se estima multiplicando las visualizaciones de tus episodios por la duración promedio. ¡Volver a ver un episodio suma tiempo!
                         </p>
                     </div>
                 </div>
@@ -363,10 +384,10 @@
                             <img id="detail-poster" src="" alt="Poster" class="w-32 md:w-48 rounded-xl shadow-2xl border border-white/10 hidden md:block aspect-[2/3] object-cover">
                             <div class="flex-1">
                                 <div id="detail-genres" class="flex flex-wrap gap-2 mb-3"></div>
-                                <h1 id="detail-title" class="text-4xl md:text-6xl font-bold mb-2 tracking-tight">Title</h1>
+                                <h1 id="detail-title" class="text-4xl md:text-6xl font-bold mb-2 tracking-tight">Título</h1>
                                 <div class="flex flex-wrap items-center gap-4 text-sm text-gray-300 font-medium">
-                                    <span id="detail-status" class="px-2 py-1 bg-white/10 rounded-md">Status</span>
-                                    <span id="detail-network"><i class="ph-fill ph-television mr-1"></i> <span id="detail-network-name">Network</span></span>
+                                    <span id="detail-status" class="px-2 py-1 bg-white/10 rounded-md">Estado</span>
+                                    <span id="detail-network"><i class="ph-fill ph-television mr-1"></i> <span id="detail-network-name">Cadena</span></span>
                                     <span id="detail-runtime"><i class="ph-fill ph-clock mr-1"></i> <span id="detail-runtime-val">0</span>m</span>
                                 </div>
                             </div>
@@ -376,7 +397,7 @@
                     <!-- Description & Progress -->
                     <div class="px-6 md:px-10 py-6 grid md:grid-cols-3 gap-8">
                         <div class="md:col-span-2">
-                            <h3 class="text-xl font-semibold mb-3 border-b border-white/10 pb-2">Summary</h3>
+                            <h3 class="text-xl font-semibold mb-3 border-b border-white/10 pb-2">Sinopsis</h3>
                             <div id="detail-summary" class="text-gray-300 text-sm leading-relaxed prose prose-invert max-w-none">
                                 <!-- Summary from API (contains HTML) -->
                             </div>
@@ -384,7 +405,7 @@
                         
                         <!-- Tracker Card -->
                         <div id="detail-tracker-card" class="glass-card p-6 rounded-2xl hidden flex-col justify-center border-accent-purple/30">
-                            <h3 class="font-semibold text-center mb-4 text-gray-200">Your Progress</h3>
+                            <h3 class="font-semibold text-center mb-4 text-gray-200">Tu Progreso</h3>
                             
                             <!-- Circular Progress -->
                             <div class="relative w-32 h-32 mx-auto mb-4">
@@ -398,14 +419,17 @@
                             </div>
                             
                             <div class="text-center text-sm text-gray-400">
-                                <span id="detail-watched-count" class="text-white font-bold text-lg">0</span> / <span id="detail-total-count">0</span> Episodes
+                                <span id="detail-watched-count" class="text-white font-bold text-lg">0</span> / <span id="detail-total-count">0</span> Episodios
                             </div>
+
+                            <!-- Status Select Container -->
+                            <div id="detail-status-container" class="w-full mt-4 pt-4 border-t border-white/10"></div>
                         </div>
                     </div>
 
                     <!-- Episodes List -->
                     <div class="px-6 md:px-10 py-6">
-                        <h3 class="text-xl font-semibold mb-6 border-b border-white/10 pb-2">Episodes</h3>
+                        <h3 class="text-xl font-semibold mb-6 border-b border-white/10 pb-2">Episodios</h3>
                         
                         <!-- Seasons Container -->
                         <div id="detail-seasons" class="space-y-6">
@@ -435,10 +459,11 @@
         };
         
         let app, db, auth, user = null;
-        let trackedShows = {}; // Local state mapped from Firestore
+        let trackedShows = {}; 
         let currentDetailShowId = null;
-        let currentDetailEpisodesData = []; // Store episode data temporarily
+        let currentDetailEpisodesData = []; 
         let firestoreUnsubscribe = null;
+        let currentLibraryFilter = 'all';
 
         // UI Utilities
         const $ = (id) => document.getElementById(id);
@@ -465,6 +490,33 @@
                 toast.classList.add('opacity-0', 'transition-opacity', 'duration-300');
                 setTimeout(() => toast.remove(), 300);
             }, 3000);
+        };
+
+        window.showConfirm = function(title, message, onConfirm) {
+            const modal = $('confirm-modal');
+            const content = $('confirm-modal-content');
+            $('confirm-title').innerText = title;
+            $('confirm-message').innerText = message;
+            
+            modal.classList.remove('hidden');
+            // force reflow
+            void modal.offsetWidth;
+            modal.classList.remove('opacity-0');
+            content.classList.remove('scale-95');
+            
+            const cleanup = () => {
+                modal.classList.add('opacity-0');
+                content.classList.add('scale-95');
+                setTimeout(() => modal.classList.add('hidden'), 300);
+                $('confirm-btn-ok').onclick = null;
+                $('confirm-btn-cancel').onclick = null;
+            };
+            
+            $('confirm-btn-cancel').onclick = cleanup;
+            $('confirm-btn-ok').onclick = () => {
+                cleanup();
+                onConfirm();
+            };
         };
 
         // --- Initialization ---
@@ -514,8 +566,8 @@
                 $('init-screen').innerHTML = `
                     <div class="text-red-400 text-center p-8">
                         <i class="ph-duotone ph-warning text-6xl mb-4"></i>
-                        <h2 class="text-2xl font-bold mb-2">Connection Error</h2>
-                        <p class="text-sm">Unable to connect to database. Please refresh.</p>
+                        <h2 class="text-2xl font-bold mb-2">Error de conexión</h2>
+                        <p class="text-sm">Imposible conectar con la base de datos. Recarga la página.</p>
                     </div>`;
             }
         }
@@ -524,10 +576,10 @@
         function toggleAuthMode(e) {
             e.preventDefault();
             isLoginMode = !isLoginMode;
-            $('auth-title').innerText = isLoginMode ? "Welcome Back" : "Create Account";
-            $('auth-submit-btn').innerText = isLoginMode ? "Sign In" : "Sign Up";
-            $('auth-toggle-text').innerText = isLoginMode ? "Don't have an account?" : "Already have an account?";
-            $('auth-toggle-btn').innerText = isLoginMode ? "Sign Up" : "Sign In";
+            $('auth-title').innerText = isLoginMode ? "Bienvenido" : "Crear Cuenta";
+            $('auth-submit-btn').innerText = isLoginMode ? "Entrar" : "Registrarse";
+            $('auth-toggle-text').innerText = isLoginMode ? "¿No tienes cuenta?" : "¿Ya tienes cuenta?";
+            $('auth-toggle-btn').innerText = isLoginMode ? "Registrarse" : "Entrar";
         }
 
         async function handleAuthSubmit(e) {
@@ -543,18 +595,18 @@
             try {
                 if (isLoginMode) {
                     await signInWithEmailAndPassword(auth, email, password);
-                    showToast("Logged in successfully", "success");
+                    showToast("Sesión iniciada correctamente", "success");
                 } else {
                     await createUserWithEmailAndPassword(auth, email, password);
-                    showToast("Account created successfully", "success");
+                    showToast("Cuenta creada correctamente", "success");
                 }
                 $('auth-form').reset();
             } catch (error) {
                 console.error("Auth Error:", error);
                 let msg = error.message;
-                if(error.code === 'auth/invalid-credential') msg = "Invalid email or password.";
-                if(error.code === 'auth/email-already-in-use') msg = "Email already in use.";
-                if(error.code === 'auth/weak-password') msg = "Password is too weak.";
+                if(error.code === 'auth/invalid-credential') msg = "Correo o contraseña incorrectos.";
+                if(error.code === 'auth/email-already-in-use') msg = "El correo ya está en uso.";
+                if(error.code === 'auth/weak-password') msg = "La contraseña es muy débil.";
                 showToast(msg, "error");
             } finally {
                 btn.innerText = originalText;
@@ -565,11 +617,11 @@
         window.handleSignOut = async function() {
             try {
                 await signOut(auth);
-                showToast("Signed out", "info");
+                showToast("Sesión cerrada", "info");
                 trackedShows = {};
             } catch (error) {
                 console.error("Sign Out Error:", error);
-                showToast("Failed to sign out", "error");
+                showToast("Error al cerrar sesión", "error");
             }
         };
 
@@ -577,7 +629,6 @@
         function startDataSync() {
             if (!user) return;
             
-            // Connected to user's personalized database configuration
             const showsRef = collection(db, 'users', user.uid, 'shows');
             
             firestoreUnsubscribe = onSnapshot(showsRef, (snapshot) => {
@@ -586,31 +637,26 @@
                     trackedShows[doc.id] = doc.data();
                 });
                 
-                // Re-render UI based on state changes
                 renderLibrary();
                 renderStats();
                 
-                // Update detail view if open
                 if (currentDetailShowId && !$('view-detail').classList.contains('translate-x-full')) {
                     renderDetailProgressUI();
                 }
             }, (error) => {
                 console.error("Firestore Listen Error:", error);
-                showToast("Data sync disconnected", "error");
+                showToast("Desconectado de la base de datos", "error");
             });
         }
 
         // --- Navigation Logic ---
         window.switchView = function(viewName) {
-            // Update Navigation UI
             document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
             const activeBtn = $(`nav-${viewName}`);
             if(activeBtn) activeBtn.classList.add('active');
 
-            // Hide all views
             document.querySelectorAll('.view-section').forEach(sec => sec.classList.add('hidden'));
             
-            // Show target
             $(`view-${viewName}`).classList.remove('hidden');
             
             if(viewName === 'library') renderLibrary();
@@ -623,7 +669,12 @@
                 $('detail-content').classList.add('hidden');
                 currentDetailShowId = null;
                 currentDetailEpisodesData = [];
-            }, 300); // Wait for transition
+            }, 300);
+        };
+
+        window.setLibraryFilter = function(status) {
+            currentLibraryFilter = status;
+            renderLibrary();
         };
 
         // --- Search Logic (TVMaze API) ---
@@ -644,7 +695,7 @@
                 $('search-loading').classList.remove('hidden');
                 $('search-loading').classList.add('flex');
 
-                searchTimeout = setTimeout(() => performSearch(query), 600); // Debounce
+                searchTimeout = setTimeout(() => performSearch(query), 600); 
             } else {
                 clearBtn.classList.add('hidden');
                 $('search-initial').classList.remove('hidden');
@@ -677,7 +728,7 @@
             } catch (error) {
                 console.error("Search API Error:", error);
                 $('search-loading').classList.add('hidden');
-                showToast("Failed to search shows. Network error.", "error");
+                showToast("Error de conexión al buscar.", "error");
             }
         }
 
@@ -689,7 +740,6 @@
                 const show = item.show;
                 if(!show) return;
                 
-                // Use HTTPS replacement if needed, TVMaze usually returns https now
                 const imageUrl = show.image?.medium || 'https://placehold.co/210x295/1F293F/ffffff?text=No+Image';
                 const year = show.premiered ? show.premiered.substring(0,4) : 'N/A';
                 const rating = show.rating?.average || '-';
@@ -703,7 +753,7 @@
                 card.innerHTML = `
                     <div class="relative aspect-[2/3] overflow-hidden bg-dark-800">
                         <img src="${imageUrl}" loading="lazy" alt="${show.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                        ${isTracked ? '<div class="absolute top-2 right-2 bg-accent-emerald text-white text-xs font-bold px-2 py-1 rounded shadow-md flex items-center gap-1"><i class="ph-bold ph-check"></i> Tracked</div>' : ''}
+                        ${isTracked ? '<div class="absolute top-2 right-2 bg-accent-emerald text-white text-xs font-bold px-2 py-1 rounded shadow-md flex items-center gap-1"><i class="ph-bold ph-check"></i> Siguiendo</div>' : ''}
                         <div class="absolute bottom-0 left-0 w-full p-3 bg-gradient-to-t from-dark-900 to-transparent">
                             <div class="flex items-center gap-1 text-yellow-400 text-sm font-semibold">
                                 <i class="ph-fill ph-star"></i> ${rating}
@@ -721,11 +771,29 @@
 
         // --- Library Logic ---
         function renderLibrary() {
+            // Update Tab UI
+            document.querySelectorAll('#library-tabs .tab-btn').forEach(b => {
+                if(b.dataset.status === currentLibraryFilter) {
+                    b.classList.add('bg-white/10', 'text-white');
+                    b.classList.remove('text-gray-400');
+                } else {
+                    b.classList.remove('bg-white/10', 'text-white');
+                    b.classList.add('text-gray-400');
+                }
+            });
+
             const container = $('library-grid');
             const emptyState = $('library-empty');
-            const showIds = Object.keys(trackedShows);
             
-            if(showIds.length === 0) {
+            const showsArray = Object.values(trackedShows);
+            
+            const filteredShows = showsArray.filter(show => {
+                if (currentLibraryFilter === 'all') return true;
+                const status = show.status || 'planned';
+                return status === currentLibraryFilter;
+            }).sort((a,b) => a.name.localeCompare(b.name));
+            
+            if(filteredShows.length === 0) {
                 container.innerHTML = '';
                 emptyState.classList.remove('hidden');
                 emptyState.classList.add('flex');
@@ -735,23 +803,22 @@
             emptyState.classList.add('hidden');
             emptyState.classList.remove('flex');
             container.innerHTML = '';
-            
-            // Sort by recently updated could be nice, but we lack timestamps in schema to keep it simple. Sort alphabetically.
-            const sortedShows = Object.values(trackedShows).sort((a,b) => a.name.localeCompare(b.name));
 
-            sortedShows.forEach(show => {
+            filteredShows.forEach(show => {
                 const imageUrl = show.image || 'https://placehold.co/210x295/1F293F/ffffff?text=No+Image';
                 
-                // Calculate unique watched
                 const episodesWatchedMap = show.episodesWatched || {};
                 const uniqueWatchedCount = Object.keys(episodesWatchedMap).filter(k => episodesWatchedMap[k] > 0).length;
-                const totalEps = show.totalEpisodes || 1; // Prevent div/0
+                const totalEps = show.totalEpisodes || 1; 
                 const percent = Math.min(Math.round((uniqueWatchedCount / totalEps) * 100), 100);
                 
-                // Color formatting based on progress
                 let progressColor = 'bg-blue-500';
                 if(percent === 100) progressColor = 'bg-accent-emerald';
                 else if (percent > 0) progressColor = 'bg-accent-purple';
+
+                // Get status label in Spanish
+                const statusLabels = { 'planned': 'Sin comenzar', 'watching': 'Viendo', 'completed': 'Terminado', 'dropped': 'Abandonado' };
+                const showStatusLabel = statusLabels[show.status || 'planned'];
 
                 const card = document.createElement('div');
                 card.className = "glass-card rounded-2xl overflow-hidden cursor-pointer group relative flex flex-col h-full animate-fade-in";
@@ -760,6 +827,7 @@
                 card.innerHTML = `
                     <div class="relative aspect-[2/3] overflow-hidden bg-dark-800">
                         <img src="${imageUrl}" loading="lazy" alt="${show.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <div class="absolute top-2 right-2 bg-black/60 backdrop-blur-md text-white text-[10px] uppercase font-bold px-2 py-1 rounded border border-white/10">${showStatusLabel}</div>
                         <div class="absolute inset-0 bg-dark-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
                             <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-white">
                                 <i class="ph-fill ph-play text-xl ml-1"></i>
@@ -767,7 +835,6 @@
                         </div>
                     </div>
                     
-                    <!-- Progress Bar Component -->
                     <div class="h-1.5 w-full bg-dark-700 overflow-hidden relative">
                         <div class="h-full ${progressColor} progress-bar-fill" style="width: ${percent}%"></div>
                     </div>
@@ -790,10 +857,9 @@
             $('view-detail').classList.remove('translate-x-full');
             $('detail-content').classList.add('hidden');
             $('detail-loading').classList.remove('hidden');
-            $('detail-actions').innerHTML = ''; // Clear old buttons
+            $('detail-actions').innerHTML = ''; 
 
             try {
-                // Fetch Show Info AND Episodes in parallel
                 const [showRes, epRes] = await Promise.all([
                     fetch(`https://api.tvmaze.com/shows/${showId}`),
                     fetch(`https://api.tvmaze.com/shows/${showId}/episodes`)
@@ -802,13 +868,13 @@
                 const showData = await showRes.json();
                 const epData = await epRes.json();
                 
-                currentDetailEpisodesData = epData; // Store globally for UI building
+                currentDetailEpisodesData = epData; 
                 
                 renderDetailView(showData, epData);
                 
             } catch (error) {
                 console.error("Detail API Error:", error);
-                showToast("Failed to load show details.", "error");
+                showToast("Error al cargar detalles.", "error");
                 closeDetailView();
             }
         }
@@ -825,7 +891,7 @@
             $('detail-hero-img').style.backgroundImage = `url(${imageUrl})`;
             $('detail-poster').src = show.image?.medium || imageUrl;
             $('detail-title').textContent = show.name;
-            $('detail-summary').innerHTML = show.summary || 'No summary available.';
+            $('detail-summary').innerHTML = show.summary || 'Sin sinopsis disponible.';
             $('detail-status').textContent = show.status;
             $('detail-network-name').textContent = show.network?.name || show.webChannel?.name || 'Web';
             $('detail-runtime-val').textContent = runtime;
@@ -834,8 +900,24 @@
             const genresHTML = show.genres.map(g => `<span class="px-2 py-0.5 border border-white/20 rounded-full text-xs text-gray-300">${g}</span>`).join('');
             $('detail-genres').innerHTML = genresHTML;
 
-            // Render Track/Untrack button
             renderDetailActionBtn(show, episodes, isTracked);
+
+            // Render Tracked Status Options
+            const statusContainer = $('detail-status-container');
+            if (isTracked) {
+                const currentStatus = (trackedShows[show.id.toString()] || {}).status || 'planned';
+                statusContainer.innerHTML = `
+                     <label class="text-xs text-gray-400 mb-1.5 block">Categoría de la Serie</label>
+                     <select onchange="updateShowStatus('${show.id}', this.value)" class="w-full bg-dark-900 border border-white/10 text-white text-sm rounded-xl focus:ring-accent-purple p-2.5 outline-none font-medium appearance-none">
+                         <option value="planned" ${currentStatus==='planned'?'selected':''}>Sin comenzar</option>
+                         <option value="watching" ${currentStatus==='watching'?'selected':''}>Viendo</option>
+                         <option value="completed" ${currentStatus==='completed'?'selected':''}>Terminado</option>
+                         <option value="dropped" ${currentStatus==='dropped'?'selected':''}>Abandonado</option>
+                     </select>
+                `;
+            } else {
+                statusContainer.innerHTML = '';
+            }
 
             // Group Episodes by Season
             const seasons = {};
@@ -855,52 +937,53 @@
                 seasonBlock.className = "bg-dark-800/40 rounded-2xl border border-white/5 overflow-hidden";
                 
                 const header = document.createElement('div');
-                header.className = "bg-dark-700/50 p-4 font-semibold text-lg flex justify-between items-center cursor-pointer";
-                header.innerHTML = `Season ${seasonNum} <i class="ph ph-caret-down text-gray-400"></i>`;
+                header.className = "bg-dark-700/50 p-4 font-semibold flex items-center justify-between cursor-pointer hover:bg-dark-700/70 transition";
+                header.id = `season-header-${seasonNum}`;
                 
                 const epList = document.createElement('div');
-                epList.className = "divide-y divide-white/5";
-                // simple toggle
-                header.onclick = () => {
+                epList.className = "divide-y divide-white/5 hidden"; // Hidden by default
+                
+                header.onclick = (e) => {
+                    // Prevent toggle if clicking the specific button inside
+                    if (e.target.closest('.mark-season-btn')) return;
                     epList.classList.toggle('hidden');
-                    header.querySelector('i').classList.toggle('rotate-180');
+                    const icon = header.querySelector('.toggle-icon');
+                    if(icon) icon.classList.toggle('rotate-180');
                 };
 
                 seasonEps.forEach(ep => {
                     const epId = ep.id.toString();
                     
-                    // We need to establish base UI structure. Data binding happens in renderDetailProgressUI
                     const epRow = document.createElement('div');
                     epRow.className = "p-4 flex flex-col md:flex-row md:items-center gap-4 hover:bg-white/5 transition-colors";
                     epRow.id = `ep-row-${epId}`;
                     
                     const epImage = ep.image?.medium || 'https://placehold.co/250x140/1F293F/ffffff?text=Ep';
-                    const epDate = ep.airdate ? new Date(ep.airdate).toLocaleDateString() : 'TBA';
+                    const epDate = ep.airdate ? new Date(ep.airdate).toLocaleDateString('es-ES') : 'Por anunciar';
                     
                     epRow.innerHTML = `
                         <img src="${epImage}" class="w-full md:w-32 h-20 object-cover rounded-lg bg-dark-900 hidden md:block" loading="lazy">
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center gap-2 mb-1">
-                                <span class="text-xs font-bold text-accent-purple px-1.5 py-0.5 bg-accent-purple/10 rounded">S${String(ep.season).padStart(2,'0')}E${String(ep.number).padStart(2,'0')}</span>
+                                <span class="text-xs font-bold text-accent-purple px-1.5 py-0.5 bg-accent-purple/10 rounded">T${String(ep.season).padStart(2,'0')}E${String(ep.number).padStart(2,'0')}</span>
                                 <h4 class="font-medium text-gray-100 truncate">${ep.name}</h4>
                             </div>
-                            <p class="text-xs text-gray-400">Aired: ${epDate} • ${ep.runtime || runtime}m</p>
+                            <p class="text-xs text-gray-400">Emisión: ${epDate} • ${ep.runtime || runtime}m</p>
                         </div>
                         
-                        <!-- Watch Controls: Only active if tracked -->
                         <div class="flex items-center justify-between md:justify-end gap-3 mt-3 md:mt-0 pt-3 md:pt-0 border-t md:border-t-0 border-white/5 watch-controls" data-epid="${epId}">
                             ${isTracked ? `
                                 <button onclick="updateEpisodeWatchCount('${show.id}', '${epId}', -1)" class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition disabled:opacity-30 disabled:cursor-not-allowed text-gray-300" id="btn-dec-${epId}">
                                     <i class="ph-bold ph-minus"></i>
                                 </button>
-                                <div class="flex flex-col items-center justify-center min-w-[2rem]">
+                                <div class="flex flex-col items-center justify-center min-w-[2.5rem]">
                                     <span class="font-bold text-lg" id="count-val-${epId}">0</span>
-                                    <span class="text-[9px] uppercase text-gray-500 tracking-wider">Views</span>
+                                    <span class="text-[9px] uppercase text-gray-500 tracking-wider">Vistas</span>
                                 </div>
-                                <button onclick="updateEpisodeWatchCount('${show.id}', '${epId}', 1)" class="w-8 h-8 rounded-full bg-accent-emerald/20 hover:bg-accent-emerald/30 text-accent-emerald flex items-center justify-center transition">
+                                <button onclick="updateEpisodeWatchCount('${show.id}', '${epId}', 1)" class="w-8 h-8 rounded-full bg-accent-emerald/20 hover:bg-accent-emerald/30 text-accent-emerald flex items-center justify-center transition shadow-lg shadow-emerald-500/10">
                                     <i class="ph-bold ph-plus"></i>
                                 </button>
-                            ` : `<span class="text-sm text-gray-500 italic px-4">Track show to log</span>`}
+                            ` : `<span class="text-sm text-gray-500 italic px-4">Sigue la serie para registrar</span>`}
                         </div>
                     `;
                     epList.appendChild(epRow);
@@ -911,7 +994,13 @@
                 seasonsContainer.appendChild(seasonBlock);
             });
 
-            // Trigger UI update based on local tracked state
+            // Expand first season automatically if tracked
+            if(isTracked && Object.keys(seasons).length > 0) {
+                const firstSeason = Object.keys(seasons).sort((a,b)=>a-b)[0];
+                const header = seasonsContainer.querySelector(`#season-header-${firstSeason}`);
+                if(header) header.click();
+            }
+
             renderDetailProgressUI();
         }
 
@@ -920,11 +1009,10 @@
             if (isTracked) {
                 container.innerHTML = `
                     <button onclick='removeShow(${show.id})' class="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 px-4 py-2 rounded-xl font-medium transition-colors text-sm flex items-center gap-2">
-                        <i class="ph-bold ph-trash"></i> Remove
+                        <i class="ph-bold ph-trash"></i> Eliminar
                     </button>
                 `;
             } else {
-                // Ensure data is stringified cleanly to avoid quotes breaking HTML attr
                 const safeShow = {
                     id: show.id,
                     name: show.name,
@@ -935,7 +1023,7 @@
                 
                 container.innerHTML = `
                     <button onclick='addShow(${JSON.stringify(safeShow)})' class="bg-gradient-to-r from-accent-purple to-indigo-600 hover:from-accent-purple/80 hover:to-indigo-600/80 text-white px-6 py-2 rounded-xl font-medium transition-colors shadow-lg shadow-accent-purple/20 flex items-center gap-2">
-                        <i class="ph-bold ph-plus"></i> Track Show
+                        <i class="ph-bold ph-plus"></i> Seguir Serie
                     </button>
                 `;
             }
@@ -946,7 +1034,7 @@
         window.addShow = async function(showData) {
             if(!user) return;
             const btn = $('detail-actions').querySelector('button');
-            btn.innerHTML = `<div class="spinner w-4 h-4 border-2"></div> Adding...`;
+            btn.innerHTML = `<div class="spinner w-4 h-4 border-2"></div> Añadiendo...`;
             btn.disabled = true;
 
             try {
@@ -957,47 +1045,121 @@
                     image: showData.image,
                     totalEpisodes: showData.totalEpisodes,
                     runtime: showData.runtime,
-                    episodesWatched: {} // Init empty map
+                    episodesWatched: {},
+                    status: 'planned' // Default status
                 });
-                showToast("Show added to your library!", "success");
-                
-                // Re-render detail view elements by re-fetching (simulate) or just updating UI
-                // Since onSnapshot will fire, we just need to re-render the action button and enable controls
-                // We'll call openShowDetail again to refresh purely.
+                showToast("¡Serie añadida a tu biblioteca!", "success");
                 openShowDetail(showData.id);
-
             } catch (e) {
                 console.error("Error adding show:", e);
-                showToast("Failed to add show.", "error");
-                btn.innerHTML = `<i class="ph-bold ph-plus"></i> Track Show`;
+                showToast("Error al añadir la serie.", "error");
+                btn.innerHTML = `<i class="ph-bold ph-plus"></i> Seguir Serie`;
                 btn.disabled = false;
             }
         };
 
         window.removeShow = async function(showId) {
             if(!user) return;
-
             try {
                 const docRef = doc(db, 'users', user.uid, 'shows', showId.toString());
                 await deleteDoc(docRef);
-                showToast("Show removed.", "info");
-                openShowDetail(showId); // Refresh view
+                showToast("Serie eliminada.", "info");
+                openShowDetail(showId); 
             } catch (e) {
                 console.error("Error removing show:", e);
-                showToast("Failed to remove show.", "error");
+                showToast("Error al eliminar la serie.", "error");
             }
         };
+
+        window.updateShowStatus = async function(showId, newStatus) {
+            if (!user) return;
+            try {
+                const docRef = doc(db, 'users', user.uid, 'shows', showId.toString());
+                await updateDoc(docRef, { status: newStatus });
+                showToast("Estado actualizado", "success");
+            } catch(e) {
+                console.error("Error updating status:", e);
+                showToast("Error al cambiar de estado", "error");
+            }
+        }
+
+        window.batchUpdateEpisodes = async function(showId, episodeIdsArray, targetCount) {
+            if (!user) return;
+            const docRef = doc(db, 'users', user.uid, 'shows', showId.toString());
+            const updates = {};
+            
+            episodeIdsArray.forEach(epId => {
+                updates[`episodesWatched.${epId}`] = targetCount > 0 ? targetCount : deleteField();
+            });
+            
+            // Auto update status if planned
+            const currentData = trackedShows[showId.toString()];
+            if (currentData && currentData.status === 'planned' && targetCount > 0) {
+                updates['status'] = 'watching';
+            }
+            
+            try {
+                await updateDoc(docRef, updates);
+                showToast("Progreso actualizado", "success");
+            } catch (e) {
+                console.error("Error en batchUpdate:", e);
+                showToast("Error al actualizar episodios", "error");
+            }
+        }
+
+        window.markSeasonWatched = function(showId, seasonNum) {
+            showConfirm("Marcar Temporada", `¿Quieres marcar todos los episodios de la Temporada ${seasonNum} como vistos?`, () => {
+                const episodesToMark = currentDetailEpisodesData
+                    .filter(ep => ep.season === seasonNum)
+                    .map(ep => ep.id.toString());
+                
+                const currentData = trackedShows[showId.toString()] || {};
+                const episodesWatchedMap = currentData.episodesWatched || {};
+                
+                const unwatched = episodesToMark.filter(id => (episodesWatchedMap[id] || 0) === 0);
+                
+                if (unwatched.length > 0) {
+                    batchUpdateEpisodes(showId, unwatched, 1);
+                } else {
+                    showToast("La temporada ya está vista", "info");
+                }
+            });
+        }
 
         window.updateEpisodeWatchCount = async function(showId, episodeId, delta) {
             if(!user) return;
             
             const currentData = trackedShows[showId.toString()];
-            if(!currentData) return; // Should not happen if UI is correct
+            if(!currentData) return; 
 
             const currentCount = (currentData.episodesWatched && currentData.episodesWatched[episodeId]) || 0;
             let newCount = currentCount + delta;
             if (newCount < 0) newCount = 0;
             if (newCount === currentCount) return;
+
+            // Smart Catch-up logic (0 -> 1 check)
+            if (delta === 1 && currentCount === 0) {
+                const epIndex = currentDetailEpisodesData.findIndex(ep => ep.id.toString() === episodeId.toString());
+                if (epIndex > 0) {
+                    let hasUnwatchedPrevious = false;
+                    const unwatchedIds = [];
+                    for (let i = 0; i < epIndex; i++) {
+                        const prevEpId = currentDetailEpisodesData[i].id.toString();
+                        const prevCount = (currentData.episodesWatched && currentData.episodesWatched[prevEpId]) || 0;
+                        if (prevCount === 0) {
+                            hasUnwatchedPrevious = true;
+                            unwatchedIds.push(prevEpId);
+                        }
+                    }
+                    
+                    if (hasUnwatchedPrevious) {
+                        showConfirm("Episodios anteriores", "¿Hay episodios anteriores sin ver, quieres marcarlos todos como vistos?", async () => {
+                            await batchUpdateEpisodes(showId, [...unwatchedIds, episodeId], 1);
+                        });
+                        return; // Prevent single update, handled by batch
+                    }
+                }
+            }
 
             // Optimistic UI update
             const countEl = $(`count-val-${episodeId}`);
@@ -1005,20 +1167,17 @@
             
             try {
                 const docRef = doc(db, 'users', user.uid, 'shows', showId.toString());
+                const updates = { [`episodesWatched.${episodeId}`]: newCount > 0 ? newCount : deleteField() };
                 
-                // Using dot notation field path to update nested map map cleanly
-                const fieldPath = `episodesWatched.${episodeId}`;
-                
-                // If 0, delete field to save space, else set value
-                await updateDoc(docRef, {
-                    [fieldPath]: newCount > 0 ? newCount : deleteField()
-                });
-                
-                // Note: onSnapshot will fire and update `trackedShows` and call renderDetailProgressUI naturally
+                // Auto switch to 'watching' if it was 'planned' and they watch an ep
+                if (currentData.status === 'planned' && newCount > 0) {
+                    updates['status'] = 'watching';
+                }
+
+                await updateDoc(docRef, updates);
             } catch (e) {
                 console.error("Error updating watch count:", e);
-                showToast("Failed to update progress.", "error");
-                // Revert optimistic update
+                showToast("Error al guardar progreso.", "error");
                 if(countEl) countEl.innerText = currentCount;
             }
         };
@@ -1036,13 +1195,11 @@
                 return;
             }
 
-            // User tracks this show. Show progress.
             trackerCard.classList.remove('hidden');
             trackerCard.classList.add('flex');
 
             const episodesWatchedMap = showData.episodesWatched || {};
             
-            // Calculate uniquely watched eps for progress bar
             const uniqueWatched = Object.keys(episodesWatchedMap).filter(k => episodesWatchedMap[k] > 0).length;
             const totalEps = showData.totalEpisodes || 1;
             const percent = Math.min(Math.round((uniqueWatched / totalEps) * 100), 100);
@@ -1051,15 +1208,13 @@
             $('detail-total-count').textContent = totalEps;
             $('detail-progress-percent').textContent = `${percent}%`;
             
-            // SVG Circle Progress logic (Circumference ~ 283)
             const offset = 283 - (283 * percent / 100);
             $('detail-progress-circle').style.strokeDashoffset = offset;
             
-            // Color changing based on completion
-            if(percent === 100) $('detail-progress-circle').setAttribute('stroke', '#10B981'); // Emerald
-            else $('detail-progress-circle').setAttribute('stroke', '#8B5CF6'); // Purple
+            if(percent === 100) $('detail-progress-circle').setAttribute('stroke', '#10B981'); 
+            else $('detail-progress-circle').setAttribute('stroke', '#8B5CF6'); 
 
-            // Update all individual episode row values
+            // Update individual episode rows
             currentDetailEpisodesData.forEach(ep => {
                 const epId = ep.id.toString();
                 const views = episodesWatchedMap[epId] || 0;
@@ -1081,6 +1236,50 @@
                     }
                 }
             });
+
+            // Update Seasons Progress Headers
+            const seasonsMap = {};
+            currentDetailEpisodesData.forEach(ep => {
+                if(!seasonsMap[ep.season]) seasonsMap[ep.season] = [];
+                seasonsMap[ep.season].push(ep);
+            });
+
+            Object.keys(seasonsMap).forEach(seasonNum => {
+                const seasonEps = seasonsMap[seasonNum];
+                let seasonWatched = 0;
+                seasonEps.forEach(ep => {
+                    if (episodesWatchedMap[ep.id.toString()] > 0) seasonWatched++;
+                });
+                const totalSeason = seasonEps.length;
+                const seasonPercent = Math.min(Math.round((seasonWatched / totalSeason) * 100), 100);
+                
+                const headerEl = $(`season-header-${seasonNum}`);
+                if(headerEl) {
+                    const isFullyWatched = seasonWatched === totalSeason;
+                    
+                    // Maintain existing toggle state visually
+                    const existingIcon = headerEl.querySelector('.toggle-icon');
+                    const isRotated = existingIcon && existingIcon.classList.contains('rotate-180');
+
+                    headerEl.innerHTML = `
+                        <div class="flex-1 pr-4">
+                            <div class="flex justify-between items-center mb-1.5">
+                                <span>Temporada ${seasonNum}</span>
+                                <span class="text-xs text-gray-400 font-normal">${seasonWatched} / ${totalSeason}</span>
+                            </div>
+                            <div class="h-1.5 w-full bg-dark-900 rounded-full overflow-hidden">
+                                <div class="h-full bg-accent-emerald transition-all duration-500" style="width: ${seasonPercent}%"></div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            ${(!isFullyWatched) ? `<button onclick="markSeasonWatched('${currentDetailShowId}', ${seasonNum})" class="mark-season-btn text-[10px] uppercase bg-white/10 hover:bg-white/20 px-2.5 py-1.5 rounded-lg text-white transition font-bold flex items-center gap-1"><i class="ph-bold ph-check"></i> Marcar temp.</button>` : ''}
+                            <div class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center">
+                                <i class="ph ph-caret-down text-gray-400 toggle-icon transition-transform ${isRotated ? 'rotate-180' : ''}"></i>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
         }
 
         // --- Stats Logic ---
@@ -1093,7 +1292,7 @@
 
             showsArray.forEach(show => {
                 const map = show.episodesWatched || {};
-                const runtime = show.runtime || 30; // default 30m if unknown
+                const runtime = show.runtime || 30; 
                 
                 Object.values(map).forEach(views => {
                     if (views > 0) {
@@ -1103,12 +1302,10 @@
                 });
             });
 
-            // Convert Mins to Days/Hours
             const totalHours = Math.floor(totalTimeMins / 60);
             const days = Math.floor(totalHours / 24);
             const remainingHours = totalHours % 24;
 
-            // Animate Numbers (simple implementation)
             animateValue("stat-shows", parseInt($("stat-shows").innerText) || 0, totalShows, 500);
             animateValue("stat-episodes", parseInt($("stat-episodes").innerText) || 0, totalEpViews, 800);
             animateValue("stat-time-days", parseInt($("stat-time-days").innerText) || 0, days, 1000);
@@ -1123,7 +1320,6 @@
             const step = (timestamp) => {
                 if (!startTimestamp) startTimestamp = timestamp;
                 const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                // Ease out quad
                 const easeOut = progress * (2 - progress);
                 obj.innerHTML = Math.floor(easeOut * (end - start) + start);
                 if (progress < 1) {
