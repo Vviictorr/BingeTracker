@@ -249,29 +249,14 @@
 
             <!-- View: Search -->
             <section id="view-search" class="view-section hidden p-4 md:p-8 animate-fade-in w-full max-w-7xl mx-auto">
-                <header class="mb-8 flex flex-col md:flex-row gap-4 items-center max-w-3xl mt-2">
-                    <div class="relative flex-1 w-full">
+                <header class="mb-8 flex flex-col gap-4 max-w-3xl mt-2">
+                    <div class="relative w-full">
                         <i class="ph ph-magnifying-glass absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl"></i>
                         <input type="text" id="search-input" placeholder="Buscar series o anime..." class="w-full bg-dark-800/80 border border-white/10 focus:border-blue-400 focus:ring-1 focus:ring-blue-400 rounded-2xl py-4 pl-12 pr-12 text-white placeholder-gray-500 outline-none transition-all shadow-lg text-lg">
                         <button id="search-clear" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-white hidden"><i class="ph-fill ph-x-circle text-xl"></i></button>
                     </div>
-                    <div class="relative w-full md:w-56 shrink-0">
-                        <select id="search-genre" class="w-full bg-dark-800/80 border border-white/10 focus:border-blue-400 focus:ring-1 focus:ring-blue-400 rounded-2xl py-4 pl-4 pr-10 text-white outline-none transition-all shadow-lg text-sm appearance-none cursor-pointer font-medium">
-                            <option value="all">Todas las categorías</option>
-                            <option value="Action">Acción</option>
-                            <option value="Anime">Animación</option>
-                            <option value="Adventure">Aventura</option>
-                            <option value="Science-Fiction">Ciencia Ficción</option>
-                            <option value="Comedy">Comedia</option>
-                            <option value="Crime">Crimen</option>
-                            <option value="Drama">Drama</option>
-                            <option value="Fantasy">Fantasía</option>
-                            <option value="Mystery">Misterio</option>
-                            <option value="Romance">Romance</option>
-                            <option value="Horror">Terror</option>
-                            <option value="Thriller">Thriller</option>
-                        </select>
-                        <i class="ph-bold ph-caret-down absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                    <div id="search-genre-chips" class="flex flex-wrap gap-2">
+                        <!-- Chips Injected by JS -->
                     </div>
                 </header>
                 <div id="search-loading" class="hidden justify-center py-12"><div class="spinner border-t-blue-400"></div></div>
@@ -812,15 +797,36 @@
 
         // --- Search ---
         let searchTimeout;
+        const availableGenres = ["Action", "Adventure", "Anime", "Comedy", "Crime", "Drama", "Fantasy", "Horror", "Mystery", "Romance", "Science-Fiction", "Thriller"];
+        const selectedGenres = new Set();
+        
+        function renderGenreChips() {
+            const container = $('search-genre-chips');
+            if (!container) return;
+            container.innerHTML = '';
+            availableGenres.forEach(genre => {
+                const btn = document.createElement('button');
+                btn.textContent = genre;
+                const isActive = selectedGenres.has(genre);
+                // Styled exactly like the provided reference image (dark transparent, thin border, rounded-full)
+                btn.className = `px-4 py-1 border rounded-full text-sm transition-all cursor-pointer select-none ${isActive ? 'border-white text-white bg-white/20 font-medium' : 'border-white/20 text-gray-300 hover:bg-white/10 bg-transparent'}`;
+                btn.onclick = () => {
+                    if(selectedGenres.has(genre)) selectedGenres.delete(genre);
+                    else selectedGenres.add(genre);
+                    renderGenreChips();
+                    performSearch();
+                };
+                container.appendChild(btn);
+            });
+        }
         
         const performSearch = () => {
             const q = $('search-input').value.trim();
-            const genre = $('search-genre').value;
             
             $('search-clear').classList.toggle('hidden', q.length === 0);
             clearTimeout(searchTimeout);
             
-            if (q.length > 0 || genre !== 'all') {
+            if (q.length > 0 || selectedGenres.size > 0) {
                 $('search-initial').classList.add('hidden'); 
                 $('search-no-results').classList.add('hidden');
                 $('search-results').innerHTML = ''; 
@@ -831,20 +837,28 @@
                     try {
                         let showsData = [];
                         
-                        // 1. Fetch data based on query presence
                         if (q.length > 0) {
                             const res = await fetch(`https://api.tvmaze.com/search/shows?q=${encodeURIComponent(q)}`);
                             const data = await res.json();
                             showsData = data.map(item => item.show).filter(s => s !== null);
-                        } else {
-                            // If no query but genre is selected, fetch general popular shows
-                            const res = await fetch(`https://api.tvmaze.com/shows`);
-                            showsData = await res.json();
+                        } else if (selectedGenres.size > 0) {
+                            // Fetch the first 500 popular shows (Pages 0 and 1) concurrently
+                            const [res0, res1] = await Promise.all([
+                                fetch(`https://api.tvmaze.com/shows?page=0`),
+                                fetch(`https://api.tvmaze.com/shows?page=1`)
+                            ]);
+                            const data0 = await res0.json();
+                            const data1 = await res1.json();
+                            showsData = [...data0, ...data1];
                         }
                         
-                        // 2. Filter by genre if not 'all'
-                        if (genre !== 'all') {
-                            showsData = showsData.filter(show => show.genres && show.genres.includes(genre));
+                        // Multi-select intersection filter (Show must contain ALL selected genres)
+                        if (selectedGenres.size > 0) {
+                            const selectedArr = Array.from(selectedGenres);
+                            showsData = showsData.filter(show => {
+                                if (!show.genres) return false;
+                                return selectedArr.every(g => show.genres.includes(g));
+                            });
                         }
                         
                         $('search-loading').classList.add('hidden'); 
@@ -887,8 +901,9 @@
             }
         };
 
+        // Initialize chips and listeners
+        renderGenreChips();
         $('search-input').addEventListener('input', performSearch);
-        $('search-genre').addEventListener('change', performSearch);
         $('search-clear').addEventListener('click', () => { 
             $('search-input').value = ''; 
             performSearch(); 
@@ -923,7 +938,8 @@
             $('detail-summary').innerHTML = show.summary || 'Sin sinopsis.';
             $('detail-status').textContent = show.status;
             $('detail-runtime-val').textContent = show.averageRuntime || show.runtime || 0;
-            $('detail-genres').innerHTML = show.genres.map(g=>`<span class="px-2 py-0.5 border border-white/20 rounded-full text-xs text-gray-300">${g}</span>`).join('');
+            // Match the pill aesthetic from the reference image
+            $('detail-genres').innerHTML = show.genres.map(g=>`<span class="px-3 py-1 border border-white/20 bg-transparent rounded-full text-sm text-gray-200">${g}</span>`).join('');
             
             // Rating UI
             const ratingContainer = $('detail-rating-container');
