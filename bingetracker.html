@@ -249,11 +249,29 @@
 
             <!-- View: Search -->
             <section id="view-search" class="view-section hidden p-4 md:p-8 animate-fade-in w-full max-w-7xl mx-auto">
-                <header class="mb-8">
-                    <div class="relative max-w-2xl mt-2">
+                <header class="mb-8 flex flex-col md:flex-row gap-4 items-center max-w-3xl mt-2">
+                    <div class="relative flex-1 w-full">
                         <i class="ph ph-magnifying-glass absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl"></i>
                         <input type="text" id="search-input" placeholder="Buscar series o anime..." class="w-full bg-dark-800/80 border border-white/10 focus:border-blue-400 focus:ring-1 focus:ring-blue-400 rounded-2xl py-4 pl-12 pr-12 text-white placeholder-gray-500 outline-none transition-all shadow-lg text-lg">
                         <button id="search-clear" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-white hidden"><i class="ph-fill ph-x-circle text-xl"></i></button>
+                    </div>
+                    <div class="relative w-full md:w-56 shrink-0">
+                        <select id="search-genre" class="w-full bg-dark-800/80 border border-white/10 focus:border-blue-400 focus:ring-1 focus:ring-blue-400 rounded-2xl py-4 pl-4 pr-10 text-white outline-none transition-all shadow-lg text-sm appearance-none cursor-pointer font-medium">
+                            <option value="all">Todas las categorías</option>
+                            <option value="Action">Acción</option>
+                            <option value="Anime">Animación</option>
+                            <option value="Adventure">Aventura</option>
+                            <option value="Science-Fiction">Ciencia Ficción</option>
+                            <option value="Comedy">Comedia</option>
+                            <option value="Crime">Crimen</option>
+                            <option value="Drama">Drama</option>
+                            <option value="Fantasy">Fantasía</option>
+                            <option value="Mystery">Misterio</option>
+                            <option value="Romance">Romance</option>
+                            <option value="Horror">Terror</option>
+                            <option value="Thriller">Thriller</option>
+                        </select>
+                        <i class="ph-bold ph-caret-down absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
                     </div>
                 </header>
                 <div id="search-loading" class="hidden justify-center py-12"><div class="spinner border-t-blue-400"></div></div>
@@ -794,23 +812,53 @@
 
         // --- Search ---
         let searchTimeout;
-        $('search-input').addEventListener('input', (e) => {
-            const q = e.target.value.trim();
-            $('search-clear').classList.toggle('hidden', q.length===0);
+        
+        const performSearch = () => {
+            const q = $('search-input').value.trim();
+            const genre = $('search-genre').value;
+            
+            $('search-clear').classList.toggle('hidden', q.length === 0);
             clearTimeout(searchTimeout);
-            if(q.length>0) {
-                $('search-initial').classList.add('hidden'); $('search-no-results').classList.add('hidden');
-                $('search-results').innerHTML=''; $('search-loading').classList.remove('hidden'); $('search-loading').classList.add('flex');
+            
+            if (q.length > 0 || genre !== 'all') {
+                $('search-initial').classList.add('hidden'); 
+                $('search-no-results').classList.add('hidden');
+                $('search-results').innerHTML = ''; 
+                $('search-loading').classList.remove('hidden'); 
+                $('search-loading').classList.add('flex');
+                
                 searchTimeout = setTimeout(async () => {
                     try {
-                        const res = await fetch(`https://api.tvmaze.com/search/shows?q=${encodeURIComponent(q)}`);
-                        const data = await res.json();
-                        $('search-loading').classList.add('hidden'); $('search-loading').classList.remove('flex');
-                        if(data.length===0) { $('search-no-results').classList.remove('hidden'); $('search-no-results').classList.add('flex'); return; }
+                        let showsData = [];
+                        
+                        // 1. Fetch data based on query presence
+                        if (q.length > 0) {
+                            const res = await fetch(`https://api.tvmaze.com/search/shows?q=${encodeURIComponent(q)}`);
+                            const data = await res.json();
+                            showsData = data.map(item => item.show).filter(s => s !== null);
+                        } else {
+                            // If no query but genre is selected, fetch general popular shows
+                            const res = await fetch(`https://api.tvmaze.com/shows`);
+                            showsData = await res.json();
+                        }
+                        
+                        // 2. Filter by genre if not 'all'
+                        if (genre !== 'all') {
+                            showsData = showsData.filter(show => show.genres && show.genres.includes(genre));
+                        }
+                        
+                        $('search-loading').classList.add('hidden'); 
+                        $('search-loading').classList.remove('flex');
+                        
+                        if (showsData.length === 0) { 
+                            $('search-no-results').classList.remove('hidden'); 
+                            $('search-no-results').classList.add('flex'); 
+                            return; 
+                        }
                         
                         const grid = $('search-results');
-                        data.forEach(item => {
-                            const show = item.show; if(!show) return;
+                        showsData.forEach(show => {
+                            if (!show) return;
                             const isTracked = trackedShows[show.id] !== undefined;
                             const card = document.createElement('div');
                             card.className = "glass-card rounded-2xl overflow-hidden cursor-pointer group flex flex-col relative";
@@ -824,14 +872,27 @@
                             `;
                             grid.appendChild(card);
                         });
-                    } catch(e) { showToast("Error", "error"); $('search-loading').classList.add('hidden'); }
+                    } catch(e) { 
+                        showToast("Error al buscar", "error"); 
+                        $('search-loading').classList.add('hidden'); 
+                        $('search-loading').classList.remove('flex');
+                    }
                 }, 600);
             } else {
-                $('search-initial').classList.remove('hidden'); $('search-results').innerHTML=''; $('search-no-results').classList.add('hidden');
-                $('search-loading').classList.add('hidden'); $('search-loading').classList.remove('flex');
+                $('search-initial').classList.remove('hidden'); 
+                $('search-results').innerHTML = ''; 
+                $('search-no-results').classList.add('hidden');
+                $('search-loading').classList.add('hidden'); 
+                $('search-loading').classList.remove('flex');
             }
+        };
+
+        $('search-input').addEventListener('input', performSearch);
+        $('search-genre').addEventListener('change', performSearch);
+        $('search-clear').addEventListener('click', () => { 
+            $('search-input').value = ''; 
+            performSearch(); 
         });
-        $('search-clear').addEventListener('click', () => { $('search-input').value=''; $('search-input').dispatchEvent(new Event('input')); });
 
         // --- Detail View ---
         window.openShowDetail = async (id) => {
