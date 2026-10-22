@@ -70,6 +70,15 @@
 
         .star-rating .ph-star { transition: color 0.2s, transform 0.1s; cursor: pointer; }
         .star-rating .ph-star:hover { transform: scale(1.2); }
+        
+        /* Google Translate overrides */
+        .goog-te-banner-frame.skiptranslate, .skiptranslate iframe { display: none !important; }
+        body { top: 0px !important; }
+        .goog-tooltip { display: none !important; }
+        .goog-tooltip:hover { display: none !important; }
+        .goog-text-highlight { background-color: transparent !important; border: none !important; box-shadow: none !important; }
+        .goog-te-gadget { color: #9CA3AF !important; font-family: 'Inter', sans-serif !important; }
+        .goog-te-combo { background-color: #1F293F; color: white; border: 1px solid rgba(255,255,255,0.1); border-radius: 0.5rem; padding: 0.5rem; outline: none; }
     </style>
 </head>
 <body class="antialiased selection:bg-accent-purple selection:text-white relative">
@@ -154,6 +163,12 @@
                 <span class="text-[10px] font-medium tracking-wider uppercase group-[.active]:text-white">Stats</span>
             </button>
 
+            <button onclick="switchView('profile')" id="nav-profile" class="nav-btn flex flex-col items-center gap-1 p-2 md:p-3 text-gray-400 hover:text-white transition-colors relative group">
+                <i class="ph ph-user text-2xl group-[.active]:text-blue-400 group-[.active]:ph-fill transition-all"></i>
+                <span class="text-[10px] font-medium tracking-wider uppercase group-[.active]:text-white hidden md:block">Perfil</span>
+                <span class="text-[10px] font-medium tracking-wider uppercase group-[.active]:text-white md:hidden">Perfil</span>
+            </button>
+
             <div class="md:mt-auto hidden md:flex flex-col items-center gap-4 p-4">
                 <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-dark-700 to-dark-800 border border-white/10 flex items-center justify-center text-white shadow-lg" id="user-avatar">
                     <span id="user-avatar-text" class="font-bold text-sm"></span>
@@ -211,6 +226,43 @@
                         <div id="dash-upcoming-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             <!-- Cards Injected -->
                         </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- View: Profile -->
+            <section id="view-profile" class="view-section hidden p-4 md:p-8 animate-fade-in max-w-3xl mx-auto w-full">
+                <header class="mb-8 mt-2 md:mt-0">
+                    <h1 class="text-3xl md:text-4xl font-bold mb-2">Tu <span class="text-gradient">Perfil</span></h1>
+                    <p class="text-gray-400 text-sm">Personaliza tu cuenta y ajusta el idioma de los datos de TVMaze.</p>
+                </header>
+
+                <div class="space-y-6">
+                    <!-- Configuración de Perfil -->
+                    <div class="glass-card p-6 rounded-2xl border border-white/5">
+                        <div class="flex items-center gap-3 mb-4">
+                            <i class="ph-fill ph-user-circle text-2xl text-blue-400"></i>
+                            <h2 class="text-xl font-bold">Datos Personales</h2>
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <label class="text-sm text-gray-400 font-medium">Nombre a mostrar</label>
+                            <div class="flex flex-col sm:flex-row gap-3">
+                                <input type="text" id="profile-name-input" placeholder="Tu nombre..." class="flex-1 bg-dark-800/80 border border-white/10 focus:border-blue-400 focus:ring-1 focus:ring-blue-400 rounded-xl py-3 px-4 text-white outline-none transition-all">
+                                <button onclick="updateUserProfile()" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-blue-500/20 transition-colors whitespace-nowrap">Actualizar Perfil</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Traductor Google -->
+                    <div class="glass-card p-6 rounded-2xl border border-white/5">
+                        <div class="flex items-center gap-3 mb-4">
+                            <i class="ph-fill ph-translate text-2xl text-accent-emerald"></i>
+                            <h2 class="text-xl font-bold">Traductor de la App</h2>
+                        </div>
+                        <p class="text-sm text-gray-400 mb-4 leading-relaxed">
+                            Gran parte de las sinopsis y datos de TVMaze están en inglés. Si deseas que la aplicación traduzca todo el contenido en tiempo real, selecciona <strong>"Español"</strong> en la caja de abajo.
+                        </p>
+                        <div id="google_translate_element" class="bg-dark-800/50 p-4 rounded-xl border border-white/10"></div>
                     </div>
                 </div>
             </section>
@@ -438,7 +490,7 @@
     <!-- Firebase App Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, deleteField } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -512,8 +564,11 @@
                 onAuthStateChanged(auth, (u) => {
                     if (u) {
                         user = u;
-                        $('user-avatar-text').innerText = u.email.substring(0,2).toUpperCase();
-                        $('dash-user-name').innerText = u.email.split('@')[0];
+                        const displayName = u.displayName || u.email.split('@')[0];
+                        $('user-avatar-text').innerText = (u.displayName || u.email).substring(0,2).toUpperCase();
+                        $('dash-user-name').innerText = displayName;
+                        if($('profile-name-input')) $('profile-name-input').value = displayName;
+                        
                         $('auth-screen').classList.add('hidden'); $('init-screen').classList.add('hidden');
                         $('app-container').classList.remove('hidden'); setTimeout(() => $('app-container').classList.remove('opacity-0'), 50);
                         
@@ -545,17 +600,24 @@
             renderView(v);
         };
 
-        function renderAllViews() {
-            renderDashboard(); renderLibrary(); renderStats();
-            if(currentDetailShowId && !$('view-detail').classList.contains('translate-x-full')) renderDetailProgressUI();
-        }
-
         function renderView(v) {
             if(v==='dashboard') renderDashboard();
             if(v==='library') renderLibrary();
             if(v==='stats') renderStats();
             if(v==='discover') renderDiscover();
         }
+
+        window.updateUserProfile = async () => {
+            if(!user) return;
+            const newName = $('profile-name-input').value.trim();
+            if(!newName) return showToast("El nombre no puede estar vacío", "error");
+            try {
+                await updateProfile(user, { displayName: newName });
+                $('dash-user-name').innerText = newName;
+                $('user-avatar-text').innerText = newName.substring(0,2).toUpperCase();
+                showToast("Perfil actualizado correctamente", "success");
+            } catch(e) { showToast("Error al actualizar perfil", "error"); }
+        };
 
         window.closeDetailView = () => {
             $('view-detail').classList.add('translate-x-full');
@@ -686,6 +748,7 @@
                 // Render Upcoming
                 if(upcomingEvents.length > 0) {
                     upcomingEvents.sort((a,b) => new Date(a.ep.airdate) - new Date(b.ep.airdate)).slice(0,6).forEach(ev => {
+                        // (Mantenemos el generador de HTML de Próximos estrenos intacto)
                         const el = document.createElement('div');
                         el.className = "glass-panel p-4 rounded-xl flex items-center gap-4 cursor-pointer hover:bg-white/5 transition";
                         el.onclick = () => openShowDetail(ev.showId);
@@ -710,7 +773,12 @@
                     $('dash-upcoming-empty').classList.remove('hidden');
                 }
 
-                $('dash-continue-empty').classList.toggle('hidden', !hasContinue);
+                // SOLUCIÓN AL BUG VISUAL DEL MENSAJE VACÍO
+                if (hasContinue) {
+                    $('dash-continue-empty').classList.add('hidden');
+                } else {
+                    $('dash-continue-empty').classList.remove('hidden');
+                }
                 
             } catch (globalErr) {
                 console.error("Error global renderizando dashboard:", globalErr);
@@ -1294,24 +1362,73 @@
                 }
                 if(unwatched.length>0) {
                     showConfirm("Ponerse al día", "¿Quieres marcar los episodios anteriores como vistos?", async () => {
-                        const upd = {}; [...unwatched, epId].forEach(i => upd[`episodesWatched.${i}`]=1);
+                        const upd = {}; 
+                        if(!data.episodesWatched) data.episodesWatched = {};
+                        [...unwatched, epId].forEach(i => {
+                            upd[`episodesWatched.${i}`] = 1;
+                            data.episodesWatched[i] = 1; // Actualización optimista local
+                        });
+                        renderDetailProgressUI(); // UI Instantánea
                         await updateDoc(doc(db, 'users', user.uid, 'shows', sId.toString()), upd);
+                        checkOptimisticCompletion(sId);
                     });
                     return;
                 }
             }
-            await updateDoc(doc(db, 'users', user.uid, 'shows', sId.toString()), { [`episodesWatched.${epId}`]: nxt>0?nxt:deleteField() });
+
+            // Actualización Local y de Interfaz Optimista (Evita la congelación)
+            if(!data.episodesWatched) data.episodesWatched = {};
+            if(nxt > 0) data.episodesWatched[epId] = nxt;
+            else delete data.episodesWatched[epId];
+            
+            renderDetailProgressUI();
+
+            // Petición a base de datos en segundo plano
+            const docRef = doc(db, 'users', user.uid, 'shows', sId.toString());
+            updateDoc(docRef, { [`episodesWatched.${epId}`]: nxt>0?nxt:deleteField() })
+                .then(() => checkOptimisticCompletion(sId))
+                .catch(e => { console.error(e); showToast("Error de conexión", "error"); });
         };
 
         window.markSeason = (sId, sNum) => {
             showConfirm("Marcar Temporada", `¿Marcar Temporada ${sNum} como vista?`, async () => {
                 const eps = currentDetailEpisodesData.filter(ep=>ep.season===sNum && ep.airdate && new Date(ep.airdate)<=new Date());
                 const upd = {};
-                const map = trackedShows[sId]?.episodesWatched || {};
-                eps.forEach(ep => { if((map[ep.id]||0)===0) upd[`episodesWatched.${ep.id}`] = 1; });
-                if(Object.keys(upd).length>0) await updateDoc(doc(db, 'users', user.uid, 'shows', sId.toString()), upd);
+                const data = trackedShows[sId];
+                if(!data.episodesWatched) data.episodesWatched = {};
+                
+                eps.forEach(ep => { 
+                    if((data.episodesWatched[ep.id]||0)===0) {
+                        upd[`episodesWatched.${ep.id}`] = 1; 
+                        data.episodesWatched[ep.id] = 1; // Actualización optimista local
+                    }
+                });
+                
+                if(Object.keys(upd).length>0) {
+                    renderDetailProgressUI(); // UI Instantánea
+                    const docRef = doc(db, 'users', user.uid, 'shows', sId.toString());
+                    updateDoc(docRef, upd)
+                        .then(() => checkOptimisticCompletion(sId))
+                        .catch(e => showToast("Error de conexión", "error"));
+                }
             });
         };
+
+        function checkOptimisticCompletion(sId) {
+            const data = trackedShows[sId];
+            if(!data) return;
+            const map = data.episodesWatched || {};
+            const airedEps = currentDetailEpisodesData.filter(ep => ep.airdate && new Date(ep.airdate) <= new Date());
+            const watched = airedEps.filter(ep => (map[ep.id]||0)>0).length;
+            
+            // Si llega al 100%, pasarlo a terminado automáticamente en la UI al momento
+            if(watched === airedEps.length && airedEps.length > 0 && data.status !== 'completed' && data.status !== 'dropped') {
+                data.status = 'completed';
+                if($('detail-status')) $('detail-status').textContent = 'Terminado'; // Actualizar badge de UI si está abierto
+                showToast("¡Felicidades! Serie completada.", "success");
+                updateDoc(doc(db, 'users', user.uid, 'shows', sId.toString()), { status: 'completed' });
+            }
+        }
 
         // --- Stats ---
         function renderStats() {
@@ -1329,5 +1446,18 @@
         window.addEventListener('DOMContentLoaded', init);
 
     </script>
+
+    <!-- Google Translate Script Initialization -->
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'es', // El idioma base de la UI
+                includedLanguages: 'es,en,fr,de,it,pt,ja,ko,zh-CN',
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                autoDisplay: false
+            }, 'google_translate_element');
+        }
+    </script>
+    <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
 </html>
