@@ -249,49 +249,64 @@
 
             <!-- View: Search -->
             <section id="view-search" class="view-section hidden p-4 md:p-8 animate-fade-in w-full max-w-7xl mx-auto">
-                <header class="mb-8 flex flex-col gap-4 max-w-3xl mt-2">
+                <header class="mb-8 flex flex-col gap-4 max-w-4xl mt-2">
                     <div class="relative w-full">
                         <i class="ph ph-magnifying-glass absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl"></i>
-                        <input type="text" id="search-input" placeholder="Buscar series o anime..." class="w-full bg-dark-800/80 border border-white/10 focus:border-blue-400 focus:ring-1 focus:ring-blue-400 rounded-2xl py-4 pl-12 pr-12 text-white placeholder-gray-500 outline-none transition-all shadow-lg text-lg">
+                        <input type="text" id="search-input" placeholder="Buscar título (limpia el buscador para usar filtros avanzados)..." class="w-full bg-dark-800/80 border border-white/10 focus:border-blue-400 focus:ring-1 focus:ring-blue-400 rounded-2xl py-4 pl-12 pr-12 text-white placeholder-gray-500 outline-none transition-all shadow-lg text-lg">
                         <button id="search-clear" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-white hidden"><i class="ph-fill ph-x-circle text-xl"></i></button>
                     </div>
-                    <div id="search-genre-chips" class="flex flex-wrap gap-2">
+                    
+                    <!-- Advanced Filters mimicking TVMaze -->
+                    <div class="flex flex-col md:flex-row gap-4 w-full">
+                        <select id="filter-status" class="flex-1 bg-dark-800/80 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-blue-400 transition-colors cursor-pointer appearance-none">
+                            <option value="">Cualquier Estado (Status)</option>
+                            <option value="Running">En Emisión (Running)</option>
+                            <option value="Ended">Terminada (Ended)</option>
+                            <option value="To Be Determined">Por Determinar (TBD)</option>
+                            <option value="In Development">En Desarrollo</option>
+                        </select>
+                        <select id="filter-type" class="flex-1 bg-dark-800/80 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-blue-400 transition-colors cursor-pointer appearance-none">
+                            <option value="">Cualquier Tipo (Show Type)</option>
+                            <option value="Scripted">Scripted</option>
+                            <option value="Animation">Animation (Animación)</option>
+                            <option value="Reality">Reality</option>
+                            <option value="Talk Show">Talk Show</option>
+                            <option value="Documentary">Documentary</option>
+                            <option value="Game Show">Game Show</option>
+                            <option value="News">News</option>
+                            <option value="Sports">Sports</option>
+                            <option value="Variety">Variety</option>
+                            <option value="Award Show">Award Show</option>
+                        </select>
+                    </div>
+                    
+                    <div id="search-genre-chips" class="flex flex-wrap gap-2 mt-2">
                         <!-- Chips Injected by JS -->
                     </div>
                 </header>
-                <div id="search-loading" class="hidden justify-center py-12"><div class="spinner border-t-blue-400"></div></div>
-                <div id="search-initial" class="flex flex-col items-center justify-center py-20 text-center opacity-50"><i class="ph-duotone ph-television text-6xl mb-4"></i></div>
-                <div id="search-no-results" class="hidden flex-col items-center justify-center py-20 text-center"><p class="text-gray-400">Sin resultados.</p></div>
+                
+                <div id="search-loading" class="hidden justify-center items-center flex-col py-12 gap-4">
+                    <div class="spinner border-t-blue-400 w-10 h-10 border-4"></div>
+                    <p class="text-blue-400 text-sm animate-pulse font-medium">Escaneando base de datos mundial...</p>
+                </div>
+                
+                <div id="search-initial" class="flex flex-col items-center justify-center py-20 text-center opacity-50">
+                    <i class="ph-duotone ph-magnifying-glass-plus text-6xl mb-4"></i>
+                    <p class="max-w-xs text-sm">Busca por título o aplica filtros avanzados para explorar el catálogo completo de TVMaze.</p>
+                </div>
+                
+                <div id="search-no-results" class="hidden flex-col items-center justify-center py-20 text-center">
+                    <i class="ph-duotone ph-ghost text-5xl text-gray-500 mb-3"></i>
+                    <p class="text-gray-400">No hay más resultados.</p>
+                </div>
+                
                 <div id="search-results" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6"></div>
-            </section>
-
-            <!-- View: Stats -->
-            <section id="view-stats" class="view-section hidden p-4 md:p-8 animate-fade-in w-full max-w-5xl mx-auto">
-                <header class="mb-8">
-                    <h1 class="text-3xl md:text-4xl font-bold mb-2">Tus <span class="text-gradient">Estadísticas</span></h1>
-                </header>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div class="glass-card rounded-3xl p-6 relative overflow-hidden group">
-                        <div class="absolute top-[-20%] right-[-10%] w-32 h-32 bg-blue-500/10 rounded-full blur-2xl"></div>
-                        <i class="ph-duotone ph-television text-4xl text-blue-400 mb-4"></i>
-                        <p class="text-gray-400 text-sm font-medium uppercase mb-1">Series Seguidas</p>
-                        <h2 id="stat-shows" class="text-4xl md:text-5xl font-bold">0</h2>
-                    </div>
-                    <div class="glass-card rounded-3xl p-6 relative overflow-hidden group">
-                        <div class="absolute top-[-20%] right-[-10%] w-32 h-32 bg-accent-emerald/10 rounded-full blur-2xl"></div>
-                        <i class="ph-duotone ph-play-circle text-4xl text-accent-emerald mb-4"></i>
-                        <p class="text-gray-400 text-sm font-medium uppercase mb-1">Episodios Vistos</p>
-                        <h2 id="stat-episodes" class="text-4xl md:text-5xl font-bold">0</h2>
-                    </div>
-                    <div class="glass-card rounded-3xl p-6 relative overflow-hidden group">
-                        <div class="absolute top-[-20%] right-[-10%] w-32 h-32 bg-accent-purple/10 rounded-full blur-2xl"></div>
-                        <i class="ph-duotone ph-hourglass-high text-4xl text-accent-purple mb-4"></i>
-                        <p class="text-gray-400 text-sm font-medium uppercase mb-1">Tiempo Visto</p>
-                        <div class="flex items-baseline gap-2">
-                            <h2 id="stat-time-days" class="text-4xl md:text-5xl font-bold">0</h2><span class="text-gray-400">D</span>
-                            <h2 id="stat-time-hours" class="text-3xl md:text-4xl font-bold ml-2">0</h2><span class="text-gray-400">H</span>
-                        </div>
-                    </div>
+                
+                <!-- Pagination Controls -->
+                <div id="search-pagination" class="hidden justify-center items-center gap-6 mt-10 mb-8 w-full">
+                    <button id="btn-prev-page" class="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center disabled:opacity-30 disabled:pointer-events-none transition-all"><i class="ph-bold ph-caret-left text-xl"></i></button>
+                    <span id="search-page-indicator" class="font-bold text-xl w-10 text-center text-blue-400">1</span>
+                    <button id="btn-next-page" class="w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 hover:bg-blue-500/40 hover:text-white flex items-center justify-center disabled:opacity-30 disabled:pointer-events-none transition-all shadow-lg shadow-blue-500/20"><i class="ph-bold ph-caret-right text-xl"></i></button>
                 </div>
             </section>
 
@@ -800,6 +815,14 @@
         const availableGenres = ["Action", "Adventure", "Anime", "Comedy", "Crime", "Drama", "Fantasy", "Horror", "Mystery", "Romance", "Science-Fiction", "Thriller"];
         const selectedGenres = new Set();
         
+        // Advanced Scanner State
+        let currentScanId = 0;
+        let tvmazePage = 0;
+        let filteredResults = [];
+        let endOfTvmaze = false;
+        let currentSearchPage = 1;
+        const ITEMS_PER_PAGE = 30; // 30 series exactas por página como pediste
+        
         function renderGenreChips() {
             const container = $('search-genre-chips');
             if (!container) return;
@@ -808,7 +831,6 @@
                 const btn = document.createElement('button');
                 btn.textContent = genre;
                 const isActive = selectedGenres.has(genre);
-                // Styled exactly like the provided reference image (dark transparent, thin border, rounded-full)
                 btn.className = `px-4 py-1 border rounded-full text-sm transition-all cursor-pointer select-none ${isActive ? 'border-white text-white bg-white/20 font-medium' : 'border-white/20 text-gray-300 hover:bg-white/10 bg-transparent'}`;
                 btn.onclick = () => {
                     if(selectedGenres.has(genre)) selectedGenres.delete(genre);
@@ -820,46 +842,44 @@
             });
         }
         
+        function resetSearchEngine() {
+            tvmazePage = 0;
+            filteredResults = [];
+            endOfTvmaze = false;
+            currentSearchPage = 1;
+            $('search-results').innerHTML = '';
+            $('search-pagination').classList.add('hidden');
+            $('search-pagination').classList.remove('flex');
+        }
+        
         const performSearch = () => {
             const q = $('search-input').value.trim();
+            const statusVal = $('filter-status').value;
+            const typeVal = $('filter-type').value;
+            const hasAdvancedFilters = selectedGenres.size > 0 || statusVal !== "" || typeVal !== "";
             
             $('search-clear').classList.toggle('hidden', q.length === 0);
             clearTimeout(searchTimeout);
             
-            if (q.length > 0 || selectedGenres.size > 0) {
+            if (q.length > 0) {
+                // Modo Texto: Busca directamente por nombre y luego aplica filtros locales (si los hay)
+                resetSearchEngine();
                 $('search-initial').classList.add('hidden'); 
                 $('search-no-results').classList.add('hidden');
-                $('search-results').innerHTML = ''; 
                 $('search-loading').classList.remove('hidden'); 
                 $('search-loading').classList.add('flex');
                 
                 searchTimeout = setTimeout(async () => {
+                    const myScanId = ++currentScanId;
                     try {
-                        let showsData = [];
+                        const res = await fetch(`https://api.tvmaze.com/search/shows?q=${encodeURIComponent(q)}`);
+                        const data = await res.json();
+                        if (myScanId !== currentScanId) return; // Cancelado por nueva búsqueda
                         
-                        if (q.length > 0) {
-                            const res = await fetch(`https://api.tvmaze.com/search/shows?q=${encodeURIComponent(q)}`);
-                            const data = await res.json();
-                            showsData = data.map(item => item.show).filter(s => s !== null);
-                        } else if (selectedGenres.size > 0) {
-                            // Fetch the first 500 popular shows (Pages 0 and 1) concurrently
-                            const [res0, res1] = await Promise.all([
-                                fetch(`https://api.tvmaze.com/shows?page=0`),
-                                fetch(`https://api.tvmaze.com/shows?page=1`)
-                            ]);
-                            const data0 = await res0.json();
-                            const data1 = await res1.json();
-                            showsData = [...data0, ...data1];
-                        }
+                        let showsData = data.map(item => item.show).filter(s => s !== null);
                         
-                        // Multi-select intersection filter (Show must contain ALL selected genres)
-                        if (selectedGenres.size > 0) {
-                            const selectedArr = Array.from(selectedGenres);
-                            showsData = showsData.filter(show => {
-                                if (!show.genres) return false;
-                                return selectedArr.every(g => show.genres.includes(g));
-                            });
-                        }
+                        // Aplicar filtros a los resultados de texto
+                        showsData = filterShowsArray(showsData, statusVal, typeVal);
                         
                         $('search-loading').classList.add('hidden'); 
                         $('search-loading').classList.remove('flex');
@@ -867,43 +887,199 @@
                         if (showsData.length === 0) { 
                             $('search-no-results').classList.remove('hidden'); 
                             $('search-no-results').classList.add('flex'); 
-                            return; 
+                        } else {
+                            renderSearchResults(showsData);
                         }
-                        
-                        const grid = $('search-results');
-                        showsData.forEach(show => {
-                            if (!show) return;
-                            const isTracked = trackedShows[show.id] !== undefined;
-                            const card = document.createElement('div');
-                            card.className = "glass-card rounded-2xl overflow-hidden cursor-pointer group flex flex-col relative";
-                            card.onclick = () => openShowDetail(show.id);
-                            card.innerHTML = `
-                                <div class="relative aspect-[2/3] bg-dark-800 overflow-hidden">
-                                    <img src="${show.image?.medium||'https://placehold.co/210x295/1F293F/ffffff?text=No+Image'}" class="w-full h-full object-cover group-hover:scale-105 transition-transform">
-                                    ${isTracked ? '<div class="absolute top-2 right-2 bg-accent-emerald text-white text-[10px] font-bold px-2 py-1 rounded"><i class="ph-bold ph-check"></i></div>':''}
-                                </div>
-                                <div class="p-3"><h3 class="font-bold text-sm line-clamp-1">${show.name}</h3><p class="text-xs text-gray-400">${show.premiered?.substring(0,4)||'N/A'}</p></div>
-                            `;
-                            grid.appendChild(card);
-                        });
-                    } catch(e) { 
-                        showToast("Error al buscar", "error"); 
-                        $('search-loading').classList.add('hidden'); 
-                        $('search-loading').classList.remove('flex');
-                    }
+                    } catch(e) { showToast("Error al buscar", "error"); }
                 }, 600);
+            } else if (hasAdvancedFilters) {
+                // Modo Escáner Avanzado: Busca por las páginas maestras de TVMaze
+                resetSearchEngine();
+                $('search-initial').classList.add('hidden');
+                $('search-no-results').classList.add('hidden');
+                loadSearchPage(1); // Empezar a cargar la página 1 de la UI (30 items)
             } else {
+                // Estado inicial vacío
+                resetSearchEngine();
                 $('search-initial').classList.remove('hidden'); 
-                $('search-results').innerHTML = ''; 
                 $('search-no-results').classList.add('hidden');
                 $('search-loading').classList.add('hidden'); 
                 $('search-loading').classList.remove('flex');
             }
         };
 
+        // Función centralizada para filtrar Arrays de TVMaze
+        function filterShowsArray(shows, targetStatus, targetType) {
+            return shows.filter(show => {
+                if (targetStatus && show.status !== targetStatus) return false;
+                if (targetType && show.type !== targetType) return false;
+                if (selectedGenres.size > 0) {
+                    const selGenres = Array.from(selectedGenres);
+                    if (!show.genres) return false;
+                    if (!selGenres.every(g => show.genres.includes(g))) return false;
+                }
+                return true;
+            });
+        }
+
+        // El motor de escaneo inteligente de TVMaze
+        async function loadSearchPage(targetPage) {
+            currentSearchPage = targetPage;
+            const myScanId = ++currentScanId;
+            const requiredItems = targetPage * ITEMS_PER_PAGE;
+
+            $('search-pagination').classList.add('hidden');
+            $('search-pagination').classList.remove('flex');
+            $('search-loading').classList.remove('hidden');
+            $('search-loading').classList.add('flex');
+            $('search-no-results').classList.add('hidden');
+
+            const statusVal = $('filter-status').value;
+            const typeVal = $('filter-type').value;
+
+            // Escanea páginas de TVMaze hasta encontrar suficientes elementos para llenar tu página UI
+            while (filteredResults.length < requiredItems && !endOfTvmaze) {
+                if (myScanId !== currentScanId) return; // Abortar si el usuario cambia los filtros
+
+                try {
+                    // Descargamos 2 páginas maestras de TVMaze de golpe para ir más rápido
+                    const p1 = fetch(`https://api.tvmaze.com/shows?page=${tvmazePage}`).then(r => r.status===404?404:(r.status===429?429:r.json()));
+                    const p2 = fetch(`https://api.tvmaze.com/shows?page=${tvmazePage+1}`).then(r => r.status===404?404:(r.status===429?429:r.json()));
+
+                    const [res1, res2] = await Promise.all([p1, p2]);
+
+                    if (myScanId !== currentScanId) return;
+
+                    // Manejo del Límite de Peticiones (Rate Limit TVMaze = ~20 c/10s)
+                    if (res1 === 429 || res2 === 429) {
+                        await new Promise(r => setTimeout(r, 2000));
+                        continue; // Reintentar mismas páginas
+                    }
+
+                    let combined = [];
+                    let found404 = false;
+
+                    if (res1 === 404) found404 = true;
+                    else if (Array.isArray(res1)) combined = combined.concat(res1);
+
+                    if (res2 === 404) found404 = true;
+                    else if (Array.isArray(res2)) combined = combined.concat(res2);
+
+                    tvmazePage += 2;
+
+                    // Filtramos los cientos de resultados crudos
+                    const matched = filterShowsArray(combined, statusVal, typeVal);
+                    filteredResults.push(...matched);
+
+                    if (found404) {
+                        endOfTvmaze = true;
+                        break;
+                    }
+
+                    // Pequeño descanso entre llamadas para no saturar la API
+                    await new Promise(r => setTimeout(r, 250));
+                } catch(e) {
+                    console.warn("Scan loop interrumpido", e);
+                    break;
+                }
+            }
+
+            if (myScanId !== currentScanId) return;
+
+            $('search-loading').classList.add('hidden');
+            $('search-loading').classList.remove('flex');
+
+            const startIndex = (targetPage - 1) * ITEMS_PER_PAGE;
+            const pageItems = filteredResults.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+            if (pageItems.length === 0 && filteredResults.length === 0) {
+                $('search-no-results').classList.remove('hidden');
+                $('search-no-results').classList.add('flex');
+                $('search-results').innerHTML = '';
+                return;
+            }
+
+            renderSearchResults(pageItems);
+            renderPaginationUI();
+        }
+
+        function renderPaginationUI() {
+            const pagContainer = $('search-pagination');
+            pagContainer.classList.remove('hidden');
+            pagContainer.classList.add('flex');
+
+            const btnPrev = $('btn-prev-page');
+            const btnNext = $('btn-next-page');
+            const indicator = $('search-page-indicator');
+
+            indicator.textContent = currentSearchPage;
+            btnPrev.disabled = currentSearchPage === 1;
+
+            // Bloquear botón siguiente si llegamos al fin de TVMaze y no quedan items en memoria
+            const maxPagesFound = Math.ceil(filteredResults.length / ITEMS_PER_PAGE);
+            btnNext.disabled = !!(endOfTvmaze && currentSearchPage >= maxPagesFound);
+
+            btnPrev.onclick = () => {
+                if (currentSearchPage > 1) {
+                    currentSearchPage--;
+                    const startIndex = (currentSearchPage - 1) * ITEMS_PER_PAGE;
+                    renderSearchResults(filteredResults.slice(startIndex, startIndex + ITEMS_PER_PAGE));
+                    renderPaginationUI();
+                    $('view-search').scrollTo({top: 0, behavior: 'smooth'}); // Volver arriba
+                }
+            };
+
+            btnNext.onclick = () => {
+                const requiredItems = (currentSearchPage + 1) * ITEMS_PER_PAGE;
+                if (filteredResults.length >= requiredItems || endOfTvmaze) {
+                    // Los items ya están descargados en memoria, solo renderizar
+                    currentSearchPage++;
+                    const startIndex = (currentSearchPage - 1) * ITEMS_PER_PAGE;
+                    renderSearchResults(filteredResults.slice(startIndex, startIndex + ITEMS_PER_PAGE));
+                    renderPaginationUI();
+                    $('view-search').scrollTo({top: 0, behavior: 'smooth'});
+                } else {
+                    // Hay que escáner más páginas de TVMaze
+                    loadSearchPage(currentSearchPage + 1);
+                }
+            };
+        }
+
+        function renderSearchResults(showsData) {
+            const grid = $('search-results');
+            grid.innerHTML = '';
+            showsData.forEach(show => {
+                if (!show) return;
+                const isTracked = trackedShows[show.id] !== undefined;
+                const card = document.createElement('div');
+                card.className = "glass-card rounded-2xl overflow-hidden cursor-pointer group flex flex-col relative animate-fade-in";
+                card.onclick = () => openShowDetail(show.id);
+                card.innerHTML = `
+                    <div class="relative aspect-[2/3] bg-dark-800 overflow-hidden">
+                        <img src="${show.image?.medium||'https://placehold.co/210x295/1F293F/ffffff?text=No+Image'}" class="w-full h-full object-cover group-hover:scale-105 transition-transform">
+                        ${isTracked ? '<div class="absolute top-2 right-2 bg-accent-emerald text-white text-[10px] font-bold px-2 py-1 rounded shadow-lg"><i class="ph-bold ph-check"></i></div>':''}
+                        <div class="absolute bottom-0 w-full p-2 bg-gradient-to-t from-dark-900 via-dark-900/80 to-transparent flex justify-between items-end">
+                            <span class="text-xs font-bold text-yellow-400 drop-shadow-md"><i class="ph-fill ph-star"></i> ${show.rating?.average||'-'}</span>
+                            <span class="text-[9px] font-bold text-white bg-black/60 px-1.5 py-0.5 rounded border border-white/10 uppercase tracking-wider">${show.type||'Web'}</span>
+                        </div>
+                    </div>
+                    <div class="p-3">
+                        <h3 class="font-bold text-sm line-clamp-1 mb-1">${show.name}</h3>
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-gray-400 font-medium">${show.premiered?.substring(0,4)||'N/A'}</span>
+                            <span class="font-bold uppercase ${show.status==='Running'?'text-accent-emerald':(show.status==='Ended'?'text-red-400':'text-gray-500')}">${show.status||''}</span>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
         // Initialize chips and listeners
         renderGenreChips();
         $('search-input').addEventListener('input', performSearch);
+        $('filter-status').addEventListener('change', performSearch);
+        $('filter-type').addEventListener('change', performSearch);
         $('search-clear').addEventListener('click', () => { 
             $('search-input').value = ''; 
             performSearch(); 
