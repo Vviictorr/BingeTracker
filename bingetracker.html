@@ -77,8 +77,28 @@
         .goog-tooltip { display: none !important; }
         .goog-tooltip:hover { display: none !important; }
         .goog-text-highlight { background-color: transparent !important; border: none !important; box-shadow: none !important; }
-        .goog-te-gadget { color: #9CA3AF !important; font-family: 'Inter', sans-serif !important; }
-        .goog-te-combo { background-color: #1F293F; color: white; border: 1px solid rgba(255,255,255,0.1); border-radius: 0.5rem; padding: 0.5rem; outline: none; }
+        
+        /* OVERRIDES SEVEROS PARA GOOGLE TRANSLATE */
+        .goog-te-combo { 
+            background-color: #151C2C !important; 
+            color: white !important; 
+            border: 1px solid rgba(16, 185, 129, 0.5) !important; 
+            border-radius: 0.75rem !important; 
+            padding: 0.75rem !important; 
+            font-size: 1rem !important; 
+            width: 100% !important; 
+            outline: none !important;
+            appearance: none !important;
+            -webkit-appearance: none !important;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 1rem center !important;
+            background-size: 1em !important;
+        }
+        .goog-logo-link { display: none !important; }
+        .goog-te-gadget { color: transparent !important; font-size: 0 !important; }
+        .goog-te-gadget .goog-te-combo { margin: 0 !important; }
+        
     </style>
 </head>
 <body class="antialiased selection:bg-accent-purple selection:text-white relative">
@@ -362,6 +382,34 @@
                 </div>
             </section>
 
+            <!-- View: Stats -->
+            <section id="view-stats" class="view-section hidden p-4 md:p-8 animate-fade-in w-full max-w-5xl mx-auto">
+                <header class="mb-8 mt-2 md:mt-0">
+                    <h1 class="text-3xl md:text-4xl font-bold mb-2">Tus <span class="text-gradient">Estadísticas</span></h1>
+                    <p class="text-gray-400 text-sm">El tiempo total que has invertido en BingeTracker.</p>
+                </header>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="glass-card p-8 rounded-3xl border border-white/5 flex flex-col items-center justify-center text-center">
+                        <i class="ph-fill ph-television-simple text-5xl text-accent-purple mb-4"></i>
+                        <h3 class="text-gray-400 text-sm font-bold uppercase tracking-wider mb-2">Series Seguidas</h3>
+                        <span id="stat-shows" class="text-5xl font-black text-white">0</span>
+                    </div>
+                    <div class="glass-card p-8 rounded-3xl border border-white/5 flex flex-col items-center justify-center text-center">
+                        <i class="ph-fill ph-popcorn text-5xl text-yellow-400 mb-4"></i>
+                        <h3 class="text-gray-400 text-sm font-bold uppercase tracking-wider mb-2">Episodios Vistos</h3>
+                        <span id="stat-episodes" class="text-5xl font-black text-white">0</span>
+                    </div>
+                    <div class="glass-card p-8 rounded-3xl border border-white/5 flex flex-col items-center justify-center text-center">
+                        <i class="ph-fill ph-clock text-5xl text-accent-emerald mb-4"></i>
+                        <h3 class="text-gray-400 text-sm font-bold uppercase tracking-wider mb-2">Tiempo Total</h3>
+                        <div class="flex items-end gap-1">
+                            <span id="stat-time-days" class="text-5xl font-black text-white">0</span><span class="text-gray-400 text-sm mb-2 mr-2 font-bold">d</span>
+                            <span id="stat-time-hours" class="text-5xl font-black text-white">0</span><span class="text-gray-400 text-sm mb-2 font-bold">h</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <!-- Overlay View: Show Detail -->
             <section id="view-detail" class="fixed inset-0 z-50 bg-dark-900/95 backdrop-blur-xl transform translate-x-full transition-transform duration-300 overflow-y-auto flex flex-col md:pl-24">
                 <div class="sticky top-0 z-20 glass-panel px-4 py-4 flex justify-between items-center border-b border-white/5">
@@ -508,6 +556,7 @@
         let currentDetailEpisodesData = []; 
         let tvmazeCache = {}; // Cache api calls by ID
         let currentLibraryFilter = 'watching';
+        let currentActiveView = 'dashboard';
 
         const $ = (id) => document.getElementById(id);
         
@@ -576,7 +625,7 @@
                         onSnapshot(collection(db, 'users', u.uid, 'shows'), (snap) => {
                             trackedShows = {};
                             snap.forEach(d => trackedShows[d.id] = d.data());
-                            renderAllViews();
+                            renderView(currentActiveView);
                         });
                         
                         switchView('dashboard');
@@ -593,6 +642,7 @@
 
         // --- Navigation ---
         window.switchView = (v) => {
+            currentActiveView = v;
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             const b = $(`nav-${v}`); if(b) b.classList.add('active');
             document.querySelectorAll('.view-section').forEach(s => s.classList.add('hidden'));
@@ -1439,8 +1489,10 @@
                 Object.values(s.episodesWatched||{}).forEach(v => { if(v>0) { e+=v; t+=(v*rt); } });
             });
             const h = Math.floor(t/60), d = Math.floor(h/24), rh = h%24;
-            $('stat-shows').innerText = arr.length; $('stat-episodes').innerText = e;
-            $('stat-time-days').innerText = d; $('stat-time-hours').innerText = rh;
+            if($('stat-shows')) $('stat-shows').innerText = arr.length; 
+            if($('stat-episodes')) $('stat-episodes').innerText = e;
+            if($('stat-time-days')) $('stat-time-days').innerText = d; 
+            if($('stat-time-hours')) $('stat-time-hours').innerText = rh;
         }
 
         window.addEventListener('DOMContentLoaded', init);
