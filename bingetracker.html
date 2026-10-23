@@ -167,6 +167,12 @@
                 <span class="text-[10px] font-medium tracking-wider uppercase group-[.active]:text-white">Librería</span>
             </button>
             
+            <button onclick="switchView('community')" id="nav-community" class="nav-btn flex flex-col items-center gap-1 p-2 md:p-3 text-gray-400 hover:text-white transition-colors relative group">
+                <i class="ph ph-users text-2xl group-[.active]:text-rose-400 group-[.active]:ph-fill transition-all"></i>
+                <span class="text-[10px] font-medium tracking-wider uppercase group-[.active]:text-white hidden md:block">Comunidad</span>
+                <span class="text-[10px] font-medium tracking-wider uppercase group-[.active]:text-white md:hidden">Social</span>
+            </button>
+
             <button onclick="switchView('discover')" id="nav-discover" class="nav-btn flex flex-col items-center gap-1 p-2 md:p-3 text-gray-400 hover:text-white transition-colors relative group">
                 <i class="ph ph-compass text-2xl group-[.active]:text-rose-400 group-[.active]:ph-fill transition-all"></i>
                 <span class="text-[10px] font-medium tracking-wider uppercase group-[.active]:text-white hidden md:block">Descubrir</span>
@@ -410,6 +416,29 @@
                 </div>
             </section>
 
+            <!-- View: Community -->
+            <section id="view-community" class="view-section hidden p-4 md:p-8 animate-fade-in w-full max-w-7xl mx-auto">
+                <header class="mb-8 mt-2 md:mt-0">
+                    <h1 class="text-3xl md:text-4xl font-bold mb-2">Tu <span class="text-rose-400">Comunidad</span></h1>
+                    <p class="text-gray-400 text-sm">Busca amigos, sigue sus perfiles y descubre qué están viendo.</p>
+                </header>
+
+                <div class="relative w-full max-w-2xl mb-8">
+                    <i class="ph ph-magnifying-glass absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl"></i>
+                    <input type="text" id="community-search" placeholder="Buscar usuarios por nombre..." class="w-full bg-dark-800/80 border border-white/10 focus:border-rose-400 focus:ring-1 focus:ring-rose-400 rounded-2xl py-4 pl-12 pr-4 text-white placeholder-gray-500 outline-none transition-all shadow-lg text-lg">
+                </div>
+
+                <div id="community-tabs" class="flex gap-4 mb-6 border-b border-white/10 pb-2 overflow-x-auto no-scrollbar">
+                    <button onclick="setCommTab('following')" id="tab-comm-following" class="text-rose-400 font-bold border-b-2 border-rose-400 pb-2 px-2 transition-all whitespace-nowrap">Siguiendo</button>
+                    <button onclick="setCommTab('search')" id="tab-comm-search" class="text-gray-400 hover:text-white pb-2 px-2 transition-all whitespace-nowrap">Resultados</button>
+                </div>
+
+                <div id="comm-loading" class="hidden justify-center py-12"><div class="spinner border-t-rose-400 w-10 h-10 border-4"></div></div>
+                
+                <div id="comm-following-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
+                <div id="comm-search-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 hidden"></div>
+            </section>
+
             <!-- Overlay View: Show Detail -->
             <section id="view-detail" class="fixed inset-0 z-50 bg-dark-900/95 backdrop-blur-xl transform translate-x-full transition-transform duration-300 overflow-y-auto flex flex-col md:pl-24">
                 <div class="sticky top-0 z-20 glass-panel px-4 py-4 flex justify-between items-center border-b border-white/5">
@@ -450,32 +479,32 @@
                         <div class="md:col-span-2">
                             <h3 class="text-xl font-semibold mb-3 border-b border-white/10 pb-2">Sinopsis</h3>
                             <div id="detail-summary" class="text-gray-300 text-sm leading-relaxed prose prose-invert"></div>
-                        </div>
-                        
-                        <div id="detail-tracker-card" class="glass-card p-6 rounded-2xl hidden flex-col justify-center border-accent-purple/30">
-                            <h3 class="font-semibold text-center mb-4 text-gray-200">Progreso Total</h3>
-                            <div class="relative w-32 h-32 mx-auto mb-4">
-                                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                                    <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="8"></circle>
-                                    <circle id="detail-progress-circle" cx="50" cy="50" r="45" fill="none" stroke="#8B5CF6" stroke-width="8" stroke-dasharray="283" stroke-dashoffset="283" stroke-linecap="round" class="transition-all duration-1000"></circle>
-                                </svg>
-                                <div class="absolute inset-0 flex flex-col items-center justify-center">
-                                    <span id="detail-progress-percent" class="text-2xl font-bold">0%</span>
-                                </div>
-                            </div>
-                            <div class="text-center text-sm text-gray-400 mb-4">
-                                <span id="detail-watched-count" class="text-white font-bold text-lg">0</span> / <span id="detail-total-count">0</span> Emitidos
-                            </div>
-                            <div id="detail-status-container" class="w-full pt-4 border-t border-white/10">
-                                <!-- Status override inject -->
+            <!-- Overlay View: Public Profile -->
+            <section id="view-public-profile" class="fixed inset-0 z-[55] bg-dark-900/95 backdrop-blur-xl transform translate-x-full transition-transform duration-300 overflow-y-auto flex flex-col md:pl-24">
+                <div class="sticky top-0 z-20 glass-panel px-4 py-4 flex justify-between items-center border-b border-white/5">
+                    <button onclick="closePublicProfile()" class="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors"><i class="ph-bold ph-caret-left text-xl"></i></button>
+                    <button id="btn-follow-user" class="hidden px-5 py-2 rounded-xl text-sm font-bold shadow-lg transition-all active:scale-95"></button>
+                </div>
+                <div id="pub-profile-loading" class="flex-1 flex items-center justify-center hidden"><div class="spinner w-12 h-12 border-4 border-t-rose-400"></div></div>
+                <div id="pub-profile-content" class="pb-24 max-w-5xl mx-auto w-full hidden p-6 md:p-10">
+                    <div class="flex flex-col md:flex-row items-center gap-6 mb-12 text-center md:text-left">
+                        <div class="w-24 h-24 md:w-32 md:h-32 rounded-full bg-gradient-to-tr from-rose-500 to-purple-600 flex items-center justify-center text-4xl font-black text-white shadow-xl shadow-rose-500/20 border-4 border-dark-900 shrink-0" id="pub-avatar"></div>
+                        <div>
+                            <h1 class="text-3xl md:text-5xl font-bold mb-3" id="pub-name">Usuario</h1>
+                            <div class="flex flex-wrap justify-center md:justify-start gap-4 text-gray-300 font-medium">
+                                <span class="bg-white/10 px-4 py-1.5 rounded-full" id="pub-stat-shows"><i class="ph-fill ph-television-simple text-accent-purple"></i> 0 Series</span>
+                                <span class="bg-white/10 px-4 py-1.5 rounded-full" id="pub-stat-eps"><i class="ph-fill ph-popcorn text-yellow-400"></i> 0 Episodios</span>
                             </div>
                         </div>
                     </div>
-
-                    <div class="px-6 md:px-10 py-6">
-                        <h3 class="text-xl font-semibold mb-6 border-b border-white/10 pb-2">Episodios</h3>
-                        <div id="detail-seasons" class="space-y-4"></div>
+                    
+                    <h3 class="text-xl font-semibold mb-6 border-b border-white/10 pb-2">Librería de <span id="pub-name-short" class="text-rose-400"></span></h3>
+                    
+                    <div id="pub-shows-empty" class="hidden flex-col items-center justify-center py-10 opacity-50">
+                        <i class="ph-duotone ph-ghost text-5xl mb-2"></i>
+                        <p>No tiene series públicas.</p>
                     </div>
+                    <div id="pub-shows-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6"></div>
                 </div>
             </section>
         </main>
@@ -539,7 +568,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, deleteField } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, deleteField, getDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBttVULbQniX91bFT1bbk7D9O523GfXZAA",
@@ -550,8 +579,16 @@
             appId: "1:483090339853:web:8a77c757213888410edd44"
         };
         
+        // Critical Environment Paths (Rule 1 Compliance for robust multiplayer data)
+        const APP_ID = typeof __app_id !== 'undefined' ? __app_id : 'bingetracker-v1';
+        const PATH_USERS = `artifacts/${APP_ID}/users`;
+        const PATH_PUBLIC_USERS = `artifacts/${APP_ID}/public/data/users`;
+
         let app, db, auth, user = null;
         let trackedShows = {}; 
+        let followingUsers = {};
+        let allPublicUsers = [];
+        
         let currentDetailShowId = null;
         let currentDetailEpisodesData = []; 
         let tvmazeCache = {}; // Cache api calls by ID
@@ -614,33 +651,37 @@
                     if (u) {
                         user = u;
                         const displayName = u.displayName || u.email.split('@')[0];
-                        $('user-avatar-text').innerText = (u.displayName || u.email).substring(0,2).toUpperCase();
+                        $('user-avatar-text').innerText = displayName.substring(0,2).toUpperCase();
                         $('dash-user-name').innerText = displayName;
                         if($('profile-name-input')) $('profile-name-input').value = displayName;
                         
                         $('auth-screen').classList.add('hidden'); $('init-screen').classList.add('hidden');
                         $('app-container').classList.remove('hidden'); setTimeout(() => $('app-container').classList.remove('opacity-0'), 50);
                         
-                        // Listen Firestore
-                        onSnapshot(collection(db, 'users', u.uid, 'shows'), (snap) => {
+                        // Sync Public Profile for Community Features
+                        setDoc(doc(db, PATH_PUBLIC_USERS, u.uid), {
+                            uid: u.uid,
+                            displayName: displayName,
+                            lastActive: new Date().toISOString()
+                        }, { merge: true });
+
+                        // Listen Firestore (Private Shows)
+                        onSnapshot(collection(db, PATH_USERS, u.uid, 'shows'), (snap) => {
                             trackedShows = {};
                             snap.forEach(d => trackedShows[d.id] = d.data());
                             renderView(currentActiveView);
                         });
                         
+                        // Listen Firestore (Following)
+                        onSnapshot(collection(db, PATH_USERS, u.uid, 'following'), (snap) => {
+                            followingUsers = {};
+                            snap.forEach(d => followingUsers[d.id] = d.data());
+                            if(currentActiveView === 'community') renderCommunity();
+                        });
+                        
                         switchView('dashboard');
                     } else {
-                        user = null; trackedShows = {};
-                        $('init-screen').classList.add('hidden'); $('app-container').classList.add('hidden', 'opacity-0');
-                        $('auth-screen').classList.remove('hidden');
-                    }
-                });
-            } catch(e) { console.error(e); }
-        }
-
-        window.handleSignOut = () => signOut(auth);
-
-        // --- Navigation ---
+                        user = null; trackedShows = {}; followingUsers = {};
         window.switchView = (v) => {
             currentActiveView = v;
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -655,8 +696,10 @@
             if(v==='library') renderLibrary();
             if(v==='stats') renderStats();
             if(v==='discover') renderDiscover();
+            if(v==='community') renderCommunity();
         }
 
+        window.updateUserProfile = async () => {
         window.updateUserProfile = async () => {
             if(!user) return;
             const newName = $('profile-name-input').value.trim();
@@ -665,6 +708,10 @@
                 await updateProfile(user, { displayName: newName });
                 $('dash-user-name').innerText = newName;
                 $('user-avatar-text').innerText = newName.substring(0,2).toUpperCase();
+                
+                // Actualizar perfil público
+                await updateDoc(doc(db, PATH_PUBLIC_USERS, user.uid), { displayName: newName });
+                
                 showToast("Perfil actualizado correctamente", "success");
             } catch(e) { showToast("Error al actualizar perfil", "error"); }
         };
@@ -711,7 +758,7 @@
             if(totalAired !== currentDbData.totalEpisodes) updates.totalEpisodes = totalAired;
             
             if(Object.keys(updates).length > 0) {
-                await updateDoc(doc(db, 'users', user.uid, 'shows', showId.toString()), updates);
+                await updateDoc(doc(db, PATH_USERS, user.uid, 'shows', showId.toString()), updates);
                 return calcStatus;
             }
             return currentDbData.status;
@@ -845,7 +892,7 @@
             const currentData = trackedShows[showId];
             if(!currentData) return;
             const currentCount = (currentData.episodesWatched && currentData.episodesWatched[epId]) || 0;
-            const docRef = doc(db, 'users', user.uid, 'shows', showId.toString());
+            const docRef = doc(db, PATH_USERS, user.uid, 'shows', showId.toString());
             await updateDoc(docRef, { [`episodesWatched.${epId}`]: currentCount + 1 });
             showToast("Episodio marcado", "success");
             // Dashboard will re-render automatically due to onSnapshot
@@ -1279,7 +1326,7 @@
                 const block = document.createElement('div'); block.className = "bg-dark-800/40 rounded-2xl border border-white/5";
                 const head = document.createElement('div'); head.className = "bg-dark-700/50 p-4 flex items-center justify-between cursor-pointer";
                 head.id = `sh-${sNum}`;
-                const list = document.createElement('div'); list.className = "divide-y divide-white/5 hidden";
+                const list = document.createElement('div'); list.className = "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 hidden";
                 
                 head.onclick = (e) => { if(e.target.closest('button')) return; list.classList.toggle('hidden'); head.querySelector('.ph-caret-down').classList.toggle('rotate-180'); };
                 
@@ -1287,23 +1334,29 @@
                     const epId = ep.id.toString();
                     const isAired = ep.airdate && new Date(ep.airdate) <= today;
                     const row = document.createElement('div');
-                    row.className = `p-3 md:p-4 flex flex-col md:flex-row md:items-center gap-4 ${!isAired?'opacity-50 grayscale':''}`;
+                    
+                    const imgSrc = ep.image?.medium || show.image?.medium || 'https://placehold.co/300x170/1F293F/ffffff?text=Episodio';
+                    
                     row.id = `ep-row-${epId}`;
+                    row.className = `glass-card rounded-xl border border-white/5 overflow-hidden flex flex-col relative group transition-colors ${!isAired?'opacity-50 grayscale':''}`;
                     
                     row.innerHTML = `
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-2 mb-1">
-                                <span class="text-[10px] font-bold text-accent-purple bg-accent-purple/10 px-1.5 rounded">S${String(ep.season).padStart(2,'0')}E${String(ep.number).padStart(2,'0')}</span>
-                                <h4 class="font-medium text-sm truncate">${ep.name}</h4>
-                            </div>
-                            <p class="text-xs text-gray-400">${ep.airdate ? new Date(ep.airdate).toLocaleDateString('es-ES') : 'Por anunciar'}</p>
+                        <div class="relative aspect-video bg-dark-800 overflow-hidden">
+                            <img src="${imgSrc}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <div class="absolute inset-0 bg-gradient-to-t from-dark-900/80 to-transparent"></div>
+                            <div class="absolute top-2 left-2 bg-accent-purple/90 backdrop-blur text-white text-[10px] font-bold px-2 py-1 rounded-md shadow-lg uppercase border border-white/20 tracking-wider">T${String(ep.season).padStart(2,'0')}E${String(ep.number).padStart(2,'0')}</div>
                         </div>
-                        <div class="flex items-center justify-end gap-3 shrink-0" data-epid="${epId}">
-                            ${isTracked && isAired ? `
-                                <button onclick="updateEp('${show.id}', '${epId}', -1)" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-300 disabled:opacity-30" id="dec-${epId}"><i class="ph-bold ph-minus"></i></button>
-                                <span class="font-bold w-4 text-center" id="cnt-${epId}">0</span>
-                                <button onclick="updateEp('${show.id}', '${epId}', 1)" class="w-8 h-8 rounded-full bg-accent-emerald/20 text-accent-emerald flex items-center justify-center"><i class="ph-bold ph-plus"></i></button>
-                            ` : (!isAired ? '<span class="text-xs text-gray-500 uppercase font-bold tracking-wider">No Emitido</span>' : '')}
+                        <div class="p-3 md:p-4 flex-1 flex flex-col">
+                            <h4 class="font-bold text-xs line-clamp-2 mb-1 leading-tight text-gray-200" title="${ep.name}">${ep.name}</h4>
+                            <p class="text-[10px] text-gray-400 mb-4 font-medium">${ep.airdate ? new Date(ep.airdate).toLocaleDateString('es-ES') : 'Por anunciar'}</p>
+                            
+                            <div class="mt-auto flex items-center justify-between border-t border-white/10 pt-3" data-epid="${epId}">
+                                ${isTracked && isAired ? `
+                                    <button onclick="updateEp('${show.id}', '${epId}', -1)" class="w-7 h-7 rounded-full bg-white/5 hover:bg-white/20 flex items-center justify-center text-gray-400 hover:text-white disabled:opacity-30 transition" id="dec-${epId}"><i class="ph-bold ph-minus text-xs"></i></button>
+                                    <span class="font-bold text-sm w-8 text-center text-white" id="cnt-${epId}">0</span>
+                                    <button onclick="updateEp('${show.id}', '${epId}', 1)" class="w-7 h-7 rounded-full bg-accent-emerald/20 hover:bg-accent-emerald/40 text-accent-emerald flex items-center justify-center transition" id="inc-${epId}"><i class="ph-bold ph-plus text-xs"></i></button>
+                                ` : (!isAired ? '<span class="text-[9px] text-gray-500 uppercase font-bold tracking-wider mx-auto bg-white/5 px-2 py-1 rounded">No Emitido</span>' : '<span class="text-[9px] text-gray-500 uppercase font-bold tracking-wider mx-auto">Sigue la serie</span>')}
+                            </div>
                         </div>
                     `;
                     list.appendChild(row);
@@ -1336,7 +1389,15 @@
                 if($(`cnt-${id}`)) $(`cnt-${id}`).textContent = v;
                 if($(`dec-${id}`)) $(`dec-${id}`).disabled = v<=0;
                 const r = $(`ep-row-${id}`);
-                if(r) { if(v>0){ r.classList.add('bg-white/[0.02]'); r.style.borderLeft="3px solid #10B981"; } else { r.classList.remove('bg-white/[0.02]'); r.style.borderLeft="none"; } }
+                if(r) { 
+                    if(v>0){ 
+                        r.classList.add('border-accent-emerald', 'bg-accent-emerald/5'); 
+                        r.classList.remove('border-white/5');
+                    } else { 
+                        r.classList.remove('border-accent-emerald', 'bg-accent-emerald/5'); 
+                        r.classList.add('border-white/5');
+                    } 
+                }
             });
 
             // Season headers
@@ -1366,7 +1427,7 @@
         window.addShow = async (id, name, img, runtime) => {
             if(!user) return;
             const eps = currentDetailEpisodesData.filter(ep=>ep.airdate && new Date(ep.airdate)<=new Date());
-            await setDoc(doc(db, 'users', user.uid, 'shows', id.toString()), {
+            await setDoc(doc(db, PATH_USERS, user.uid, 'shows', id.toString()), {
                 showId: id, name, image: img, runtime, totalEpisodes: eps.length, episodesWatched: {}, status: 'planned', rating: 0
             });
             showToast("Serie añadida", "success");
@@ -1375,19 +1436,19 @@
 
         window.removeShow = async (id) => {
             if(!user) return;
-            await deleteDoc(doc(db, 'users', user.uid, 'shows', id.toString()));
+            await deleteDoc(doc(db, PATH_USERS, user.uid, 'shows', id.toString()));
             showToast("Serie eliminada", "info"); closeDetailView();
         };
 
         window.forceStatus = async (showId, status) => {
             if(!user) return;
-            await updateDoc(doc(db, 'users', user.uid, 'shows', showId.toString()), { status });
+            await updateDoc(doc(db, PATH_USERS, user.uid, 'shows', showId.toString()), { status });
             showToast("Estado forzado", "info");
         }
 
         window.rateShow = async (showId, rating) => {
             if(!user) return;
-            await updateDoc(doc(db, 'users', user.uid, 'shows', showId.toString()), { rating });
+            await updateDoc(doc(db, PATH_USERS, user.uid, 'shows', showId.toString()), { rating });
             
             // visual update immediately
             const stars = $('detail-rating-container').querySelectorAll('.ph-star');
@@ -1419,7 +1480,7 @@
                             data.episodesWatched[i] = 1; // Actualización optimista local
                         });
                         renderDetailProgressUI(); // UI Instantánea
-                        await updateDoc(doc(db, 'users', user.uid, 'shows', sId.toString()), upd);
+                        await updateDoc(doc(db, PATH_USERS, user.uid, 'shows', sId.toString()), upd);
                         checkOptimisticCompletion(sId);
                     });
                     return;
@@ -1434,7 +1495,7 @@
             renderDetailProgressUI();
 
             // Petición a base de datos en segundo plano
-            const docRef = doc(db, 'users', user.uid, 'shows', sId.toString());
+            const docRef = doc(db, PATH_USERS, user.uid, 'shows', sId.toString());
             updateDoc(docRef, { [`episodesWatched.${epId}`]: nxt>0?nxt:deleteField() })
                 .then(() => checkOptimisticCompletion(sId))
                 .catch(e => { console.error(e); showToast("Error de conexión", "error"); });
@@ -1456,7 +1517,7 @@
                 
                 if(Object.keys(upd).length>0) {
                     renderDetailProgressUI(); // UI Instantánea
-                    const docRef = doc(db, 'users', user.uid, 'shows', sId.toString());
+                    const docRef = doc(db, PATH_USERS, user.uid, 'shows', sId.toString());
                     updateDoc(docRef, upd)
                         .then(() => checkOptimisticCompletion(sId))
                         .catch(e => showToast("Error de conexión", "error"));
@@ -1476,8 +1537,169 @@
                 data.status = 'completed';
                 if($('detail-status')) $('detail-status').textContent = 'Terminado'; // Actualizar badge de UI si está abierto
                 showToast("¡Felicidades! Serie completada.", "success");
-                updateDoc(doc(db, 'users', user.uid, 'shows', sId.toString()), { status: 'completed' });
+                updateDoc(doc(db, PATH_USERS, user.uid, 'shows', sId.toString()), { status: 'completed' });
             }
+        }
+        
+        // --- Community ---
+        let currentCommTab = 'following';
+
+        window.setCommTab = (tab) => {
+            currentCommTab = tab;
+            $('tab-comm-following').className = tab === 'following' ? 'text-rose-400 font-bold border-b-2 border-rose-400 pb-2 px-2 transition-all whitespace-nowrap' : 'text-gray-400 hover:text-white pb-2 px-2 transition-all whitespace-nowrap';
+            $('tab-comm-search').className = tab === 'search' ? 'text-rose-400 font-bold border-b-2 border-rose-400 pb-2 px-2 transition-all whitespace-nowrap' : 'text-gray-400 hover:text-white pb-2 px-2 transition-all whitespace-nowrap';
+            $('comm-following-grid').classList.toggle('hidden', tab !== 'following');
+            $('comm-search-grid').classList.toggle('hidden', tab !== 'search');
+        }
+
+        $('community-search').addEventListener('input', async (e) => {
+            const q = e.target.value.toLowerCase().trim();
+            setCommTab('search');
+            if(q.length < 2) { $('comm-search-grid').innerHTML = ''; return; }
+            $('comm-loading').classList.remove('hidden'); $('comm-search-grid').classList.add('hidden');
+            
+            try {
+                if(allPublicUsers.length === 0) {
+                    const snap = await getDocs(collection(db, PATH_PUBLIC_USERS));
+                    allPublicUsers = []; snap.forEach(d => allPublicUsers.push(d.data()));
+                }
+                
+                const results = allPublicUsers.filter(u => u.uid !== user.uid && (u.displayName||'').toLowerCase().includes(q));
+                
+                const grid = $('comm-search-grid'); grid.innerHTML = '';
+                if(results.length === 0) grid.innerHTML = '<div class="col-span-full text-center text-gray-400 py-10">No se encontraron usuarios.</div>';
+                
+                results.forEach(u => {
+                    const isFollowing = !!followingUsers[u.uid];
+                    grid.innerHTML += `
+                        <div class="glass-card p-5 rounded-2xl flex items-center justify-between cursor-pointer hover:bg-white/5 border border-white/5 hover:border-rose-400/30 transition-all" onclick="openPublicProfile('${u.uid}')">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-rose-500 to-purple-600 flex items-center justify-center font-bold text-white shadow-lg text-lg border-2 border-dark-900">${(u.displayName||'U').substring(0,2).toUpperCase()}</div>
+                                <span class="font-bold text-lg text-gray-200">${u.displayName||'Usuario'}</span>
+                            </div>
+                            ${isFollowing ? '<i class="ph-fill ph-check-circle text-rose-400 text-2xl drop-shadow-md"></i>' : ''}
+                        </div>
+                    `;
+                });
+            } catch (err) { showToast("Error al buscar", "error"); }
+            
+            $('comm-loading').classList.add('hidden'); $('comm-search-grid').classList.remove('hidden');
+        });
+
+        function renderCommunity() {
+            const grid = $('comm-following-grid'); grid.innerHTML = '';
+            const followed = Object.values(followingUsers);
+            if(followed.length === 0) {
+                 grid.innerHTML = '<div class="col-span-full flex flex-col items-center text-gray-400 py-16 opacity-50"><i class="ph-duotone ph-users text-6xl mb-4"></i><p>No sigues a nadie aún.</p></div>';
+                 return;
+            }
+            followed.forEach(u => {
+                grid.innerHTML += `
+                    <div class="glass-card p-5 rounded-2xl flex items-center gap-4 cursor-pointer hover:bg-white/5 transition-all border border-white/5 hover:border-rose-400/30 group" onclick="openPublicProfile('${u.uid}')">
+                        <div class="w-14 h-14 rounded-full bg-gradient-to-tr from-rose-500 to-purple-600 flex items-center justify-center font-black text-white text-xl shadow-lg border-2 border-dark-900 group-hover:scale-105 transition-transform">${(u.displayName||'U').substring(0,2).toUpperCase()}</div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="font-bold text-white text-lg truncate">${u.displayName||'Usuario'}</h4>
+                            <p class="text-xs text-rose-400 font-medium mt-1">Ver perfil</p>
+                        </div>
+                        <i class="ph-bold ph-caret-right text-gray-600 group-hover:text-rose-400 transition-colors"></i>
+                    </div>
+                `;
+            });
+        }
+
+        let currentPubUid = null;
+        window.openPublicProfile = async (uid) => {
+            currentPubUid = uid;
+            $('view-public-profile').classList.remove('translate-x-full');
+            $('pub-profile-content').classList.add('hidden');
+            $('pub-profile-loading').classList.remove('hidden');
+            
+            // Setup Follow Button
+            const btn = $('btn-follow-user');
+            btn.classList.remove('hidden');
+            const isFollowing = !!followingUsers[uid];
+            btn.className = isFollowing ? "px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg transition-all active:scale-95 bg-white/10 text-white hover:bg-red-500/20 hover:text-red-400" : "px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg transition-all active:scale-95 bg-rose-500 text-white hover:bg-rose-600 shadow-rose-500/20";
+            btn.innerHTML = isFollowing ? '<i class="ph-bold ph-user-minus mr-1"></i> Dejar de seguir' : '<i class="ph-bold ph-user-plus mr-1"></i> Seguir';
+            btn.onclick = () => toggleFollow(uid);
+
+            try {
+                // Fetch User Info
+                let uInfo = allPublicUsers.find(u => u.uid === uid);
+                if(!uInfo) {
+                    const docSnap = await getDoc(doc(db, PATH_PUBLIC_USERS, uid));
+                    if(docSnap.exists()) uInfo = docSnap.data();
+                }
+                
+                const name = uInfo ? uInfo.displayName : 'Usuario';
+                $('pub-avatar').innerText = name.substring(0,2).toUpperCase();
+                $('pub-name').innerText = name;
+                $('pub-name-short').innerText = name;
+
+                // Fetch their shows
+                const showsSnap = await getDocs(collection(db, PATH_USERS, uid, 'shows'));
+                let pubShows = [];
+                let totalEps = 0;
+                showsSnap.forEach(d => {
+                    const data = d.data();
+                    pubShows.push(data);
+                    totalEps += Object.values(data.episodesWatched||{}).filter(v=>v>0).length;
+                });
+
+                $('pub-stat-shows').innerHTML = `<i class="ph-fill ph-television-simple text-accent-purple"></i> ${pubShows.length} Series`;
+                $('pub-stat-eps').innerHTML = `<i class="ph-fill ph-popcorn text-yellow-400"></i> ${totalEps} Episodios`;
+
+                const grid = $('pub-shows-grid'); grid.innerHTML = '';
+                if (pubShows.length === 0) {
+                    $('pub-shows-empty').classList.remove('hidden');
+                    $('pub-shows-empty').classList.add('flex');
+                } else {
+                    $('pub-shows-empty').classList.add('hidden');
+                    $('pub-shows-empty').classList.remove('flex');
+                    pubShows.sort((a,b)=>a.name.localeCompare(b.name)).forEach(s => {
+                        const map = s.episodesWatched || {};
+                        const wCount = Object.keys(map).filter(k=>map[k]>0).length;
+                        const tot = s.totalEpisodes || 1;
+                        const pct = Math.min(Math.round((wCount/tot)*100), 100);
+                        
+                        grid.innerHTML += `
+                            <div class="glass-card rounded-2xl overflow-hidden relative cursor-pointer group hover:-translate-y-1 transition-transform border border-white/5 hover:border-rose-400/30" onclick="openShowDetail(${s.showId})">
+                                <div class="relative aspect-[2/3] bg-dark-800">
+                                    <img src="${s.image||'https://placehold.co/210x295/1F293F/ffffff?text=Serie'}" class="w-full h-full object-cover">
+                                    <div class="absolute bottom-0 w-full h-1.5 bg-dark-900/50"><div class="h-full bg-gradient-to-r from-rose-500 to-purple-500" style="width:${pct}%"></div></div>
+                                </div>
+                                <div class="p-3 text-center bg-dark-800/80 backdrop-blur-md h-full">
+                                    <h4 class="font-bold text-xs line-clamp-2 text-white mb-1 leading-tight">${s.name}</h4>
+                                    <span class="text-[10px] text-gray-400 font-medium">${wCount}/${tot} EP</span>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+            } catch (err) {
+                showToast("Error al cargar el perfil", "error");
+            }
+            
+            $('pub-profile-loading').classList.add('hidden');
+            $('pub-profile-content').classList.remove('hidden');
+        }
+
+        window.closePublicProfile = () => {
+            $('view-public-profile').classList.add('translate-x-full');
+            setTimeout(() => { $('pub-profile-content').classList.add('hidden'); currentPubUid = null; }, 300);
+        }
+        
+        window.toggleFollow = async (uid) => {
+            if(!user) return;
+            const ref = doc(db, PATH_USERS, user.uid, 'following', uid);
+            const isFollowing = !!followingUsers[uid];
+            const uInfo = allPublicUsers.find(u => u.uid === uid) || { uid, displayName: $('pub-name').innerText };
+
+            try {
+                if(isFollowing) await deleteDoc(ref);
+                else await setDoc(ref, uInfo);
+                showToast(isFollowing ? "Dejaste de seguir" : "Siguiendo a " + uInfo.displayName, "success");
+                openPublicProfile(uid); // Re-render optimista
+            } catch(e) { showToast("Error al procesar", "error"); }
         }
 
         // --- Stats ---
