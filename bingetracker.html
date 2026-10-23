@@ -101,7 +101,7 @@
         
     </style>
 </head>
-<s="antialiased selection:bg-accent-purple selection:text-white relative">
+<body class="antialiased selection:bg-accent-purple selection:text-white relative">
 
     <!-- Ambient Glow -->
     <div class="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] bg-accent-purple/20 blur-[120px] rounded-full pointer-events-none z-[-1]"></div>
@@ -479,6 +479,38 @@
                         <div class="md:col-span-2">
                             <h3 class="text-xl font-semibold mb-3 border-b border-white/10 pb-2">Sinopsis</h3>
                             <div id="detail-summary" class="text-gray-300 text-sm leading-relaxed prose prose-invert"></div>
+                        </div>
+                        <div class="md:col-span-1">
+                            <div id="detail-tracker-card" class="glass-card p-6 rounded-2xl hidden flex-col gap-4 sticky top-24">
+                                <h3 class="font-bold text-lg border-b border-white/10 pb-2">Tu Progreso</h3>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-gray-400">Vistos</span>
+                                    <span class="font-bold text-xl"><span id="detail-watched-count" class="text-white">0</span> <span class="text-gray-500 text-sm">/ <span id="detail-total-count">0</span></span></span>
+                                </div>
+                                <!-- Progress Circle -->
+                                <div class="flex items-center justify-center py-2">
+                                    <div class="relative w-24 h-24">
+                                        <svg class="w-full h-full" viewBox="0 0 100 100">
+                                            <circle class="text-dark-900 stroke-current" stroke-width="8" cx="50" cy="50" r="45" fill="transparent"></circle>
+                                            <circle id="detail-progress-circle" class="text-accent-purple stroke-current transition-all duration-500" stroke-width="8" stroke-linecap="round" cx="50" cy="50" r="45" fill="transparent" stroke-dasharray="282.7" stroke-dashoffset="282.7" transform="rotate(-90 50 50)"></circle>
+                                        </svg>
+                                        <div class="absolute inset-0 flex items-center justify-center">
+                                            <span id="detail-progress-percent" class="text-xl font-bold">0%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="detail-status-container"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Seasons & Episodes -->
+                    <div class="px-6 md:px-10 pb-10">
+                        <h3 class="text-xl font-semibold mb-4 border-b border-white/10 pb-2">Episodios</h3>
+                        <div id="detail-seasons" class="space-y-4"></div>
+                    </div>
+                </div>
+            </section>
             <!-- Overlay View: Public Profile -->
             <section id="view-public-profile" class="fixed inset-0 z-[55] bg-dark-900/95 backdrop-blur-xl transform translate-x-full transition-transform duration-300 overflow-y-auto flex flex-col md:pl-24">
                 <div class="sticky top-0 z-20 glass-panel px-4 py-4 flex justify-between items-center border-b border-white/5">
@@ -682,12 +714,29 @@
                         switchView('dashboard');
                     } else {
                         user = null; trackedShows = {}; followingUsers = {};
+                        $('app-container').classList.add('hidden');
+                        $('auth-screen').classList.remove('hidden');
+                        $('init-screen').classList.add('hidden');
+                    }
+                });
+            } catch (err) {
+                console.error("Firebase init error:", err);
+                showToast("Error de conexión con Firebase", "error");
+            }
+        }
+
+        window.handleSignOut = async () => {
+            if (auth) {
+                await signOut(auth);
+            }
+        };
+
         window.switchView = (v) => {
             currentActiveView = v;
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             const b = $(`nav-${v}`); if(b) b.classList.add('active');
             document.querySelectorAll('.view-section').forEach(s => s.classList.add('hidden'));
-            $(`view-${v}`).classList.remove('hidden');
+            const sec = $(`view-${v}`); if(sec) sec.classList.remove('hidden');
             renderView(v);
         };
 
@@ -699,7 +748,6 @@
             if(v==='community') renderCommunity();
         }
 
-        window.updateUserProfile = async () => {
         window.updateUserProfile = async () => {
             if(!user) return;
             const newName = $('profile-name-input').value.trim();
@@ -1733,6 +1781,5 @@
         }
     </script>
     <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-    
 </body>
 </html>
