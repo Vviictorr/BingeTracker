@@ -611,10 +611,9 @@
             appId: "1:483090339853:web:8a77c757213888410edd44"
         };
         
-        // Critical Environment Paths (Rule 1 Compliance for robust multiplayer data)
-        const APP_ID = typeof __app_id !== 'undefined' ? __app_id : 'bingetracker-v1';
-        const PATH_USERS = `artifacts/${APP_ID}/users`;
-        const PATH_PUBLIC_USERS = `artifacts/${APP_ID}/public/data/users`;
+        // Rutas de la base de datos (Restauradas a la raíz para recuperar tus datos originales)
+        const PATH_USERS = `users`;
+        const PATH_PUBLIC_USERS = `public_users`;
 
         let app, db, auth, user = null;
         let trackedShows = {}; 
