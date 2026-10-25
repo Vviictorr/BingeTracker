@@ -5,10 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>BingeTracker - Tu Gestor de Series</title>
     
-    <!-- PWA Meta Tags & Inline Manifest -->
+    <!-- PWA Official Manifest Link -->
+    <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0B0F19">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icon-192.png">
 
     <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -97,7 +99,6 @@
         .goog-logo-link { display: none !important; }
         .goog-te-gadget { color: transparent !important; font-size: 0 !important; }
         .goog-te-gadget .goog-te-combo { margin: 0 !important; }
-        
     </style>
 </head>
 <body class="antialiased selection:bg-accent-purple selection:text-white relative">
@@ -145,7 +146,7 @@
 
     <div id="app-container" class="hidden opacity-0 transition-opacity duration-500">
         
-        <!-- Navigation (Simplified to 5 Tabs) -->
+        <!-- Navigation (5 Tabs) -->
         <nav class="glass-panel fixed bottom-0 w-full md:w-24 md:h-screen md:left-0 md:top-0 z-40 flex md:flex-col items-center justify-around md:justify-start md:pt-8 md:gap-6 pb-safe pt-2 md:pb-8 border-t md:border-t-0 md:border-r border-white/10">
             <div class="hidden md:flex flex-col items-center mb-4"><i class="ph-fill ph-television-simple text-3xl text-accent-purple"></i></div>
 
@@ -243,7 +244,7 @@
                 </div>
             </section>
 
-            <!-- View: Profile (Now contains Stats) -->
+            <!-- View: Profile (Stats & Config) -->
             <section id="view-profile" class="view-section hidden p-4 md:p-8 animate-fade-in max-w-4xl mx-auto w-full">
                 <header class="mb-8 mt-2 md:mt-0">
                     <h1 class="text-3xl md:text-4xl font-bold mb-2">Tu <span class="text-gradient">Perfil</span></h1>
@@ -339,7 +340,7 @@
                 <div id="library-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6 mt-4"></div>
             </section>
 
-            <!-- View: Search (Now includes Discover) -->
+            <!-- View: Search (Discover + Search) -->
             <section id="view-search" class="view-section hidden p-4 md:p-8 animate-fade-in w-full max-w-7xl mx-auto">
                 <header class="mb-8 flex flex-col gap-4 max-w-4xl mt-2">
                     <h1 class="text-3xl font-bold mb-1"><span class="text-gradient">Explorar</span> Base de Datos</h1>
@@ -531,38 +532,18 @@
         </main>
     </div>
 
-    <!-- PWA Service Worker Registration -->
+    <!-- Service Worker Registration -->
     <script>
-        const currentUrl = window.location.href.split('#')[0].split('?')[0]; 
-        const manifestJSON = {
-            "name": "BingeTracker",
-            "short_name": "BingeTracker",
-            "start_url": currentUrl,
-            "display": "standalone",
-            "background_color": "#0B0F19",
-            "theme_color": "#0B0F19",
-            "icons": [{
-                "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzBCOEYxOSIvPjwvc3ZnPg==",
-                "sizes": "192x192",
-                "type": "image/svg+xml"
-            }]
-        };
-        const manifestBlob = new Blob([JSON.stringify(manifestJSON)], {type: 'application/manifest+json'});
-        const manifestLink = document.createElement('link');
-        manifestLink.rel = 'manifest';
-        manifestLink.href = URL.createObjectURL(manifestBlob);
-        document.head.appendChild(manifestLink);
-
-        const swCode = `
-            const CACHE_NAME = 'bingetracker-v4';
-            self.addEventListener('install', (e) => self.skipWaiting());
-            self.addEventListener('activate', (e) => self.clients.claim());
-            self.addEventListener('fetch', (e) => {
-                e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
-            });
-        `;
-        const blob = new Blob([swCode], {type: 'application/javascript'});
         if ('serviceWorker' in navigator) {
+            const swCode = `
+                const CACHE_NAME = 'bingetracker-v5';
+                self.addEventListener('install', (e) => self.skipWaiting());
+                self.addEventListener('activate', (e) => self.clients.claim());
+                self.addEventListener('fetch', (e) => {
+                    e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+                });
+            `;
+            const blob = new Blob([swCode], {type: 'application/javascript'});
             navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(err => console.log('SW Reg failed:', err));
         }
 
@@ -590,7 +571,6 @@
         import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile, updatePassword } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, deleteField, getDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Usamos tu config original para que conecte con tus datos reales.
         const firebaseConfig = {
             apiKey: "AIzaSyBttVULbQniX91bFT1bbk7D9O523GfXZAA",
             authDomain: "bingetracker-669c9.firebaseapp.com",
@@ -600,7 +580,6 @@
             appId: "1:483090339853:web:8a77c757213888410edd44"
         };
         
-        // Volvemos a leer de tu carpeta raíz original para no perder tus series guardadas.
         const PATH_USERS = `users`;
         const PATH_PUBLIC_USERS = `public_users`;
 
@@ -675,14 +654,14 @@
                         $('auth-screen').classList.add('hidden'); $('init-screen').classList.add('hidden');
                         $('app-container').classList.remove('hidden'); setTimeout(() => $('app-container').classList.remove('opacity-0'), 50);
                         
-                        // Guardamos datos públicos (solo ID y nombre) para la comunidad
                         setDoc(doc(db, PATH_PUBLIC_USERS, u.uid), { uid: u.uid, displayName: displayName, lastActive: new Date().toISOString() }, { merge: true }).catch(()=>{});
 
+                        let firstLoad = true;
                         onSnapshot(collection(db, PATH_USERS, u.uid, 'shows'), (snap) => {
                             trackedShows = {};
                             snap.forEach(d => trackedShows[d.id] = d.data());
-                            renderView(currentActiveView);
-                            if(currentActiveView === 'profile') renderStats();
+                            if(firstLoad) { switchView('dashboard'); firstLoad = false; } 
+                            else { renderView(currentActiveView); if(currentActiveView === 'profile') renderStats(); }
                         });
                         
                         onSnapshot(collection(db, PATH_USERS, u.uid, 'following'), (snap) => {
@@ -691,7 +670,6 @@
                             if(currentActiveView === 'community') renderCommunity();
                         });
                         
-                        switchView('dashboard');
                     } else {
                         user = null; trackedShows = {}; followingUsers = {};
                         $('app-container').classList.add('hidden');
@@ -758,7 +736,7 @@
             if(tvmazeCache[showId]) return tvmazeCache[showId];
             try {
                 const res = await fetch(`https://api.tvmaze.com/shows/${showId}?embed=episodes`);
-                if(!res.ok) return null; // Previene fallos si la API de TVMaze nos limita
+                if(!res.ok) return null; 
                 const data = await res.json();
                 tvmazeCache[showId] = data;
                 return data;
@@ -784,7 +762,6 @@
             if(totalAired !== currentDbData.totalEpisodes) updates.totalEpisodes = totalAired;
             
             if(Object.keys(updates).length > 0) {
-                // Actualizamos Firebase
                 await updateDoc(doc(db, PATH_USERS, user.uid, 'shows', showId.toString()), updates);
                 return calcStatus;
             }
@@ -812,13 +789,11 @@
             let upcomingEvents = [];
 
             try {
-                // Cargamos de forma segura las series, con timeout por si la API falla
                 const loadPromises = allShows.map(async (dbShow) => {
                     try {
                         const apiData = await fetchTVMaze(dbShow.showId);
                         if(!apiData) return;
                         
-                        // Envolvemos el calculo de Firebase en try/catch para que no crashee la pantalla
                         let actualStatus = dbShow.status;
                         try { actualStatus = await calculateShowStatus(dbShow.showId, apiData._embedded.episodes, dbShow) || actualStatus; } catch(e){}
 
@@ -1201,7 +1176,6 @@
             $('detail-content').classList.add('hidden'); $('detail-loading').classList.remove('hidden'); $('detail-actions').innerHTML = '';
             
             try {
-                // 1. Cargamos de TVMaze
                 const apiData = await fetchTVMaze(id);
                 if(!apiData) {
                     showToast("No se ha podido cargar de TVMaze. Inténtalo en unos segundos.", "error");
@@ -1211,7 +1185,6 @@
                 
                 currentDetailEpisodesData = apiData._embedded.episodes;
                 
-                // Set absolute global episode numbers (#)
                 let globalCount = 1;
                 currentDetailEpisodesData.forEach(ep => {
                     if (ep.season > 0 && ep.number !== null && ep.airdate) {
@@ -1219,21 +1192,15 @@
                     }
                 });
 
-                // 2. Si la serie está en Firebase, calculamos estado
                 if(trackedShows[id]) {
                     try {
                         await calculateShowStatus(id, currentDetailEpisodesData, trackedShows[id]);
-                    } catch(fbError) {
-                        console.error("Error sincronizando Firebase:", fbError);
-                        // No rompemos la pantalla si Firebase nos da fallo de permisos o red, seguimos dibujando.
-                    }
+                    } catch(fbError) {}
                 }
                 
-                // 3. Dibujamos en pantalla todo lo cargado
                 renderDetail(apiData);
                 
             } catch(e) { 
-                console.error("Error crítico en openShowDetail:", e);
                 showToast("Error inesperado al cargar la serie", "error"); 
                 closeDetailView(); 
             }
@@ -1284,7 +1251,6 @@
                 $('detail-tracker-card').classList.add('hidden'); $('detail-tracker-card').classList.remove('flex');
             }
 
-            // Agrupación por Temporadas
             const sMap = {}; 
             currentDetailEpisodesData.forEach(ep=>{ if(!sMap[ep.season]) sMap[ep.season]=[]; sMap[ep.season].push(ep); });
             const sCont = $('detail-seasons'); sCont.innerHTML = '';
@@ -1341,7 +1307,6 @@
                 block.appendChild(head); block.appendChild(list); sCont.appendChild(block);
             });
 
-            // Apertura segura de la primera temporada (evita crasheos de la vista)
             setTimeout(() => {
                 if(isTracked && Object.keys(sMap).length > 0) {
                     const firstSeason = sCont.querySelector(`#sh-${Object.keys(sMap)[0]}`);
@@ -1379,22 +1344,18 @@
             const massActions = $('detail-mass-actions');
             if(massActions && trackedShows[currentDetailShowId]) {
                 massActions.innerHTML = '';
-                // Si estamos al 100%, mostramos botón rojo de DESMARCAR
                 if(pct === 100 && total > 0) {
                     massActions.innerHTML += `<button onclick="unmarkAllShow('${currentDetailShowId}')" class="text-[10px] bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white px-3 py-1.5 rounded-lg font-bold uppercase transition shadow-lg border border-red-500/20"><i class="ph-bold ph-x-circle mr-1"></i>Desmarcar Serie</button>`;
                 } 
-                // Si nos falta, mostramos botón verde de MARCAR
                 else if (total > 0) {
                     massActions.innerHTML += `<button onclick="markAllShow('${currentDetailShowId}')" class="text-[10px] bg-accent-emerald/20 text-accent-emerald hover:bg-accent-emerald hover:text-white px-3 py-1.5 rounded-lg font-bold uppercase transition shadow-lg border border-emerald-500/20"><i class="ph-bold ph-check-double mr-1"></i>Marcar Serie</button>`;
                 }
                 
-                // Botón Morado de (+1)
                 if(total > 0) {
                     massActions.innerHTML += `<button onclick="rewatchAllShow('${currentDetailShowId}')" class="text-[10px] bg-accent-purple/20 text-accent-purple hover:bg-accent-purple hover:text-white px-3 py-1.5 rounded-lg font-bold uppercase transition shadow-lg border border-purple-500/20"><i class="ph-bold ph-arrows-clockwise mr-1"></i>Re-ver todo (+1)</button>`;
                 }
             }
 
-            // Iluminamos las tarjetas de episodios vistos individualmente
             currentDetailEpisodesData.forEach(ep => {
                 const id = ep.id.toString(), v = map[id]||0;
                 if($(`cnt-${id}`)) $(`cnt-${id}`).textContent = v;
@@ -1406,7 +1367,6 @@
                 }
             });
 
-            // Actualizamos los botones y barras de progreso por Temporada
             const sMap = {}; airedEps.forEach(ep=>{ if(!sMap[ep.season]) sMap[ep.season]=[]; sMap[ep.season].push(ep); });
             Object.keys(sMap).forEach(sNum => {
                 const eps = sMap[sNum], sTotal = eps.length, sWatch = eps.filter(ep=>(map[ep.id]||0)>0).length;
@@ -1491,7 +1451,7 @@
             if(!data.episodesWatched) data.episodesWatched = {};
             if(nxt > 0) data.episodesWatched[epId] = nxt; else delete data.episodesWatched[epId];
             renderDetailProgressUI();
-            checkOptimisticCompletion(sId); // Refresca color localmente
+            checkOptimisticCompletion(sId); 
             
             updateDoc(doc(db, PATH_USERS, user.uid, 'shows', sId.toString()), { [`episodesWatched.${epId}`]: nxt>0?nxt:deleteField() })
                 .catch(e => showToast("Error", "error"));
@@ -1552,7 +1512,7 @@
             showConfirm("Desmarcar Serie Completa", "¿Seguro que quieres borrar el progreso de TODOS los episodios?", () => {
                 const upd = { episodesWatched: {} };
                 const data = trackedShows[sId]; 
-                data.episodesWatched = {}; // Reset optimista local
+                data.episodesWatched = {}; 
                 
                 renderDetailProgressUI(); 
                 checkOptimisticCompletion(sId);
@@ -1569,7 +1529,7 @@
                 eps.forEach(ep => { 
                     const cur = data.episodesWatched[ep.id] || 0;
                     upd[`episodesWatched.${ep.id}`] = cur + 1; 
-                    data.episodesWatched[ep.id] = cur + 1; // Actualización optimista local
+                    data.episodesWatched[ep.id] = cur + 1; 
                 });
                 
                 if(Object.keys(upd).length>0) {
@@ -1588,14 +1548,12 @@
             const airedEps = currentDetailEpisodesData.filter(ep => ep.airdate && new Date(ep.airdate) <= new Date());
             const watched = airedEps.filter(ep => (map[ep.id]||0)>0).length;
             
-            // Subida a Terminado automáticamente
             if(watched === airedEps.length && airedEps.length > 0 && data.status !== 'completed' && data.status !== 'dropped') {
                 data.status = 'completed';
                 if($('detail-status')) $('detail-status').textContent = 'Terminado'; 
                 showToast("¡Felicidades! Serie completada.", "success");
                 updateDoc(doc(db, PATH_USERS, user.uid, 'shows', sId.toString()), { status: 'completed' }).catch(()=>{});
             } 
-            // Bajada a Viendo (Si desmarcas algo de una serie completada)
             else if (watched < airedEps.length && data.status === 'completed') {
                 data.status = 'watching';
                 if($('detail-status')) $('detail-status').textContent = 'Viendo'; 
