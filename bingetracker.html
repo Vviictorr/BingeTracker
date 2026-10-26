@@ -273,7 +273,8 @@
 
                     <!-- Background -->
                     <div class="glass-card p-6 rounded-2xl">
-                        <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-4"><h2 class="text-xl font-bold flex items-center gap-2"><i class="ph-fill ph-paint-brush text-2xl text-yellow-400"></i> Fondo</h2><div class="flex gap-2"><button onclick="setCustomBg('')" class="bg-red-500/20 text-red-400 rounded-xl px-4 py-2 text-sm font-bold border border-red-500/20">Quitar</button><div class="relative bg-white/10 rounded-xl px-4 py-2 border border-white/20"><span class="text-sm font-bold text-white flex items-center gap-2"><i class="ph-bold ph-upload-simple"></i> Subir</span><input type="file" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="uploadCustomBg(event)"></div></div></div>
+                        <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-4"><h2 class="text-xl font-bold flex items-center gap-2"><i class="ph-fill ph-paint-brush text-2xl text-yellow-400"></i> Fondo</h2><div class="flex gap-2"><button onclick="setCustomBg('')" class="bg-red-500/20 text-red-400 hover:bg-red-500/40 hover:text-white transition-all rounded-xl px-4 py-2 text-sm font-bold border border-red-500/20">Quitar</button><div class="relative bg-white/10 hover:bg-white/20 transition-all rounded-xl px-4 py-2 border border-white/20 cursor-pointer"><span class="text-sm font-bold text-white flex items-center gap-2"><i class="ph-bold ph-upload-simple"></i> Subir</span><input type="file" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="uploadCustomBg(event)"></div></div></div>
+                        <div id="profile-bg-grid" class="flex gap-3 overflow-x-auto pb-4 snap-x"></div>
                     </div>
 
                     <!-- Translate -->
@@ -411,9 +412,12 @@
             
             <!-- OVERLAY: EPISODE MODAL -->
             <section id="ep-modal" class="fixed inset-0 z-[100] bg-dark-900/95 backdrop-blur-xl transform translate-y-full transition-transform duration-300 overflow-y-auto flex flex-col md:pl-24">
-                <button onclick="closeEpisodeModal()" class="fixed top-4 right-4 md:top-6 md:right-10 w-12 h-12 rounded-full bg-black/60 text-white flex items-center justify-center z-[110] backdrop-blur"><i class="ph-bold ph-x text-xl"></i></button>
+                <button onclick="closeEpisodeModal()" class="fixed top-4 right-4 md:top-6 md:right-10 w-12 h-12 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center z-[110] backdrop-blur transition-all hover:scale-110"><i class="ph-bold ph-x text-xl"></i></button>
 
-                <div class="relative w-full h-64 md:h-80 bg-dark-800 shrink-0 border-b border-white/10">
+                <div class="relative w-full h-64 md:h-80 bg-dark-800 shrink-0 border-b border-white/10 group">
+                    <button id="ep-modal-prev-btn" class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/60 hover:bg-black/80 text-white items-center justify-center z-[110] backdrop-blur transition-all hover:scale-110 hidden shadow-xl border border-white/10"><i class="ph-bold ph-caret-left text-xl"></i></button>
+                    <button id="ep-modal-next-btn" class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/60 hover:bg-black/80 text-white items-center justify-center z-[110] backdrop-blur transition-all hover:scale-110 hidden shadow-xl border border-white/10"><i class="ph-bold ph-caret-right text-xl"></i></button>
+                    
                     <img id="ep-modal-img" src="" class="w-full h-full object-cover opacity-50">
                     <div class="absolute inset-0 bg-gradient-to-t from-dark-900 to-transparent"></div>
                     <div class="absolute bottom-0 left-0 w-full p-6 md:p-10 pb-4">
@@ -533,7 +537,6 @@
                     onSnapshot(doc(db, 'users', u.uid), (docSnap) => {
                         if(docSnap.exists()) { userSettings = { ...userSettings, ...docSnap.data() }; applyCustomBg(userSettings.background); if(currentActiveView === 'dashboard') renderHistoryUI(); }
                     });
-                    if(currentActiveView === 'dashboard') renderDashboard();
                 } else { user = null; trackedShows = {}; $('app-container').classList.add('hidden'); $('auth-screen').classList.remove('hidden'); $('init-screen').classList.add('hidden'); }
             });
         }
@@ -575,11 +578,18 @@
             const all = [...new Set([...defs, ...myImgs])];
             grid.innerHTML = all.map(url => {
                 const isSel = user?.photoURL === url;
-                return `<div onclick="updateUserAvatar('${url}')" class="w-16 h-16 shrink-0 rounded-full cursor-pointer border-2 transition-all ${isSel ? 'border-accent-purple scale-110 shadow-lg' : 'border-transparent opacity-70'}"><img src="${url}" class="w-full h-full rounded-full object-cover"></div>`;
+                return `<div onclick="updateUserAvatar('${url}')" class="w-16 h-16 shrink-0 rounded-full cursor-pointer border-2 transition-all hover:opacity-100 ${isSel ? 'border-accent-purple scale-110 shadow-lg opacity-100' : 'border-transparent opacity-70'}"><img src="${url}" class="w-full h-full rounded-full object-cover"></div>`;
             }).join('');
         };
-        function applyCustomBg(url) { $('custom-bg').style.backgroundImage = url ? `url(${url})` : ''; $('custom-bg').classList.toggle('hidden', !url); }
-        window.setCustomBg = async (url) => { if(!user) return; applyCustomBg(url); try { await setDoc(doc(db, 'users', user.uid), { background: url }, { merge: true }); } catch(e){} };
+        
+        const defBgs = ['https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=1000&auto=format&fit=crop', 'https://images.unsplash.com/photo-1618336306543-cb41427181c8?q=80&w=1000&auto=format&fit=crop', 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=1000&auto=format&fit=crop', 'https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=1000&auto=format&fit=crop', 'https://images.unsplash.com/photo-1604014237800-1c9102c219da?q=80&w=1000&auto=format&fit=crop'];
+        window.renderBgOptions = () => {
+            const grid = $('profile-bg-grid'); if(!grid) return;
+            grid.innerHTML = defBgs.map(url => `<div onclick="setCustomBg('${url}')" class="w-24 h-16 shrink-0 rounded-xl cursor-pointer border-2 transition-all hover:opacity-100 ${userSettings.background === url ? 'border-yellow-400 scale-105 shadow-lg opacity-100' : 'border-transparent opacity-70'}"><img src="${url}" class="w-full h-full rounded-xl object-cover"></div>`).join('');
+        };
+
+        function applyCustomBg(url) { $('custom-bg').style.backgroundImage = url ? `url(${url})` : ''; $('custom-bg').classList.toggle('hidden', !url); renderBgOptions(); }
+        window.setCustomBg = async (url) => { if(!user) return; applyCustomBg(url); try { userSettings.background = url; await setDoc(doc(db, 'users', user.uid), { background: url }, { merge: true }); } catch(e){} };
         window.uploadCustomBg = async (e) => { if(!e.target.files[0]) return; try { const b64 = await compressImage(e.target.files[0], 1280); await setCustomBg(b64); } catch(err){} };
 
         // --- History & Stats ---
@@ -601,7 +611,7 @@
             const h = Math.floor(t/60), d = Math.floor(h/24), rh = h%24;
             if($('stat-shows')) $('stat-shows').innerText = arr.length; if($('stat-episodes')) $('stat-episodes').innerText = e;
             if($('stat-time-days')) $('stat-time-days').innerText = d; if($('stat-time-hours')) $('stat-time-hours').innerText = rh;
-            renderAvatarOptions();
+            renderAvatarOptions(); renderBgOptions();
         }
 
         // --- Core TVMaze ---
@@ -903,9 +913,9 @@
             $('detail-progress-circle').setAttribute('stroke', pct===100 ? '#10B981' : '#8B5CF6');
 
             const mAct = $('detail-mass-actions'); mAct.innerHTML = '';
-            if(pct === 100 && total > 0) mAct.innerHTML += `<button onclick="unmarkAllShow('${currentDetailShowId}')" class="text-xs bg-red-500 text-white px-4 py-2 rounded-xl font-bold uppercase shadow-lg"><i class="ph-bold ph-x-circle mr-1 text-lg"></i>Desmarcar Serie</button>`;
-            else if (total > 0) mAct.innerHTML += `<button onclick="markAllShow('${currentDetailShowId}', '${data.name.replace(/'/g,"\\'")}')" class="text-xs bg-accent-emerald text-white px-4 py-2 rounded-xl font-bold uppercase shadow-lg"><i class="ph-bold ph-check-double mr-1 text-lg"></i>Marcar Serie</button>`;
-            if(total > 0) mAct.innerHTML += `<button onclick="rewatchAllShow('${currentDetailShowId}', '${data.name.replace(/'/g,"\\'")}')" class="text-xs bg-accent-purple text-white px-4 py-2 rounded-xl font-bold uppercase shadow-lg"><i class="ph-bold ph-arrows-clockwise mr-1 text-lg"></i>Re-ver (+1)</button>`;
+            if(pct === 100 && total > 0) mAct.innerHTML += `<button onclick="unmarkAllShow('${currentDetailShowId}')" class="text-xs bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl font-bold uppercase shadow-lg transition-transform hover:scale-105 active:scale-95"><i class="ph-bold ph-x-circle mr-1 text-lg"></i>Desmarcar Serie</button>`;
+            else if (total > 0) mAct.innerHTML += `<button onclick="markAllShow('${currentDetailShowId}', '${data.name.replace(/'/g,"\\'")}')" class="text-xs bg-accent-emerald hover:bg-emerald-600 text-white px-4 py-2 rounded-xl font-bold uppercase shadow-lg transition-transform hover:scale-105 active:scale-95"><i class="ph-bold ph-check-double mr-1 text-lg"></i>Marcar Serie</button>`;
+            if(total > 0) mAct.innerHTML += `<button onclick="rewatchAllShow('${currentDetailShowId}', '${data.name.replace(/'/g,"\\'")}')" class="text-xs bg-accent-purple hover:bg-purple-600 text-white px-4 py-2 rounded-xl font-bold uppercase shadow-lg transition-transform hover:scale-105 active:scale-95"><i class="ph-bold ph-arrows-clockwise mr-1 text-lg"></i>Re-ver (+1)</button>`;
 
             currentDetailEpisodesData.forEach(ep => {
                 const id = ep.id.toString(), v = map[id]||0;
@@ -1068,6 +1078,16 @@
         window.openEpisodeModal = async (epId) => {
             currentModalEpId = epId.toString(); const ep = currentDetailEpisodesData.find(e => e.id.toString() === epId); if(!ep) return;
             const m = $('ep-modal'); m.classList.remove('translate-y-full');
+            
+            // Navegación rápida (Flechas)
+            const epIndex = currentDetailEpisodesData.findIndex(e => e.id.toString() === epId);
+            const prevEp = epIndex > 0 ? currentDetailEpisodesData[epIndex - 1] : null;
+            const nextEp = epIndex < currentDetailEpisodesData.length - 1 ? currentDetailEpisodesData[epIndex + 1] : null;
+            
+            const prevBtn = $('ep-modal-prev-btn'), nextBtn = $('ep-modal-next-btn');
+            if(prevEp) { prevBtn.classList.remove('hidden'); prevBtn.classList.add('flex'); prevBtn.onclick = () => openEpisodeModal(prevEp.id.toString()); } else { prevBtn.classList.add('hidden'); prevBtn.classList.remove('flex'); }
+            if(nextEp) { nextBtn.classList.remove('hidden'); nextBtn.classList.add('flex'); nextBtn.onclick = () => openEpisodeModal(nextEp.id.toString()); } else { nextBtn.classList.add('hidden'); nextBtn.classList.remove('flex'); }
+            
             $('ep-modal-title').innerText = ep.name; $('ep-modal-badge').innerText = `T${String(ep.season).padStart(2,'0')}E${String(ep.number).padStart(2,'0')} ${ep.globalNumber ? '• #'+ep.globalNumber : ''}`;
             $('ep-modal-img').src = ep.image?.original || ep.image?.medium || $('detail-poster').src; $('ep-modal-summary').innerHTML = ep.summary || 'Sin sinopsis.';
             $('ep-modal-comment-input').value = ''; $('ep-modal-comments-list').innerHTML = '<div class="spinner mx-auto my-10 border-t-accent-purple"></div>';
