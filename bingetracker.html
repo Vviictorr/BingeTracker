@@ -40,7 +40,7 @@
         .glass-card:hover { transform: translateY(-4px); box-shadow: 0 10px 30px -10px rgba(139, 92, 246, 0.3); border: 1px solid rgba(139, 92, 246, 0.3); }
         .text-gradient { background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-image: linear-gradient(to right, #8B5CF6, #10B981); }
         
-        /* Custom Scrollbar for horizontal lists & panels */
+        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: rgba(11, 15, 25, 0.5); border-radius: 10px; }
         ::-webkit-scrollbar-thumb { background: #1F293F; border-radius: 10px; border: 2px solid #0B0F19; }
@@ -738,12 +738,6 @@
             const cur = (data.episodesWatched && data.episodesWatched[epId]) || 0;
             if(!data.episodesWatched) data.episodesWatched = {}; data.episodesWatched[epId] = cur + 1;
             
-            // Check if we need to mark previous episodes too
-            const allAired = currentDetailEpisodesData.filter(ep => ep.airdate && new Date(ep.airdate) <= new Date());
-            if(allAired.length > 0) {
-                // If we don't have currentDetailEpisodesData loaded for this show, we just do simple mark.
-                // It's a quick action, we assume they just marked one.
-            }
             updateDoc(doc(db, 'users', user.uid, 'shows', sId.toString()), { [`episodesWatched.${epId}`]: cur + 1 }).catch(()=>{});
             logHistory(sId, sName, epId, epName, s, e, epImg);
             renderDashboard(); 
@@ -944,8 +938,8 @@
                 
                 if(isTracked) {
                     $('detail-mass-actions').innerHTML = `
-                        <button onclick="toggleAllSeries(${apiData.id}, ${isAllComplete})" class="px-4 py-2 rounded-xl border-2 ${isAllComplete?'border-red-500 text-red-500 hover:bg-red-500 hover:text-white':'border-accent-emerald text-emerald-400 hover:bg-accent-emerald hover:text-white'} bg-transparent text-xs font-bold transition-all transform hover:scale-105 active:scale-95 flex items-center gap-1.5"><i class="ph-bold ${isAllComplete?'ph-x':'ph-check-square'}"></i> ${isAllComplete?'Desmarcar Serie':'Marcar Serie'}</button>
-                        <button onclick="rewatchAllSeries(${apiData.id})" class="px-4 py-2 rounded-xl border-2 border-accent-purple text-purple-400 bg-transparent hover:bg-accent-purple hover:text-white text-xs font-bold transition-all transform hover:scale-105 active:scale-95 flex items-center gap-1.5"><i class="ph-bold ph-arrow-clockwise"></i> Re-ver (+1)</button>
+                        <button onclick="toggleAllSeries(${apiData.id}, ${isAllComplete})" class="px-4 py-2 rounded-xl border-2 ${isAllComplete?'border-red-500 text-red-500 hover:bg-red-500 hover:text-white':'border-accent-emerald text-accent-emerald hover:bg-accent-emerald hover:text-white'} bg-transparent text-xs font-bold transition-all transform hover:scale-105 active:scale-95 flex items-center gap-1.5"><i class="ph-bold ${isAllComplete?'ph-x':'ph-check-square'}"></i> ${isAllComplete?'Desmarcar Serie':'Marcar Serie'}</button>
+                        <button onclick="rewatchAllSeries(${apiData.id})" class="px-4 py-2 rounded-xl border-2 border-accent-purple text-accent-purple bg-transparent hover:bg-accent-purple hover:text-white text-xs font-bold transition-all transform hover:scale-105 active:scale-95 flex items-center gap-1.5"><i class="ph-bold ph-arrow-clockwise"></i> Re-ver (+1)</button>
                     `;
                 } else { $('detail-mass-actions').innerHTML = ''; }
 
@@ -960,7 +954,7 @@
                     const head = document.createElement('div'); head.className = "bg-dark-700/50 p-4 flex items-center justify-between cursor-pointer group"; head.id = `sh-${sNum}`;
                     head.innerHTML = `
                         <div class="flex items-center gap-3"><i class="ph-bold ph-caret-down text-gray-400 transition-transform group-hover:text-white"></i><h4 class="font-bold">Temporada ${sNum}</h4><span class="text-xs text-gray-400">(${seasonWatched}/${seasonAired.length} vistos)</span></div>
-                        ${isTracked ? `<button onclick="event.stopPropagation(); toggleSeason(${apiData.id}, ${sNum}, ${isSeasonComplete})" class="w-8 h-8 rounded-full border-2 ${isSeasonComplete?'border-accent-emerald bg-accent-emerald text-white hover:bg-red-500 hover:border-red-500':'border-white/20 text-gray-400 hover:border-white hover:text-white'} flex items-center justify-center transition-all group-btn"><i class="ph-bold ${isSeasonComplete?'ph-check group-btn-hover:ph-x':'ph-check'}"></i></button>` : ''}
+                        ${isTracked ? `<button onclick="event.stopPropagation(); toggleSeason(${apiData.id}, ${sNum}, ${isSeasonComplete})" class="w-8 h-8 rounded-full border-2 ${isSeasonComplete?'border-accent-emerald bg-accent-emerald text-white hover:bg-red-500 hover:border-red-500 hover:text-white':'border-white/20 text-gray-400 hover:border-white hover:text-white'} flex items-center justify-center transition-all group-btn"><i class="ph-bold ${isSeasonComplete?'ph-check group-btn-hover:ph-x':'ph-check'}"></i></button>` : ''}
                     `;
                     
                     const list = document.createElement('div'); list.className = "grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 p-4 hidden";
@@ -1014,10 +1008,42 @@
             });
         };
         window.rateShow = async (id, val) => {
-            if(!user || !trackedShows[id]) return; trackedShows[id].rating = val;
+            if(!user || !trackedShows[id]) return; 
+            const oldVal = trackedShows[id].rating || 0;
+            trackedShows[id].rating = val;
+            
             await updateDoc(doc(db, 'users', user.uid, 'shows', id.toString()), { rating: val });
-            const rCont = $('detail-rating-container'); if(rCont) rCont.querySelectorAll('.ph-star').forEach((s, i) => s.classList.toggle('ph-fill', i < val));
-            showToast("Valoración guardada", "success");
+            
+            const rCont = $('detail-rating-container'); 
+            if(rCont) rCont.querySelectorAll('.ph-star').forEach((s, i) => s.classList.toggle('ph-fill', i < val));
+            
+            // Actualizar nota global de la Serie en la base de datos comunitaria
+            const sDocRef = doc(db, 'artifacts', firebaseConfig.appId, 'public', 'data', `shows_comm_global`, id.toString());
+            const sDoc = await getDoc(sDocRef);
+            let curSum = 0, curCount = 0;
+            if (sDoc.exists()) { 
+                curSum = sDoc.data().sum || 0; 
+                curCount = sDoc.data().count || 0; 
+            }
+            
+            let newSum, newCount;
+            // Si es la primera nota comunitaria registrada, reiniciamos el contador pase lo que pase
+            if (curCount === 0) {
+                newSum = val;
+                newCount = 1;
+            } else {
+                newSum = curSum - oldVal + val;
+                newCount = oldVal === 0 ? curCount + 1 : curCount;
+            }
+            
+            // Salvaguardas anti-bugs (Infinity o NaN)
+            if (newSum < 0) newSum = val;
+            if (newCount <= 0) newCount = 1;
+
+            await setDoc(sDocRef, { sum: newSum, count: newCount }, {merge: true});
+            
+            $('detail-comm-val').innerText = ((newSum / newCount) * 2).toFixed(1);
+            showToast("Valoración general guardada", "success");
         };
 
         window.updateEp = async (sId, epId, delta) => {
@@ -1049,36 +1075,42 @@
                 const targetEp = currentDetailEpisodesData.find(e => e.id.toString() === epId);
                 if(targetEp) logHistory(sId, sData.name, epId, targetEp.name, targetEp.season, targetEp.number, targetEp.image?.medium);
             }
-            openShowDetail(sId); renderDashboard(); // Full redraw for visual consistency
+            openShowDetail(sId); renderDashboard(); 
         };
 
         window.toggleSeason = async (sId, sNum, isComplete) => {
             if(!user || !trackedShows[sId]) return;
-            const sData = trackedShows[sId]; if(!sData.episodesWatched) sData.episodesWatched = {};
-            const today = new Date(); const eps = currentDetailEpisodesData.filter(ep => ep.season === sNum && ep.airdate && new Date(ep.airdate) <= today);
-            eps.forEach(ep => { sData.episodesWatched[ep.id] = isComplete ? 0 : 1; });
-            if(isComplete && sData.status === 'completed') sData.status = 'watching';
-            await updateDoc(doc(db, 'users', user.uid, 'shows', sId.toString()), { episodesWatched: sData.episodesWatched, status: sData.status });
-            checkAutoStatus(sId); openShowDetail(sId); renderDashboard(); showToast(isComplete ? "Temporada desmarcada" : "Temporada completada", "success");
+            showConfirm(isComplete ? "Desmarcar Temporada" : "Marcar Temporada", isComplete ? "¿Quieres volver a poner todos los episodios de esta temporada como no vistos?" : "¿Confirmas que has visto toda esta temporada?", async () => {
+                const sData = trackedShows[sId]; if(!sData.episodesWatched) sData.episodesWatched = {};
+                const today = new Date(); const eps = currentDetailEpisodesData.filter(ep => ep.season === sNum && ep.airdate && new Date(ep.airdate) <= today);
+                eps.forEach(ep => { sData.episodesWatched[ep.id] = isComplete ? 0 : 1; });
+                if(isComplete && sData.status === 'completed') sData.status = 'watching';
+                await updateDoc(doc(db, 'users', user.uid, 'shows', sId.toString()), { episodesWatched: sData.episodesWatched, status: sData.status });
+                checkAutoStatus(sId); openShowDetail(sId); renderDashboard(); showToast(isComplete ? "Temporada desmarcada" : "Temporada completada", "success");
+            });
         };
 
         window.toggleAllSeries = async (sId, isComplete) => {
             if(!user || !trackedShows[sId]) return;
-            const sData = trackedShows[sId]; if(!sData.episodesWatched) sData.episodesWatched = {};
-            const today = new Date(); const eps = currentDetailEpisodesData.filter(ep => ep.airdate && new Date(ep.airdate) <= today);
-            eps.forEach(ep => { sData.episodesWatched[ep.id] = isComplete ? 0 : 1; });
-            if(isComplete && sData.status === 'completed') sData.status = 'watching';
-            await updateDoc(doc(db, 'users', user.uid, 'shows', sId.toString()), { episodesWatched: sData.episodesWatched, status: sData.status });
-            checkAutoStatus(sId); openShowDetail(sId); renderDashboard(); showToast(isComplete ? "Serie desmarcada" : "¡Serie completada!", "success");
+            showConfirm(isComplete ? "Desmarcar Serie Completa" : "Marcar Serie Completa", isComplete ? "¿Quieres resetear el progreso de toda la serie?" : "¿Confirmas que has visto todos los episodios emitidos de esta serie?", async () => {
+                const sData = trackedShows[sId]; if(!sData.episodesWatched) sData.episodesWatched = {};
+                const today = new Date(); const eps = currentDetailEpisodesData.filter(ep => ep.airdate && new Date(ep.airdate) <= today);
+                eps.forEach(ep => { sData.episodesWatched[ep.id] = isComplete ? 0 : 1; });
+                if(isComplete && sData.status === 'completed') sData.status = 'watching';
+                await updateDoc(doc(db, 'users', user.uid, 'shows', sId.toString()), { episodesWatched: sData.episodesWatched, status: sData.status });
+                checkAutoStatus(sId); openShowDetail(sId); renderDashboard(); showToast(isComplete ? "Serie desmarcada" : "¡Serie completada!", "success");
+            });
         };
 
         window.rewatchAllSeries = async (sId) => {
             if(!user || !trackedShows[sId]) return;
-            const sData = trackedShows[sId]; if(!sData.episodesWatched) sData.episodesWatched = {};
-            const today = new Date(); const eps = currentDetailEpisodesData.filter(ep => ep.airdate && new Date(ep.airdate) <= today);
-            eps.forEach(ep => { sData.episodesWatched[ep.id] = (sData.episodesWatched[ep.id] || 0) + 1; });
-            await updateDoc(doc(db, 'users', user.uid, 'shows', sId.toString()), { episodesWatched: sData.episodesWatched });
-            openShowDetail(sId); renderDashboard(); showToast("¡Se ha sumado +1 visionado a toda la serie!", "success");
+            showConfirm("Re-ver Serie (+1)", "¿Quieres sumar +1 visionado a TODOS los episodios de esta serie? Esto aumentará tus estadísticas totales.", async () => {
+                const sData = trackedShows[sId]; if(!sData.episodesWatched) sData.episodesWatched = {};
+                const today = new Date(); const eps = currentDetailEpisodesData.filter(ep => ep.airdate && new Date(ep.airdate) <= today);
+                eps.forEach(ep => { sData.episodesWatched[ep.id] = (sData.episodesWatched[ep.id] || 0) + 1; });
+                await updateDoc(doc(db, 'users', user.uid, 'shows', sId.toString()), { episodesWatched: sData.episodesWatched });
+                openShowDetail(sId); renderDashboard(); showToast("¡Se ha sumado +1 visionado a toda la serie!", "success");
+            });
         };
 
         // --- Community / Show Comments & Heatmap ---
@@ -1086,6 +1118,7 @@
             const list = $('show-comments-list'); list.innerHTML = `<div class="spinner mx-auto my-10 border-t-accent-purple"></div>`;
             if(unsubscribeShowComm) unsubscribeShowComm();
             
+            // 1. Cargar Comentarios de la serie
             unsubscribeShowComm = onSnapshot(collection(db, 'artifacts', firebaseConfig.appId, 'public', 'data', `shows_comm_${showId}_comments`), (snapshot) => {
                 const comments = []; snapshot.forEach(d => comments.push(d.data()));
                 comments.sort((a,b) => new Date(b.date) - new Date(a.date));
@@ -1093,20 +1126,22 @@
                 list.innerHTML = comments.map(c => `<div class="flex gap-3 bg-dark-900/60 p-3 rounded-xl border border-white/5"><div class="w-9 h-9 rounded-full overflow-hidden shrink-0 bg-dark-800">${getAvatarHTML(c.userPhoto, c.userName)}</div><div class="flex-1 min-w-0"><div class="flex justify-between items-center mb-1"><h5 class="font-bold text-xs text-purple-300 truncate">${c.userName}</h5><span class="text-[9px] text-gray-500">${new Date(c.date).toLocaleDateString('es-ES')}</span></div><p class="text-xs text-gray-200 leading-relaxed">${c.text}</p></div></div>`).join('');
             });
 
-            // Load Heatmap Ratings (BingeTracker community ratings)
+            // 2. Cargar Nota Global de la Serie
+            getDoc(doc(db, 'artifacts', firebaseConfig.appId, 'public', 'data', `shows_comm_global`, showId.toString())).then(docSnap => {
+                if(docSnap.exists() && docSnap.data().count > 0) {
+                    $('detail-comm-val').innerText = ((docSnap.data().sum / docSnap.data().count) * 2).toFixed(1);
+                } else {
+                    $('detail-comm-val').innerText = "--";
+                }
+            });
+
+            // 3. Cargar Esquema de Notas (Heatmap de Episodios)
             getDocs(collection(db, 'artifacts', firebaseConfig.appId, 'public', 'data', `shows_comm_${showId}_ratings`)).then(snap => {
                 const ratingsMap = {};
-                let sumGlobal = 0, countGlobal = 0;
-                snap.forEach(d => { 
-                    const data = d.data(); ratingsMap[d.id] = data; 
-                    if(data.count > 0) { sumGlobal += data.sum; countGlobal += data.count; }
-                });
+                snap.forEach(d => { ratingsMap[d.id] = d.data(); });
                 currentShowCommData = ratingsMap;
-                
-                if(countGlobal > 0) $('detail-comm-val').innerText = ((sumGlobal / countGlobal) * 2).toFixed(1);
-                else $('detail-comm-val').innerText = "--";
-                
-                if(!$('#det-tab-comm').classList.contains('hidden')) renderHeatmap();
+                // Importante: No lleva #
+                if(!$('det-tab-comm').classList.contains('hidden')) renderHeatmap();
             });
         }
 
@@ -1137,15 +1172,15 @@
                     const ep = sMap[s][r];
                     if(!ep) { html += `<td class="p-1"></td>`; return; }
                     const rData = currentShowCommData[ep.id.toString()];
-                    const avg = rData && rData.count > 0 ? (rData.sum / rData.count) * 2 : null; // Escala 10
+                    const avg = rData && rData.count > 0 ? (rData.sum / rData.count) * 2 : null; 
                     
                     let bg = "bg-dark-800 text-transparent", valStr = "";
                     if(avg !== null) {
                         valStr = avg.toFixed(1);
-                        if(avg >= 9.0) bg = "bg-[#0ea5e9] text-white font-bold shadow-lg"; // Azul
-                        else if(avg >= 7.5) bg = "bg-[#10b981] text-white font-bold"; // Verde
-                        else if(avg >= 6.0) bg = "bg-[#f59e0b] text-white font-bold text-gray-900"; // Amarillo
-                        else bg = "bg-[#8b5cf6] text-white font-bold"; // Morado
+                        if(avg >= 9.0) bg = "bg-[#0ea5e9] text-white font-bold shadow-lg"; 
+                        else if(avg >= 7.5) bg = "bg-[#10b981] text-white font-bold"; 
+                        else if(avg >= 6.0) bg = "bg-[#f59e0b] text-white font-bold text-gray-900"; 
+                        else bg = "bg-[#8b5cf6] text-white font-bold"; 
                     } else if (ep.airdate && new Date(ep.airdate) <= new Date()) {
                         bg = "bg-dark-800 border border-white/5 text-gray-600"; valStr = "-";
                     }
@@ -1154,7 +1189,6 @@
                 html += `</tr>`;
             }
 
-            // Promedios por temporada
             html += `<tr><td class="p-2 text-gray-400 font-bold text-[10px] text-right pr-2 uppercase mt-2 block">Prom.</td>`;
             seasons.forEach(s => {
                 let sum = 0, count = 0;
@@ -1177,7 +1211,6 @@
                 const apiData = await fetchTVMaze(currentDetailShowId); if(!apiData) return;
                 const genres = apiData.genres || []; const type = apiData.type; const network = apiData.network?.name;
                 
-                // Fetch popular catalog pages to build comparison base
                 const promises = [1, 2, 3].map(p => fetch(`https://api.tvmaze.com/shows?page=${p}`).then(r => r.json()).catch(()=>[]));
                 const pages = await Promise.all(promises); let allShows = []; pages.forEach(arr => { allShows = allShows.concat(arr); });
                 
@@ -1207,7 +1240,6 @@
             $('ep-modal-badge').textContent = `Temporada ${ep.season} • Episodio ${ep.number} (#${ep.globalNumber||'?'})`;
             $('ep-modal-img').src = ep.image?.original || ep.image?.medium || $('detail-hero-img').style.backgroundImage.slice(5, -2) || '';
             
-            // Prev / Next episode buttons setup
             const curIdx = currentDetailEpisodesData.findIndex(e => e.id.toString() === epId);
             const prevBtn = $('ep-modal-prev-btn'), nextBtn = $('ep-modal-next-btn');
             prevBtn.onclick = () => { if(curIdx > 0) openEpisodeModal(currentDetailEpisodesData[curIdx-1].id.toString()); };
@@ -1215,7 +1247,6 @@
             prevBtn.style.display = curIdx > 0 ? 'flex' : 'none';
             nextBtn.style.display = curIdx < currentDetailEpisodesData.length - 1 ? 'flex' : 'none';
 
-            // Load episode community rating & comments
             if(unsubscribeCurrentEpComm) unsubscribeCurrentEpComm();
             unsubscribeCurrentEpComm = onSnapshot(collection(db, 'artifacts', firebaseConfig.appId, 'public', 'data', `ep_${epId}_comments`), (snap) => {
                 const list = $('ep-modal-comments-list'); const comments = []; snap.forEach(d => comments.push(d.data()));
@@ -1224,7 +1255,7 @@
                 list.innerHTML = comments.map(c => `<div class="flex gap-3 bg-dark-900/60 p-3 rounded-xl border border-white/5"><div class="w-9 h-9 rounded-full overflow-hidden shrink-0 bg-dark-800">${getAvatarHTML(c.userPhoto, c.userName)}</div><div class="flex-1 min-w-0"><div class="flex justify-between items-center mb-1"><h5 class="font-bold text-xs text-purple-300 truncate">${c.userName}</h5><span class="text-[9px] text-gray-500">${new Date(c.date).toLocaleDateString('es-ES')}</span></div><p class="text-xs text-gray-200 leading-relaxed">${c.text}</p></div></div>`).join('');
             });
 
-            // Get rating doc
+            // Get Episode rating doc
             const rDocRef = doc(db, 'artifacts', firebaseConfig.appId, 'public', 'data', `shows_comm_${currentDetailShowId}_ratings`, epId.toString());
             const rDoc = await getDoc(rDocRef);
             if(rDoc.exists()) {
@@ -1232,26 +1263,32 @@
                 $('ep-modal-comm-rating').innerText = d.count > 0 ? ((d.sum / d.count) * 2).toFixed(1) : "--";
             } else { $('ep-modal-comm-rating').innerText = "--"; }
 
-            // User rating stars
+            // User rating stars (Episode)
             const userRatingRef = doc(db, 'users', user.uid, 'episode_ratings', epId.toString());
             const uRatingDoc = await getDoc(userRatingRef);
-            const userVal = uRatingDoc.exists() ? uRatingDoc.data().rating : 0;
+            let userVal = uRatingDoc.exists() ? uRatingDoc.data().rating : 0;
+            
             $('ep-modal-user-rating').querySelectorAll('.ph-star').forEach((s, i) => {
                 s.classList.toggle('ph-fill', i < userVal);
                 s.onclick = async () => {
                     const stars = i + 1;
                     await setDoc(userRatingRef, { rating: stars });
-                    // Update global show rating sum/count
-                    const curSum = rDoc.exists() ? rDoc.data().sum : 0;
-                    const curCount = rDoc.exists() ? rDoc.data().count : 0;
-                    const oldVal = uRatingDoc.exists() ? uRatingDoc.data().rating : 0;
-                    const newSum = curSum - oldVal + stars;
-                    const newCount = oldVal === 0 ? curCount + 1 : curCount;
+                    
+                    // Fetch fresh document to avoid desync
+                    const freshRDoc = await getDoc(rDocRef);
+                    const curSum = freshRDoc.exists() ? freshRDoc.data().sum : 0;
+                    const curCount = freshRDoc.exists() ? freshRDoc.data().count : 0;
+                    
+                    const newSum = curSum - userVal + stars;
+                    const newCount = userVal === 0 ? curCount + 1 : curCount;
+                    
                     await setDoc(rDocRef, { sum: newSum, count: newCount });
+                    userVal = stars; // Local update
+                    
                     $('ep-modal-comm-rating').innerText = ((newSum / newCount) * 2).toFixed(1);
                     $('ep-modal-user-rating').querySelectorAll('.ph-star').forEach((st, idx) => st.classList.toggle('ph-fill', idx < stars));
-                    showToast("Valoración guardada", "success");
-                    setupShowCommunity(currentDetailShowId); // refresh background data
+                    showToast("Valoración de episodio guardada", "success");
+                    setupShowCommunity(currentDetailShowId); 
                 };
             });
         };
@@ -1336,7 +1373,6 @@
                     renderCommunity();
                 };
 
-                // Fetch user shows
                 const showsSnap = await getDocs(collection(db, 'users', uid, 'shows'));
                 let shows = []; showsSnap.forEach(d => shows.push(d.data()));
                 
