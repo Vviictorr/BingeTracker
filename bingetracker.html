@@ -150,7 +150,7 @@
             </button>
 
             <div class="md:mt-auto hidden md:flex flex-col items-center gap-4 p-4">
-                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-dark-700 to-dark-800 border border-white/10 flex items-center justify-center text-white shadow-lg" id="user-avatar">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-dark-700 to-dark-800 border border-white/10 flex items-center justify-center text-white shadow-lg overflow-hidden" id="user-avatar">
                     <span id="user-avatar-text" class="font-bold text-sm"></span>
                 </div>
             </div>
@@ -203,7 +203,7 @@
             <section id="view-profile" class="view-section hidden p-4 md:p-8 animate-fade-in max-w-4xl mx-auto w-full">
                 <header class="mb-8 mt-2 md:mt-0">
                     <h1 class="text-3xl md:text-4xl font-bold mb-2">Tu <span class="text-gradient">Perfil</span></h1>
-                    <p class="text-gray-400 text-sm">Tus estadísticas, configuración y seguridad.</p>
+                    <p class="text-gray-400 text-sm">Tus estadísticas, personalización y configuración.</p>
                 </header>
 
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
@@ -238,6 +238,18 @@
                             <button onclick="updateUserProfile()" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg transition-colors whitespace-nowrap">Actualizar</button>
                         </div>
                     </div>
+                    
+                    <div class="glass-card p-6 rounded-2xl border border-white/5">
+                        <div class="flex items-center gap-3 mb-4">
+                            <i class="ph-fill ph-image text-2xl text-accent-purple"></i>
+                            <h2 class="text-xl font-bold">Foto de Perfil</h2>
+                        </div>
+                        <p class="text-sm text-gray-400 mb-4">Selecciona tu foto favorita de las series que sigues o usa una predeterminada.</p>
+                        <div id="profile-avatar-grid" class="flex gap-3 overflow-x-auto pb-4 no-scrollbar snap-x">
+                            <!-- Injected -->
+                        </div>
+                    </div>
+
                     <div class="glass-card p-6 rounded-2xl border border-white/5">
                         <div class="flex items-center gap-3 mb-4">
                             <i class="ph-fill ph-lock-key text-2xl text-rose-400"></i>
@@ -251,7 +263,7 @@
                     <div class="glass-card p-6 rounded-2xl border border-white/5">
                         <div class="flex items-center gap-3 mb-4">
                             <i class="ph-fill ph-translate text-2xl text-accent-emerald"></i>
-                            <h2 class="text-xl font-bold">Traductor</h2>
+                            <h2 class="text-xl font-bold">Traductor Automático</h2>
                         </div>
                         <p class="text-sm text-gray-400 mb-4">Para traducir las sinopsis en inglés, selecciona "Español" abajo.</p>
                         <div id="google_translate_element" class="bg-dark-800/50 p-4 rounded-xl border border-white/10"></div>
@@ -340,7 +352,7 @@
             </section>
 
             <!-- Overlay: Show Detail -->
-            <section id="view-detail" class="fixed inset-0 z-[60] bg-dark-900/95 backdrop-blur-xl transform translate-x-full transition-transform duration-300 overflow-y-auto flex flex-col md:pl-24">
+            <section id="view-detail" class="fixed inset-0 z-[70] bg-dark-900/95 backdrop-blur-xl transform translate-x-full transition-transform duration-300 overflow-y-auto flex flex-col md:pl-24">
                 <div class="sticky top-0 z-20 glass-panel px-4 py-4 flex justify-between items-center border-b border-white/5">
                     <button onclick="closeDetailView()" class="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors"><i class="ph-bold ph-caret-left text-xl"></i></button>
                     <div id="detail-actions"></div>
@@ -351,7 +363,7 @@
                         <div id="detail-hero-img" class="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-30 mix-blend-luminosity"></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-dark-900/80 to-transparent"></div>
                         <div class="absolute bottom-0 left-0 w-full p-6 md:p-10 flex flex-col md:flex-row gap-6 md:items-end">
-                            <img id="detail-poster" src="" class="w-28 md:w-48 rounded-xl shadow-2xl border border-white/10 hidden md:block aspect-[2/3] object-cover">
+                            <img id="detail-poster" src="" class="w-28 md:w-48 rounded-xl shadow-2xl border border-white/10 hidden md:block aspect-[2/3] object-cover bg-dark-800">
                             <div class="flex-1">
                                 <div id="detail-genres" class="flex flex-wrap gap-2 mb-3"></div>
                                 <h1 id="detail-title" class="text-4xl md:text-5xl font-bold mb-2 tracking-tight">Título</h1>
@@ -412,7 +424,7 @@
                 <div id="pub-profile-loading" class="flex-1 flex items-center justify-center hidden"><div class="spinner w-12 h-12 border-4 border-t-rose-400"></div></div>
                 <div id="pub-profile-content" class="pb-24 max-w-5xl mx-auto w-full hidden p-6 md:p-10">
                     <div class="flex flex-col md:flex-row items-center gap-6 mb-12 text-center md:text-left">
-                        <div class="w-24 h-24 md:w-32 md:h-32 rounded-full bg-gradient-to-tr from-rose-500 to-purple-600 flex items-center justify-center text-4xl font-black text-white shadow-xl shadow-rose-500/20 border-4 border-dark-900 shrink-0" id="pub-avatar"></div>
+                        <div class="w-24 h-24 md:w-32 md:h-32 rounded-full bg-gradient-to-tr from-rose-500 to-purple-600 flex items-center justify-center text-4xl font-black text-white shadow-xl shadow-rose-500/20 border-4 border-dark-900 shrink-0 overflow-hidden" id="pub-avatar"></div>
                         <div>
                             <h1 class="text-3xl md:text-5xl font-bold mb-3" id="pub-name">Usuario</h1>
                             <div class="flex flex-wrap justify-center md:justify-start gap-3 text-gray-300 font-medium">
@@ -432,7 +444,7 @@
             <section id="ep-modal" class="fixed inset-0 z-[100] bg-dark-900/95 backdrop-blur-xl transform translate-y-full transition-transform duration-300 overflow-y-auto flex flex-col md:pl-24">
                 <button onclick="closeEpisodeModal()" class="fixed top-4 right-4 md:top-6 md:right-10 w-12 h-12 rounded-full bg-black/60 text-white flex items-center justify-center z-[110] hover:bg-black transition-colors backdrop-blur"><i class="ph-bold ph-x text-xl"></i></button>
 
-                <div class="relative w-full h-64 md:h-80 bg-dark-800 shrink-0">
+                <div class="relative w-full h-64 md:h-80 bg-dark-800 shrink-0 border-b border-white/10">
                     <img id="ep-modal-img" src="" class="w-full h-full object-cover opacity-60">
                     <div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-dark-900/60 to-transparent"></div>
                     <div class="absolute bottom-0 left-0 w-full p-6 md:p-10 pb-4">
@@ -444,7 +456,7 @@
                 <div class="p-6 md:p-10 max-w-5xl mx-auto w-full flex flex-col md:flex-row gap-8 flex-1">
                     <div class="flex-1 space-y-6">
                         <div>
-                            <h3 class="text-lg font-bold mb-2 border-b border-white/10 pb-2">Sinopsis</h3>
+                            <h3 class="text-lg font-bold mb-2 border-b border-white/10 pb-2">Sinopsis del episodio</h3>
                             <div id="ep-modal-summary" class="text-sm text-gray-300 leading-relaxed"></div>
                         </div>
 
@@ -491,7 +503,7 @@
     <!-- Scripts -->
     <script>
         if ('serviceWorker' in navigator) {
-            const swCode = `const CACHE_NAME = 'bingetracker-v6'; self.addEventListener('install', (e) => self.skipWaiting()); self.addEventListener('activate', (e) => self.clients.claim()); self.addEventListener('fetch', (e) => { e.respondWith(fetch(e.request).catch(() => caches.match(e.request))); });`;
+            const swCode = `const CACHE_NAME = 'bingetracker-v7'; self.addEventListener('install', (e) => self.skipWaiting()); self.addEventListener('activate', (e) => self.clients.claim()); self.addEventListener('fetch', (e) => { e.respondWith(fetch(e.request).catch(() => caches.match(e.request))); });`;
             const blob = new Blob([swCode], {type: 'application/javascript'});
             navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(err => console.log('SW Reg failed:', err));
         }
@@ -509,7 +521,7 @@
 
         const firebaseConfig = { apiKey: "AIzaSyBttVULbQniX91bFT1bbk7D9O523GfXZAA", authDomain: "bingetracker-669c9.firebaseapp.com", projectId: "bingetracker-669c9", storageBucket: "bingetracker-669c9.firebasestorage.app", messagingSenderId: "483090339853", appId: "1:483090339853:web:8a77c757213888410edd44" };
         
-        const PUBLIC_APP_ID = "bingetracker"; // For strictly isolated community ratings
+        const PUBLIC_APP_ID = "bingetracker"; 
         
         let app, db, auth, user = null;
         let trackedShows = {}; let followingUsers = {}; let allPublicUsers = [];
@@ -537,6 +549,17 @@
             $('confirm-btn-cancel').onclick = cleanup; $('confirm-btn-ok').onclick = () => { cleanup(); onOk(); };
         };
 
+        function updateNavbarAvatar() {
+            if(!user) return;
+            const avatarDiv = $('user-avatar');
+            if(user.photoURL) {
+                avatarDiv.innerHTML = `<img src="${user.photoURL}" class="w-full h-full rounded-full object-cover">`;
+            } else {
+                const dName = user.displayName || user.email.split('@')[0];
+                avatarDiv.innerHTML = `<span id="user-avatar-text" class="font-bold text-sm">${dName.substring(0,2).toUpperCase()}</span>`;
+            }
+        }
+
         async function init() {
             try {
                 app = initializeApp(firebaseConfig); db = getFirestore(app); auth = getAuth(app);
@@ -557,12 +580,13 @@
                 onAuthStateChanged(auth, (u) => {
                     if (u) {
                         user = u; const dName = u.displayName || u.email.split('@')[0];
-                        $('user-avatar-text').innerText = dName.substring(0,2).toUpperCase(); $('dash-user-name').innerText = dName;
+                        updateNavbarAvatar();
+                        $('dash-user-name').innerText = dName;
                         if($('profile-name-input')) $('profile-name-input').value = dName;
                         $('auth-screen').classList.add('hidden'); $('init-screen').classList.add('hidden');
                         $('app-container').classList.remove('hidden'); setTimeout(() => $('app-container').classList.remove('opacity-0'), 50);
                         
-                        setDoc(doc(db, 'public_users', u.uid), { uid: u.uid, displayName: dName, lastActive: new Date().toISOString() }, { merge: true }).catch(()=>{});
+                        setDoc(doc(db, 'public_users', u.uid), { uid: u.uid, displayName: dName, photoURL: u.photoURL || null, lastActive: new Date().toISOString() }, { merge: true }).catch(()=>{});
                         
                         let firstLoad = true;
                         onSnapshot(collection(db, 'users', u.uid, 'shows'), (snap) => {
@@ -586,7 +610,7 @@
 
         window.updateUserProfile = async () => {
             if(!user) return; const newName = $('profile-name-input').value.trim(); if(!newName) return;
-            try { await updateProfile(user, { displayName: newName }); $('dash-user-name').innerText = newName; $('user-avatar-text').innerText = newName.substring(0,2).toUpperCase();
+            try { await updateProfile(user, { displayName: newName }); $('dash-user-name').innerText = newName; updateNavbarAvatar();
                 await updateDoc(doc(db, 'public_users', user.uid), { displayName: newName }); showToast("Nombre actualizado", "success");
             } catch(e) {}
         };
@@ -595,9 +619,46 @@
             try { await updatePassword(user, pwd); showToast("Contraseña cambiada", "success"); $('profile-password-input').value = ''; } catch (err) { showToast("Cierra sesión y entra de nuevo para cambiarla", "error"); }
         };
 
+        window.renderAvatarOptions = () => {
+            const grid = $('profile-avatar-grid');
+            if(!grid) return;
+            
+            const defaultAvatars = [
+                'https://static.tvmaze.com/uploads/images/medium_portrait/497/1244306.jpg',
+                'https://static.tvmaze.com/uploads/images/medium_portrait/397/993710.jpg',
+                'https://static.tvmaze.com/uploads/images/medium_portrait/402/1007479.jpg',
+                'https://static.tvmaze.com/uploads/images/medium_portrait/498/1245276.jpg',
+                'https://static.tvmaze.com/uploads/images/medium_portrait/184/461502.jpg'
+            ];
+            
+            const userShowImages = Object.values(trackedShows).map(s => s.image).filter(img => typeof img === 'string' && img.length > 0);
+            const allAvatars = [...new Set([...defaultAvatars, ...userShowImages])]; 
+            
+            grid.innerHTML = allAvatars.map(url => {
+                const isSelected = user && user.photoURL === url;
+                return `
+                    <div onclick="updateUserAvatar('${url}')" class="w-16 h-16 shrink-0 rounded-full cursor-pointer border-2 transition-all snap-start ${isSelected ? 'border-accent-purple scale-110 shadow-lg shadow-purple-500/30' : 'border-transparent hover:border-white/30 opacity-70 hover:opacity-100'}">
+                        <img src="${url}" class="w-full h-full rounded-full object-cover bg-white/5">
+                    </div>
+                `;
+            }).join('');
+        };
+
+        window.updateUserAvatar = async (url) => {
+            if(!user) return;
+            try {
+                await updateProfile(user, { photoURL: url });
+                await updateDoc(doc(db, 'public_users', user.uid), { photoURL: url }, { merge: true });
+                showToast("Foto de perfil actualizada", "success");
+                updateNavbarAvatar();
+                renderAvatarOptions();
+            } catch(e) {
+                showToast("Error al actualizar la foto", "error");
+            }
+        };
+
         window.closeDetailView = () => { $('view-detail').classList.add('translate-x-full'); setTimeout(() => { $('detail-content').classList.add('hidden'); currentDetailShowId = null; currentDetailEpisodesData = []; }, 300); };
         
-        // --- COMMUNITY RATINGS & COMMENTS (NEW PUBLIC PATHS) ---
         async function loadShowCommunityRating(showId) {
             const elVal = $('detail-comm-val'); elVal.innerText = '--';
             try {
@@ -614,10 +675,8 @@
         
         window.rateShow = async (showId, rating) => {
             if(!user) return;
-            // Update Private
             await updateDoc(doc(db, 'users', user.uid, 'shows', showId.toString()), { rating });
             $('detail-rating-container').querySelectorAll('.ph-star').forEach((s, idx) => s.classList.toggle('ph-fill', idx < rating));
-            // Update Community Public
             try { await setDoc(doc(db, 'artifacts', PUBLIC_APP_ID, 'public', 'data', 'community_shows', showId.toString()), { ratings: { [user.uid]: rating } }, { merge: true }); loadShowCommunityRating(showId); } catch(e){}
         }
 
@@ -637,18 +696,15 @@
             $('ep-modal-comm-rating').innerText = '--';
             $('ep-modal-comm-count').innerText = '(0)';
             
-            // Clear user stars
             $('ep-modal-user-rating').querySelectorAll('.ph-star').forEach(s => {
                 s.classList.remove('ph-fill');
                 s.onclick = () => rateEpisodeCommunity(ep.id, parseInt(s.dataset.epVal));
             });
             
-            // Listener for community Data
             if(unsubscribeCurrentEpComm) unsubscribeCurrentEpComm();
             unsubscribeCurrentEpComm = onSnapshot(doc(db, 'artifacts', PUBLIC_APP_ID, 'public', 'data', 'community_episodes', epId.toString()), (docSnap) => {
                 const data = docSnap.exists() ? docSnap.data() : null;
                 
-                // Ratings
                 if(data && data.ratings) {
                     const ratings = Object.values(data.ratings);
                     if(ratings.length > 0) {
@@ -660,14 +716,14 @@
                     }
                 }
                 
-                // Comments
                 const list = $('ep-modal-comments-list'); list.innerHTML = '';
                 if(data && data.comments && data.comments.length > 0) {
                     data.comments.slice().reverse().forEach(c => {
                         const date = new Date(c.date).toLocaleDateString();
+                        const avatarHTML = c.photoURL ? `<img src="${c.photoURL}" class="w-full h-full object-cover">` : c.name.substring(0,2).toUpperCase();
                         list.innerHTML += `
                             <div class="flex gap-3 bg-dark-900/50 p-3 rounded-xl border border-white/5">
-                                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-rose-500 to-purple-600 flex items-center justify-center font-bold text-[10px] shrink-0">${c.name.substring(0,2).toUpperCase()}</div>
+                                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-rose-500 to-purple-600 flex items-center justify-center font-bold text-[10px] shrink-0 overflow-hidden border border-white/10">${avatarHTML}</div>
                                 <div class="flex-1">
                                     <div class="flex justify-between items-baseline mb-1">
                                         <span class="font-bold text-xs text-purple-300">${c.name}</span>
@@ -702,7 +758,7 @@
                 const ref = doc(db, 'artifacts', PUBLIC_APP_ID, 'public', 'data', 'community_episodes', currentModalEpId.toString());
                 const snap = await getDoc(ref);
                 const currentComments = snap.exists() && snap.data().comments ? snap.data().comments : [];
-                currentComments.push({ uid: user.uid, name: user.displayName || 'User', text: text, date: new Date().toISOString() });
+                currentComments.push({ uid: user.uid, name: user.displayName || 'Usuario', photoURL: user.photoURL || null, text: text, date: new Date().toISOString() });
                 await setDoc(ref, { comments: currentComments }, { merge: true });
                 input.value = '';
             } catch(e) { showToast("Error al publicar", "error"); }
@@ -735,7 +791,7 @@
             try {
                 const loadPromises = allShows.map(async (dbShow) => {
                     const apiData = await fetchTVMaze(dbShow.showId); if(!apiData) return;
-                    if (dbShow.status === 'watching') {
+                    if (dbShow.status === 'watching' || dbShow.status === 'planned') {
                         const today = new Date(); const aired = apiData._embedded.episodes.filter(ep => ep.airdate && new Date(ep.airdate) <= today);
                         const map = dbShow.episodesWatched || {}; const nextEp = aired.find(ep => (map[ep.id] || 0) === 0);
                         if (nextEp) {
@@ -768,7 +824,7 @@
                     upcoming.sort((a,b) => new Date(a.ep.airdate) - new Date(b.ep.airdate)).slice(0,6).forEach(ev => {
                         const dObj = new Date(ev.ep.airdate);
                         $('dash-upcoming-list').innerHTML += `
-                            <div class="glass-panel p-4 rounded-xl flex items-center gap-4 cursor-pointer hover:bg-white/5 transition" onclick="openShowDetail(${ev.showId})">
+                            <div class="glass-panel p-4 rounded-xl flex items-center gap-4 cursor-pointer hover:bg-white/5 transition border border-white/5" onclick="openShowDetail(${ev.showId})">
                                 <div class="bg-accent-purple/20 text-accent-purple rounded-lg p-2 flex flex-col items-center justify-center min-w-[3.5rem] border border-accent-purple/30">
                                     <span class="text-[9px] uppercase font-bold">${dObj.toLocaleDateString('es-ES', { weekday:'short' })}</span>
                                     <span class="text-xl font-black">${dObj.getDate()}</span>
@@ -795,6 +851,7 @@
             const h = Math.floor(t/60), d = Math.floor(h/24), rh = h%24;
             if($('stat-shows')) $('stat-shows').innerText = arr.length; if($('stat-episodes')) $('stat-episodes').innerText = e;
             if($('stat-time-days')) $('stat-time-days').innerText = d; if($('stat-time-hours')) $('stat-time-hours').innerText = rh;
+            renderAvatarOptions();
         }
 
         window.setLibraryFilter = (s) => { currentLibraryFilter = s; renderLibrary(); };
@@ -986,7 +1043,7 @@
                     const epId = ep.id.toString(), isAired = ep.airdate && new Date(ep.airdate) <= today;
                     const row = document.createElement('div'); row.id = `ep-row-${epId}`;
                     row.className = `glass-card rounded-xl border border-white/5 overflow-hidden flex flex-col relative group transition-colors cursor-pointer ${!isAired?'opacity-50 grayscale':''}`;
-                    row.onclick = () => openEpisodeModal(epId);
+                    row.onclick = () => { if(isAired) openEpisodeModal(epId); }
                     
                     row.innerHTML = `
                         <div class="relative aspect-video bg-dark-900 overflow-hidden border-b border-white/5">
@@ -1000,7 +1057,7 @@
                             <h4 class="font-bold text-xs line-clamp-2 mb-1 leading-tight text-gray-200">${ep.name}</h4>
                             <p class="text-[10px] text-gray-400 font-medium mb-2">${ep.airdate ? new Date(ep.airdate).toLocaleDateString('es-ES') : 'Por anunciar'}</p>
                         </div>
-                        <div class="mt-auto flex items-center justify-between border-t border-white/10 pt-3 p-3 bg-dark-800/50" onclick="e.stopPropagation()">
+                        <div class="mt-auto flex items-center justify-between border-t border-white/10 pt-3 p-3 bg-dark-800/50" onclick="event.stopPropagation()">
                             ${isTracked && isAired ? `
                                 <button onclick="updateEp('${show.id}', '${epId}', -1)" class="w-7 h-7 rounded-full bg-white/5 hover:bg-white/20 flex items-center justify-center text-gray-400 hover:text-white transition border border-white/5" id="dec-${epId}"><i class="ph-bold ph-minus text-xs"></i></button>
                                 <span class="font-bold text-sm w-8 text-center text-white" id="cnt-${epId}">0</span>
@@ -1065,7 +1122,9 @@
                             <div class="h-1.5 w-full bg-dark-900 rounded overflow-hidden border border-white/5"><div class="h-full bg-accent-emerald transition-all shadow-[0_0_10px_currentColor]" style="width:${sPct}%"></div></div>
                         </div>
                         <div class="flex items-center gap-3">
-                            ${sWatch < sTotal ? `<button onclick="markSeason('${currentDetailShowId}', ${sNum})" class="bg-white/10 hover:bg-emerald-500 hover:text-white px-2.5 py-1.5 rounded-lg text-[10px] uppercase font-bold text-gray-300 transition border border-white/10"><i class="ph-bold ph-check"></i></button>` : `<button onclick="unmarkSeason('${currentDetailShowId}', ${sNum})" class="bg-accent-emerald hover:bg-red-500 hover:border-red-500 text-white px-2.5 py-1.5 rounded-lg text-[10px] uppercase font-bold transition border border-emerald-500 group"><i class="ph-bold ph-check group-hover:hidden"></i><i class="ph-bold ph-x group-hover:block hidden"></i></button>`}
+                            ${sWatch < sTotal 
+                                ? `<button onclick="markSeason('${currentDetailShowId}', ${sNum})" class="bg-white/10 hover:bg-emerald-500 hover:text-white px-2.5 py-1.5 rounded-lg text-[10px] uppercase font-bold text-gray-300 transition border border-white/10"><i class="ph-bold ph-check"></i></button>` 
+                                : `<button onclick="unmarkSeason('${currentDetailShowId}', ${sNum})" class="bg-accent-emerald hover:bg-red-500 hover:border-red-500 text-white px-2.5 py-1.5 rounded-lg text-[10px] uppercase font-bold transition border border-emerald-500 group"><i class="ph-bold ph-check group-hover:hidden"></i><i class="ph-bold ph-x group-hover:block hidden"></i></button>`}
                             <i class="ph-bold ph-caret-down text-gray-400 transition-transform ${rot} pointer-events-none"></i>
                         </div>
                     `;
@@ -1160,9 +1219,13 @@
                 if(results.length === 0) grid.innerHTML = '<div class="col-span-full text-center text-gray-400 py-10">No se encontraron usuarios.</div>';
                 results.forEach(u => {
                     const isF = !!followingUsers[u.uid];
+                    const avatarHTML = u.photoURL ? `<img src="${u.photoURL}" class="w-full h-full object-cover">` : (u.displayName||'U').substring(0,2).toUpperCase();
                     grid.innerHTML += `
                         <div class="glass-card p-5 rounded-2xl flex items-center justify-between cursor-pointer hover:bg-white/5 border border-white/5 transition-all" onclick="openPublicProfile('${u.uid}')">
-                            <div class="flex items-center gap-4"><div class="w-12 h-12 rounded-full bg-gradient-to-tr from-rose-500 to-purple-600 flex items-center justify-center font-bold text-white shadow-lg text-lg">${(u.displayName||'U').substring(0,2).toUpperCase()}</div><span class="font-bold text-lg text-gray-200">${u.displayName||'Usuario'}</span></div>
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-rose-500 to-purple-600 flex items-center justify-center font-bold text-white shadow-lg text-lg overflow-hidden shrink-0 border border-white/10">${avatarHTML}</div>
+                                <span class="font-bold text-lg text-gray-200">${u.displayName||'Usuario'}</span>
+                            </div>
                             ${isF ? '<i class="ph-fill ph-check-circle text-rose-400 text-2xl drop-shadow-md"></i>' : ''}
                         </div>`;
                 });
@@ -1174,9 +1237,10 @@
             const grid = $('comm-following-grid'); grid.innerHTML = ''; const followed = Object.values(followingUsers);
             if(followed.length === 0) { grid.innerHTML = '<div class="col-span-full flex flex-col items-center text-gray-400 py-16 opacity-50"><i class="ph-duotone ph-users text-6xl mb-4"></i><p>No sigues a nadie aún.</p></div>'; return; }
             followed.forEach(u => {
+                const avatarHTML = u.photoURL ? `<img src="${u.photoURL}" class="w-full h-full object-cover">` : (u.displayName||'U').substring(0,2).toUpperCase();
                 grid.innerHTML += `
                     <div class="glass-card p-5 rounded-2xl flex items-center gap-4 cursor-pointer hover:bg-white/5 transition-all border border-white/5 group" onclick="openPublicProfile('${u.uid}')">
-                        <div class="w-14 h-14 rounded-full bg-gradient-to-tr from-rose-500 to-purple-600 flex items-center justify-center font-black text-white text-xl shadow-lg">${(u.displayName||'U').substring(0,2).toUpperCase()}</div>
+                        <div class="w-14 h-14 rounded-full bg-gradient-to-tr from-rose-500 to-purple-600 flex items-center justify-center font-black text-white text-xl shadow-lg overflow-hidden shrink-0 border border-white/10">${avatarHTML}</div>
                         <div class="flex-1 min-w-0"><h4 class="font-bold text-white text-lg truncate">${u.displayName||'Usuario'}</h4><p class="text-[10px] text-rose-400 font-bold uppercase tracking-wider mt-1">Ver perfil</p></div>
                         <i class="ph-bold ph-caret-right text-gray-600 group-hover:text-rose-400 transition-colors"></i>
                     </div>`;
@@ -1196,7 +1260,9 @@
             try {
                 let uInfo = allPublicUsers.find(u => u.uid === uid); if(!uInfo) { const docSnap = await getDoc(doc(db, 'public_users', uid)); if(docSnap.exists()) uInfo = docSnap.data(); }
                 const name = uInfo ? uInfo.displayName : 'Usuario';
-                $('pub-avatar').innerText = name.substring(0,2).toUpperCase(); $('pub-name').innerText = name; $('pub-name-short').innerText = name;
+                
+                $('pub-avatar').innerHTML = uInfo && uInfo.photoURL ? `<img src="${uInfo.photoURL}" class="w-full h-full object-cover">` : name.substring(0,2).toUpperCase();
+                $('pub-name').innerText = name; $('pub-name-short').innerText = name;
 
                 const showsSnap = await getDocs(collection(db, 'users', uid, 'shows'));
                 let pubShows = [], totalEps = 0, totalTime = 0;
@@ -1215,9 +1281,9 @@
                         const map = s.episodesWatched || {}; const wCount = Object.keys(map).filter(k=>map[k]>0).length;
                         const tot = s.totalEpisodes || 1; const pct = Math.min(Math.round((wCount/tot)*100), 100);
                         grid.innerHTML += `
-                            <div class="glass-card rounded-2xl overflow-hidden relative cursor-pointer border border-white/5">
+                            <div onclick="openShowDetail(${s.showId})" class="glass-card rounded-2xl overflow-hidden relative cursor-pointer border border-white/5 hover:border-white/20 transition-all hover:scale-[1.02]">
                                 <div class="relative aspect-[2/3] bg-dark-800"><img src="${s.image||'https://placehold.co/210x295'}" class="w-full h-full object-cover"><div class="absolute bottom-0 w-full h-1.5 bg-dark-900/50"><div class="h-full bg-gradient-to-r from-rose-500 to-purple-500" style="width:${pct}%"></div></div></div>
-                                <div class="p-3 text-center bg-dark-800/80 backdrop-blur-md h-full"><h4 class="font-bold text-xs line-clamp-2 text-white mb-1">${s.name}</h4><span class="text-[10px] text-gray-400">${wCount}/${tot} EP</span></div>
+                                <div class="p-3 text-center bg-dark-800/80 backdrop-blur-md h-full flex flex-col"><h4 class="font-bold text-xs line-clamp-2 text-white mb-1">${s.name}</h4><span class="text-[10px] text-gray-400 mt-auto">${wCount}/${tot} EP</span></div>
                             </div>`;
                     });
                 }
@@ -1228,7 +1294,7 @@
         window.closePublicProfile = () => { $('view-public-profile').classList.add('translate-x-full'); setTimeout(() => { $('pub-profile-content').classList.add('hidden'); currentPubUid = null; }, 300); }
         window.toggleFollow = async (uid) => {
             if(!user) return; const ref = doc(db, 'users', user.uid, 'following', uid); const isF = !!followingUsers[uid];
-            const uInfo = allPublicUsers.find(u => u.uid === uid) || { uid, displayName: $('pub-name').innerText };
+            const uInfo = allPublicUsers.find(u => u.uid === uid) || { uid, displayName: $('pub-name').innerText, photoURL: $('pub-avatar img')?.src || null };
             try { if(isF) await deleteDoc(ref); else await setDoc(ref, uInfo); showToast(isF ? "Dejaste de seguir" : "Siguiendo", "success"); openPublicProfile(uid); } catch(e) {}
         }
         window.addEventListener('DOMContentLoaded', init);
