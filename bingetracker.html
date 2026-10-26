@@ -40,17 +40,20 @@
 
     <style>
         body { background-color: #0B0F19; color: #ffffff; -webkit-tap-highlight-color: transparent; overflow-x: hidden; overscroll-behavior-y: none; }
-        .glass-panel { background: rgba(21, 28, 44, 0.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
-        .glass-card { background: linear-gradient(145deg, rgba(31, 41, 63, 0.4) 0%, rgba(21, 28, 44, 0.6) 100%); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .glass-panel { background: rgba(21, 28, 44, 0.7); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .glass-card { background: linear-gradient(145deg, rgba(31, 41, 63, 0.5) 0%, rgba(21, 28, 44, 0.7) 100%); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); transition: transform 0.2s ease, box-shadow 0.2s ease; }
         .glass-card:hover { transform: translateY(-4px); box-shadow: 0 10px 30px -10px rgba(139, 92, 246, 0.3); border: 1px solid rgba(139, 92, 246, 0.3); }
         .text-gradient { background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-image: linear-gradient(to right, #8B5CF6, #10B981); }
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        
+        /* Custom Scrollbars - Visible now for PC */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #1F293F; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #8B5CF6; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        #app-container { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        
+        .snap-x { scroll-snap-type: x mandatory; overflow-x: auto; padding-bottom: 12px; }
+        
+        #app-container { display: flex; flex-direction: column; height: 100vh; overflow: hidden; position: relative; z-index: 10; }
         @media (min-width: 768px) { #app-container { flex-direction: row; } }
         .main-content { flex: 1; overflow-y: auto; height: 100%; padding-bottom: 90px; }
         @media (min-width: 768px) { .main-content { padding-bottom: 0; margin-left: 6rem; } }
@@ -75,14 +78,20 @@
         .goog-logo-link { display: none !important; }
         .goog-te-gadget { color: transparent !important; font-size: 0 !important; }
         .goog-te-gadget .goog-te-combo { margin: 0 !important; }
+        
+        #custom-bg { background-size: cover; background-position: center; opacity: 0.15; z-index: -1; }
     </style>
 </head>
 <body class="antialiased selection:bg-accent-purple selection:text-white relative">
 
+    <div class="fixed inset-0 z-[-2] bg-dark-900"></div>
+    <div id="custom-bg" class="fixed inset-0 transition-all duration-1000"></div>
+    
     <div class="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] bg-accent-purple/20 blur-[120px] rounded-full pointer-events-none z-[-1]"></div>
     <div class="fixed bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-accent-emerald/10 blur-[120px] rounded-full pointer-events-none z-[-1]"></div>
 
-    <div id="confirm-modal" class="fixed inset-0 z-[110] bg-dark-900/80 backdrop-blur-sm flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+    <!-- Modals & Toasts -->
+    <div id="confirm-modal" class="fixed inset-0 z-[150] bg-dark-900/80 backdrop-blur-sm flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
         <div class="glass-card p-6 rounded-2xl w-[90%] max-w-sm transform scale-95 transition-transform duration-300" id="confirm-modal-content">
             <h3 class="text-xl font-bold mb-2 text-white" id="confirm-title">Confirmar</h3>
             <p class="text-gray-300 mb-6 text-sm leading-relaxed" id="confirm-message">¿Estás seguro?</p>
@@ -93,8 +102,9 @@
         </div>
     </div>
     
-    <div id="toast-container" class="fixed top-4 left-1/2 transform -translate-x-1/2 z-[120] flex flex-col gap-2 pointer-events-none"></div>
+    <div id="toast-container" class="fixed top-4 left-1/2 transform -translate-x-1/2 z-[160] flex flex-col gap-2 pointer-events-none"></div>
 
+    <!-- Screens -->
     <div id="init-screen" class="fixed inset-0 z-[100] bg-dark-900 flex flex-col items-center justify-center transition-opacity duration-500">
         <i class="ph-fill ph-television-simple text-6xl text-accent-purple mb-4 animate-pulse"></i>
         <h1 class="text-3xl font-bold text-gradient mb-6">BingeTracker</h1>
@@ -119,7 +129,7 @@
 
     <div id="app-container" class="hidden opacity-0 transition-opacity duration-500">
         
-        <nav class="glass-panel fixed bottom-0 w-full md:w-24 md:h-screen md:left-0 md:top-0 z-40 flex md:flex-col items-center justify-around md:justify-start md:pt-8 md:gap-6 pb-safe pt-2 md:pb-8 border-t md:border-t-0 md:border-r border-white/10">
+        <nav class="glass-panel fixed bottom-0 w-full md:w-24 md:h-screen md:left-0 md:top-0 z-40 flex md:flex-col items-center justify-around md:justify-start md:pt-8 md:gap-6 pb-safe pt-2 md:pb-8 border-t md:border-t-0 md:border-r border-white/10 bg-dark-900/80">
             <div class="hidden md:flex flex-col items-center mb-4"><i class="ph-fill ph-television-simple text-3xl text-accent-purple"></i></div>
 
             <button id="btn-install-app" class="hidden nav-btn flex-col items-center gap-1 p-2 text-accent-emerald hover:text-emerald-300 transition-colors relative group w-full">
@@ -127,7 +137,7 @@
                 <span class="text-[9px] md:text-[10px] font-bold tracking-wider uppercase">Instalar</span>
             </button>
 
-            <button onclick="switchView('dashboard')" id="nav-dashboard" class="nav-btn flex flex-col items-center gap-1 p-2 md:p-3 text-gray-400 hover:text-white transition-colors relative group">
+            <button onclick="switchView('dashboard')" id="nav-dashboard" class="nav-btn flex flex-col items-center gap-1 p-2 md:p-3 text-gray-400 hover:text-white transition-colors relative group active">
                 <i class="ph ph-house text-2xl group-[.active]:text-accent-emerald group-[.active]:ph-fill transition-all"></i>
                 <span class="text-[10px] font-medium tracking-wider uppercase group-[.active]:text-white">Inicio</span>
             </button>
@@ -150,7 +160,7 @@
             </button>
 
             <div class="md:mt-auto hidden md:flex flex-col items-center gap-4 p-4">
-                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-dark-700 to-dark-800 border border-white/10 flex items-center justify-center text-white shadow-lg overflow-hidden" id="user-avatar">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-dark-700 to-dark-800 border border-white/10 flex items-center justify-center text-white shadow-lg overflow-hidden shrink-0" id="user-avatar">
                     <span id="user-avatar-text" class="font-bold text-sm"></span>
                 </div>
             </div>
@@ -169,13 +179,16 @@
                         <h1 class="text-3xl md:text-4xl font-bold mb-1">Hola, <span class="text-gradient" id="dash-user-name">Maratonista</span></h1>
                         <p class="text-gray-400 text-sm">Aquí tienes tu resumen del día.</p>
                     </div>
-                    <button onclick="handleSignOut()" class="md:hidden w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-red-400"><i class="ph ph-sign-out text-xl"></i></button>
+                    <button onclick="handleSignOut()" class="md:hidden w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-red-400 shrink-0"><i class="ph ph-sign-out text-xl"></i></button>
                 </header>
+                
                 <div id="dash-loading" class="flex flex-col items-center justify-center py-12 hidden">
                     <div class="spinner mb-4 border-t-accent-emerald"></div>
                     <p class="text-gray-400 text-sm animate-pulse">Sincronizando progreso...</p>
                 </div>
+                
                 <div id="dash-content" class="space-y-10">
+                    <!-- Continuar Viendo -->
                     <div>
                         <div class="flex items-center gap-2 mb-4">
                             <i class="ph-fill ph-play-circle text-2xl text-accent-emerald"></i>
@@ -184,28 +197,131 @@
                         <div id="dash-continue-empty" class="hidden glass-card rounded-2xl p-6 text-center text-gray-400">
                             No tienes episodios pendientes. ¡Busca una nueva serie!
                         </div>
-                        <div id="dash-continue-grid" class="flex gap-4 overflow-x-auto pb-4 no-scrollbar snap-x"></div>
+                        <div id="dash-continue-grid" class="flex gap-4 overflow-x-auto pb-4 snap-x"></div>
                     </div>
+
+                    <!-- Próximos Estrenos -->
                     <div>
                         <div class="flex items-center gap-2 mb-4">
                             <i class="ph-fill ph-calendar-blank text-2xl text-accent-purple"></i>
                             <h2 class="text-xl font-bold">Próximos Estrenos</h2>
                         </div>
                         <div id="dash-upcoming-empty" class="hidden glass-card rounded-2xl p-6 text-center text-gray-400">
-                            No hay estrenos próximos programados.
+                            No hay estrenos próximos programados para tus series.
                         </div>
                         <div id="dash-upcoming-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
                     </div>
+
+                    <!-- Historial Reciente -->
+                    <div>
+                        <div class="flex items-center gap-2 mb-4">
+                            <i class="ph-fill ph-clock-counter-clockwise text-2xl text-blue-400"></i>
+                            <h2 class="text-xl font-bold">Historial Reciente</h2>
+                        </div>
+                        <div id="dash-history-empty" class="glass-card rounded-2xl p-6 text-center text-gray-400 hidden">
+                            Aún no has visto nada recientemente.
+                        </div>
+                        <div id="dash-history-list" class="flex gap-4 overflow-x-auto pb-4 snap-x">
+                            <!-- Inyectado desde JS -->
+                        </div>
+                    </div>
                 </div>
+            </section>
+
+            <!-- Libreria -->
+            <section id="view-library" class="view-section hidden p-4 md:p-8 animate-fade-in w-full max-w-7xl mx-auto">
+                <header class="mb-6">
+                    <h1 class="text-3xl md:text-4xl font-bold mb-4">Tu <span class="text-gradient">Biblioteca</span></h1>
+                    <div class="flex gap-2 overflow-x-auto snap-x pb-2 border-b border-white/10 w-full" id="library-tabs">
+                        <button onclick="setLibraryFilter('all')" class="tab-btn bg-white/10 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap" data-status="all">Todos</button>
+                        <button onclick="setLibraryFilter('watching')" class="tab-btn text-gray-400 hover:text-white hover:bg-white/5 px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap" data-status="watching">Viendo</button>
+                        <button onclick="setLibraryFilter('planned')" class="tab-btn text-gray-400 hover:text-white hover:bg-white/5 px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap" data-status="planned">Sin comenzar</button>
+                        <button onclick="setLibraryFilter('completed')" class="tab-btn text-gray-400 hover:text-white hover:bg-white/5 px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap" data-status="completed">Terminadas</button>
+                        <button onclick="setLibraryFilter('dropped')" class="tab-btn text-gray-400 hover:text-white hover:bg-white/5 px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap" data-status="dropped">Abandonadas</button>
+                    </div>
+                </header>
+                <div id="library-empty" class="hidden flex-col items-center justify-center py-20 text-center bg-dark-800/30 rounded-3xl border border-white/5 border-dashed">
+                    <i class="ph-duotone ph-popcorn text-6xl text-gray-600 mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-2">Vacío</h3>
+                    <p class="text-gray-400 text-sm max-w-xs mb-6">No hay series en esta categoría.</p>
+                </div>
+                <div id="library-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6 mt-4"></div>
+            </section>
+
+            <!-- Search & Discover -->
+            <section id="view-search" class="view-section hidden p-4 md:p-8 animate-fade-in w-full max-w-7xl mx-auto">
+                <header class="mb-8 flex flex-col gap-4 max-w-4xl mt-2">
+                    <h1 class="text-3xl font-bold mb-1"><span class="text-gradient">Explorar</span> Series</h1>
+                    <div class="relative w-full">
+                        <i class="ph ph-magnifying-glass absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl"></i>
+                        <input type="text" id="search-input" placeholder="Buscar título (Limpia para explorar por categorías)..." class="w-full bg-dark-800/80 border border-white/10 focus:border-blue-400 focus:ring-1 focus:ring-blue-400 rounded-2xl py-4 pl-12 pr-12 text-white placeholder-gray-500 outline-none transition-all shadow-lg text-lg">
+                        <button id="search-clear" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-white hidden"><i class="ph-fill ph-x-circle text-xl"></i></button>
+                    </div>
+                    
+                    <div class="flex flex-col md:flex-row gap-4 w-full">
+                        <select id="filter-status" class="flex-1 bg-dark-800/80 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-blue-400 transition-colors cursor-pointer appearance-none">
+                            <option value="">Cualquier Estado</option><option value="Running">En Emisión</option><option value="Ended">Terminada</option>
+                        </select>
+                        <select id="filter-type" class="flex-1 bg-dark-800/80 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-blue-400 transition-colors cursor-pointer appearance-none">
+                            <option value="">Cualquier Tipo</option><option value="Scripted">Scripted</option><option value="Animation">Animation</option><option value="Reality">Reality</option><option value="Documentary">Documentary</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mt-2">
+                        <p class="text-xs text-gray-400 mb-2 font-bold uppercase tracking-wider">Géneros Múltiples (Estilo TVMaze)</p>
+                        <div id="search-genre-chips" class="flex flex-wrap gap-2"></div>
+                    </div>
+                </header>
+                
+                <div id="search-loading" class="hidden justify-center items-center flex-col py-12 gap-4">
+                    <div class="spinner border-t-blue-400 w-10 h-10 border-4"></div>
+                    <p class="text-blue-400 text-sm animate-pulse font-medium" id="search-loading-text">Escaneando base de datos...</p>
+                </div>
+                
+                <!-- Discover (Default State) -->
+                <div id="search-initial" class="w-full pb-10">
+                    <div class="flex items-center gap-2 mb-6"><i class="ph-fill ph-sparkle text-2xl text-yellow-400 animate-pulse"></i><h2 class="text-2xl font-bold">Estrenos de Hoy & <span class="text-gradient">Tendencias</span></h2></div>
+                    <div id="discover-loading" class="flex justify-center py-12"><div class="spinner border-t-rose-400"></div></div>
+                    <div id="discover-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6 hidden"></div>
+                </div>
+                
+                <div id="search-no-results" class="hidden flex-col items-center justify-center py-20 text-center"><i class="ph-duotone ph-ghost text-5xl text-gray-500 mb-3"></i><p class="text-gray-400">Sin resultados con esos filtros.</p></div>
+                <div id="search-results" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6"></div>
+                
+                <div id="search-pagination" class="hidden justify-center items-center gap-6 mt-10 mb-8 w-full">
+                    <button id="btn-prev-page" class="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center disabled:opacity-30 disabled:pointer-events-none transition-all"><i class="ph-bold ph-caret-left text-xl"></i></button>
+                    <span id="search-page-indicator" class="font-bold text-xl w-10 text-center text-blue-400">1</span>
+                    <button id="btn-next-page" class="w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 hover:bg-blue-500/40 hover:text-white flex items-center justify-center disabled:opacity-30 disabled:pointer-events-none transition-all"><i class="ph-bold ph-caret-right text-xl"></i></button>
+                </div>
+            </section>
+
+            <!-- Community -->
+            <section id="view-community" class="view-section hidden p-4 md:p-8 animate-fade-in w-full max-w-7xl mx-auto">
+                <header class="mb-8 mt-2 md:mt-0">
+                    <h1 class="text-3xl md:text-4xl font-bold mb-2">Tu <span class="text-rose-400">Comunidad</span></h1>
+                    <p class="text-gray-400 text-sm">Busca amigos, sigue perfiles y descubre qué ven.</p>
+                </header>
+                <div class="relative w-full max-w-2xl mb-8">
+                    <i class="ph ph-magnifying-glass absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl"></i>
+                    <input type="text" id="community-search" placeholder="Buscar usuarios..." class="w-full bg-dark-800/80 border border-white/10 focus:border-rose-400 focus:ring-1 focus:ring-rose-400 rounded-2xl py-4 pl-12 pr-4 text-white placeholder-gray-500 outline-none transition-all shadow-lg text-lg">
+                </div>
+                <div id="community-tabs" class="flex gap-4 mb-6 border-b border-white/10 pb-2 overflow-x-auto snap-x">
+                    <button onclick="setCommTab('following')" id="tab-comm-following" class="text-rose-400 font-bold border-b-2 border-rose-400 pb-2 px-2 transition-all whitespace-nowrap">Siguiendo</button>
+                    <button onclick="setCommTab('search')" id="tab-comm-search" class="text-gray-400 hover:text-white pb-2 px-2 transition-all whitespace-nowrap">Resultados</button>
+                </div>
+                <div id="comm-loading" class="hidden justify-center py-12"><div class="spinner border-t-rose-400 w-10 h-10 border-4"></div></div>
+                <div id="comm-following-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
+                <div id="comm-search-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 hidden"></div>
             </section>
 
             <!-- Profile & Stats -->
             <section id="view-profile" class="view-section hidden p-4 md:p-8 animate-fade-in max-w-4xl mx-auto w-full">
                 <header class="mb-8 mt-2 md:mt-0">
                     <h1 class="text-3xl md:text-4xl font-bold mb-2">Tu <span class="text-gradient">Perfil</span></h1>
-                    <p class="text-gray-400 text-sm">Tus estadísticas, personalización y configuración.</p>
+                    <p class="text-gray-400 text-sm">Tus estadísticas, personalización y seguridad.</p>
                 </header>
 
+                <!-- Stats Widget -->
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
                     <div class="glass-card p-6 rounded-3xl border border-white/5 flex flex-col items-center justify-center text-center">
                         <i class="ph-fill ph-television-simple text-4xl text-accent-purple mb-3"></i>
@@ -228,172 +344,132 @@
                 </div>
 
                 <div class="space-y-6">
+                    <!-- Datos Personales -->
                     <div class="glass-card p-6 rounded-2xl border border-white/5">
                         <div class="flex items-center gap-3 mb-4">
-                            <i class="ph-fill ph-user-circle text-2xl text-blue-400"></i>
+                            <i class="ph-fill ph-identification-card text-2xl text-blue-400"></i>
                             <h2 class="text-xl font-bold">Datos Personales</h2>
                         </div>
                         <div class="flex flex-col sm:flex-row gap-3">
-                            <input type="text" id="profile-name-input" placeholder="Tu nombre..." class="flex-1 bg-dark-800/80 border border-white/10 focus:border-blue-400 focus:ring-1 focus:ring-blue-400 rounded-xl py-3 px-4 text-white outline-none transition-all">
-                            <button onclick="updateUserProfile()" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg transition-colors whitespace-nowrap">Actualizar</button>
+                            <input type="text" id="profile-name-input" placeholder="Tu nombre público..." class="flex-1 bg-dark-800/80 border border-white/10 focus:border-blue-400 focus:ring-1 focus:ring-blue-400 rounded-xl py-3 px-4 text-white outline-none transition-all">
+                            <button onclick="updateUserProfile()" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg transition-colors whitespace-nowrap">Actualizar Nombre</button>
                         </div>
                     </div>
                     
+                    <!-- Foto de Perfil -->
                     <div class="glass-card p-6 rounded-2xl border border-white/5">
-                        <div class="flex items-center gap-3 mb-4">
-                            <i class="ph-fill ph-image text-2xl text-accent-purple"></i>
-                            <h2 class="text-xl font-bold">Foto de Perfil</h2>
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4 border-b border-white/10 pb-4">
+                            <div class="flex items-center gap-3">
+                                <i class="ph-fill ph-image text-2xl text-accent-purple"></i>
+                                <h2 class="text-xl font-bold">Foto de Perfil</h2>
+                            </div>
+                            <div class="relative overflow-hidden inline-block bg-white/10 hover:bg-white/20 transition rounded-xl px-4 py-2 border border-white/20">
+                                <span class="text-sm font-bold text-white flex items-center gap-2"><i class="ph-bold ph-upload-simple"></i> Subir Personal</span>
+                                <input type="file" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="uploadCustomAvatar(event)">
+                            </div>
                         </div>
-                        <p class="text-sm text-gray-400 mb-4">Selecciona tu foto favorita de las series que sigues o usa una predeterminada.</p>
-                        <div id="profile-avatar-grid" class="flex gap-3 overflow-x-auto pb-4 no-scrollbar snap-x">
-                            <!-- Injected -->
+                        <p class="text-sm text-gray-400 mb-4">Elige una de las series que sigues, una clásica o sube tu propia foto.</p>
+                        <div id="profile-avatar-grid" class="flex gap-3 overflow-x-auto pb-4 snap-x">
+                            <!-- Injected by JS -->
                         </div>
                     </div>
 
+                    <!-- Personalizar Fondo -->
                     <div class="glass-card p-6 rounded-2xl border border-white/5">
-                        <div class="flex items-center gap-3 mb-4">
-                            <i class="ph-fill ph-lock-key text-2xl text-rose-400"></i>
-                            <h2 class="text-xl font-bold">Seguridad</h2>
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4 border-b border-white/10 pb-4">
+                            <div class="flex items-center gap-3">
+                                <i class="ph-fill ph-paint-brush text-2xl text-yellow-400"></i>
+                                <h2 class="text-xl font-bold">Fondo de Pantalla</h2>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="removeCustomBg()" class="bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white transition rounded-xl px-4 py-2 text-sm font-bold border border-red-500/20">Quitar</button>
+                                <div class="relative overflow-hidden inline-block bg-white/10 hover:bg-white/20 transition rounded-xl px-4 py-2 border border-white/20">
+                                    <span class="text-sm font-bold text-white flex items-center gap-2"><i class="ph-bold ph-upload-simple"></i> Subir Fondo</span>
+                                    <input type="file" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="uploadCustomBg(event)">
+                                </div>
+                            </div>
                         </div>
-                        <div class="flex flex-col sm:flex-row gap-3">
-                            <input type="password" id="profile-password-input" placeholder="Nueva contraseña (Mín. 6)..." class="flex-1 bg-dark-800/80 border border-white/10 focus:border-rose-400 focus:ring-1 focus:ring-rose-400 rounded-xl py-3 px-4 text-white outline-none transition-all">
-                            <button onclick="updateUserPassword()" class="bg-rose-500 hover:bg-rose-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg transition-colors whitespace-nowrap">Cambiar</button>
+                        <p class="text-sm text-gray-400 mb-4">Elige un tema predeterminado o sube tu propio wallpaper (se aplicará un filtro oscuro para leer bien).</p>
+                        <div class="flex gap-4 overflow-x-auto pb-4 snap-x">
+                            <div onclick="setCustomBg('')" class="w-32 h-20 shrink-0 bg-dark-900 rounded-xl cursor-pointer border-2 border-white/10 hover:border-white/50 flex flex-col items-center justify-center text-gray-500 text-xs font-bold uppercase"><i class="ph-bold ph-prohibit mb-1"></i> Por defecto</div>
+                            <div onclick="setCustomBg('https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=1000&auto=format&fit=crop')" class="w-32 h-20 shrink-0 bg-cover bg-center rounded-xl cursor-pointer border-2 border-white/10 hover:border-white/50" style="background-image: url('https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=1000&auto=format&fit=crop')"></div>
+                            <div onclick="setCustomBg('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop')" class="w-32 h-20 shrink-0 bg-cover bg-center rounded-xl cursor-pointer border-2 border-white/10 hover:border-white/50" style="background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop')"></div>
+                            <div onclick="setCustomBg('https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=1000&auto=format&fit=crop')" class="w-32 h-20 shrink-0 bg-cover bg-center rounded-xl cursor-pointer border-2 border-white/10 hover:border-white/50" style="background-image: url('https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=1000&auto=format&fit=crop')"></div>
                         </div>
                     </div>
+
+                    <!-- Traductor -->
                     <div class="glass-card p-6 rounded-2xl border border-white/5">
                         <div class="flex items-center gap-3 mb-4">
                             <i class="ph-fill ph-translate text-2xl text-accent-emerald"></i>
                             <h2 class="text-xl font-bold">Traductor Automático</h2>
                         </div>
-                        <p class="text-sm text-gray-400 mb-4">Para traducir las sinopsis en inglés, selecciona "Español" abajo.</p>
-                        <div id="google_translate_element" class="bg-dark-800/50 p-4 rounded-xl border border-white/10"></div>
+                        <p class="text-sm text-gray-400 mb-4">Para traducir la app y las sinopsis de TVMaze automáticamente, selecciona "Español" abajo.</p>
+                        <div id="google_translate_element" class="bg-dark-800/50 p-4 rounded-xl border border-white/10 w-full sm:w-1/2"></div>
+                    </div>
+
+                    <!-- Seguridad -->
+                    <div class="glass-card p-6 rounded-2xl border border-red-500/10 bg-red-500/5">
+                        <div class="flex items-center gap-3 mb-4">
+                            <i class="ph-fill ph-lock-key text-2xl text-red-400"></i>
+                            <h2 class="text-xl font-bold text-red-100">Seguridad</h2>
+                        </div>
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <input type="password" id="profile-password-input" placeholder="Escribe tu nueva contraseña (mínimo 6)..." class="flex-1 bg-dark-900 border border-red-500/20 focus:border-red-400 focus:ring-1 focus:ring-red-400 rounded-xl py-3 px-4 text-white outline-none transition-all">
+                            <button onclick="updateUserPassword()" class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-red-500/20 transition-colors whitespace-nowrap">Cambiar Contraseña</button>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Library -->
-            <section id="view-library" class="view-section hidden p-4 md:p-8 animate-fade-in w-full max-w-7xl mx-auto">
-                <header class="mb-6">
-                    <h1 class="text-3xl md:text-4xl font-bold mb-4">Tu <span class="text-gradient">Biblioteca</span></h1>
-                    <div class="flex gap-2 overflow-x-auto no-scrollbar pb-2 border-b border-white/10 w-full" id="library-tabs">
-                        <button onclick="setLibraryFilter('all')" class="tab-btn bg-white/10 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap" data-status="all">Todos</button>
-                        <button onclick="setLibraryFilter('watching')" class="tab-btn text-gray-400 hover:text-white hover:bg-white/5 px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap" data-status="watching">Viendo</button>
-                        <button onclick="setLibraryFilter('planned')" class="tab-btn text-gray-400 hover:text-white hover:bg-white/5 px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap" data-status="planned">Sin comenzar</button>
-                        <button onclick="setLibraryFilter('completed')" class="tab-btn text-gray-400 hover:text-white hover:bg-white/5 px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap" data-status="completed">Terminado</button>
-                        <button onclick="setLibraryFilter('dropped')" class="tab-btn text-gray-400 hover:text-white hover:bg-white/5 px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap" data-status="dropped">Abandonado</button>
-                    </div>
-                </header>
-                <div id="library-empty" class="hidden flex-col items-center justify-center py-20 text-center bg-dark-800/30 rounded-3xl border border-white/5 border-dashed">
-                    <i class="ph-duotone ph-popcorn text-6xl text-gray-600 mb-4"></i>
-                    <h3 class="text-xl font-semibold mb-2">Vacío</h3>
-                    <p class="text-gray-400 text-sm max-w-xs mb-6">No hay series en esta categoría.</p>
-                </div>
-                <div id="library-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6 mt-4"></div>
-            </section>
-
-            <!-- Search / Discover -->
-            <section id="view-search" class="view-section hidden p-4 md:p-8 animate-fade-in w-full max-w-7xl mx-auto">
-                <header class="mb-8 flex flex-col gap-4 max-w-4xl mt-2">
-                    <h1 class="text-3xl font-bold mb-1"><span class="text-gradient">Explorar</span> Base de Datos</h1>
-                    <div class="relative w-full">
-                        <i class="ph ph-magnifying-glass absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl"></i>
-                        <input type="text" id="search-input" placeholder="Buscar título (limpia el texto para usar filtros)..." class="w-full bg-dark-800/80 border border-white/10 focus:border-blue-400 focus:ring-1 focus:ring-blue-400 rounded-2xl py-4 pl-12 pr-12 text-white placeholder-gray-500 outline-none transition-all shadow-lg text-lg">
-                        <button id="search-clear" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-white hidden"><i class="ph-fill ph-x-circle text-xl"></i></button>
-                    </div>
-                    <div class="flex flex-col md:flex-row gap-4 w-full">
-                        <select id="filter-status" class="flex-1 bg-dark-800/80 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-blue-400 transition-colors cursor-pointer appearance-none">
-                            <option value="">Cualquier Estado</option><option value="Running">En Emisión</option><option value="Ended">Terminada</option>
-                        </select>
-                        <select id="filter-type" class="flex-1 bg-dark-800/80 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-blue-400 transition-colors cursor-pointer appearance-none">
-                            <option value="">Cualquier Tipo</option><option value="Scripted">Scripted</option><option value="Animation">Animation</option><option value="Reality">Reality</option><option value="Documentary">Documentary</option>
-                        </select>
-                    </div>
-                    <div id="search-genre-chips" class="flex flex-wrap gap-2 mt-2"></div>
-                </header>
-                
-                <div id="search-loading" class="hidden justify-center items-center flex-col py-12 gap-4">
-                    <div class="spinner border-t-blue-400 w-10 h-10 border-4"></div>
-                    <p class="text-blue-400 text-sm animate-pulse font-medium">Buscando...</p>
-                </div>
-                
-                <div id="search-initial" class="w-full pb-10">
-                    <div class="flex items-center gap-2 mb-6"><i class="ph-fill ph-sparkle text-2xl text-yellow-400 animate-pulse"></i><h2 class="text-2xl font-bold">Descubrir: <span class="text-gradient">Tendencias</span></h2></div>
-                    <div id="discover-loading" class="flex justify-center py-12"><div class="spinner border-t-rose-400"></div></div>
-                    <div id="discover-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6 hidden"></div>
-                </div>
-                
-                <div id="search-no-results" class="hidden flex-col items-center justify-center py-20 text-center"><i class="ph-duotone ph-ghost text-5xl text-gray-500 mb-3"></i><p class="text-gray-400">Sin resultados.</p></div>
-                <div id="search-results" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6"></div>
-                
-                <div id="search-pagination" class="hidden justify-center items-center gap-6 mt-10 mb-8 w-full">
-                    <button id="btn-prev-page" class="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center disabled:opacity-30 disabled:pointer-events-none transition-all"><i class="ph-bold ph-caret-left text-xl"></i></button>
-                    <span id="search-page-indicator" class="font-bold text-xl w-10 text-center text-blue-400">1</span>
-                    <button id="btn-next-page" class="w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 hover:bg-blue-500/40 hover:text-white flex items-center justify-center disabled:opacity-30 disabled:pointer-events-none transition-all"><i class="ph-bold ph-caret-right text-xl"></i></button>
-                </div>
-            </section>
-
-            <!-- Community -->
-            <section id="view-community" class="view-section hidden p-4 md:p-8 animate-fade-in w-full max-w-7xl mx-auto">
-                <header class="mb-8 mt-2 md:mt-0">
-                    <h1 class="text-3xl md:text-4xl font-bold mb-2">Tu <span class="text-rose-400">Comunidad</span></h1>
-                    <p class="text-gray-400 text-sm">Busca amigos, sigue perfiles y descubre qué ven.</p>
-                </header>
-                <div class="relative w-full max-w-2xl mb-8">
-                    <i class="ph ph-magnifying-glass absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl"></i>
-                    <input type="text" id="community-search" placeholder="Buscar usuarios..." class="w-full bg-dark-800/80 border border-white/10 focus:border-rose-400 focus:ring-1 focus:ring-rose-400 rounded-2xl py-4 pl-12 pr-4 text-white placeholder-gray-500 outline-none transition-all shadow-lg text-lg">
-                </div>
-                <div id="community-tabs" class="flex gap-4 mb-6 border-b border-white/10 pb-2 overflow-x-auto no-scrollbar">
-                    <button onclick="setCommTab('following')" id="tab-comm-following" class="text-rose-400 font-bold border-b-2 border-rose-400 pb-2 px-2 transition-all whitespace-nowrap">Siguiendo</button>
-                    <button onclick="setCommTab('search')" id="tab-comm-search" class="text-gray-400 hover:text-white pb-2 px-2 transition-all whitespace-nowrap">Resultados</button>
-                </div>
-                <div id="comm-loading" class="hidden justify-center py-12"><div class="spinner border-t-rose-400 w-10 h-10 border-4"></div></div>
-                <div id="comm-following-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
-                <div id="comm-search-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 hidden"></div>
-            </section>
-
-            <!-- Overlay: Show Detail -->
+            <!-- Overlay: Detail View (Series) -->
             <section id="view-detail" class="fixed inset-0 z-[70] bg-dark-900/95 backdrop-blur-xl transform translate-x-full transition-transform duration-300 overflow-y-auto flex flex-col md:pl-24">
-                <div class="sticky top-0 z-20 glass-panel px-4 py-4 flex justify-between items-center border-b border-white/5">
-                    <button onclick="closeDetailView()" class="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors"><i class="ph-bold ph-caret-left text-xl"></i></button>
-                    <div id="detail-actions"></div>
+                <div class="sticky top-0 z-20 glass-panel px-4 py-4 flex justify-between items-center border-b border-white/5 shadow-xl">
+                    <button onclick="closeDetailView()" class="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors shadow"><i class="ph-bold ph-caret-left text-xl"></i></button>
+                    <div id="detail-actions" class="flex gap-2"></div>
                 </div>
+                
                 <div id="detail-loading" class="flex-1 flex items-center justify-center hidden"><div class="spinner w-12 h-12 border-4"></div></div>
+                
                 <div id="detail-content" class="pb-24 max-w-5xl mx-auto w-full hidden">
-                    <div class="relative w-full h-[40vh] md:h-[50vh]">
+                    <!-- Hero Section -->
+                    <div class="relative w-full h-[45vh] md:h-[55vh]">
                         <div id="detail-hero-img" class="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-30 mix-blend-luminosity"></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-dark-900/80 to-transparent"></div>
                         <div class="absolute bottom-0 left-0 w-full p-6 md:p-10 flex flex-col md:flex-row gap-6 md:items-end">
-                            <img id="detail-poster" src="" class="w-28 md:w-48 rounded-xl shadow-2xl border border-white/10 hidden md:block aspect-[2/3] object-cover bg-dark-800">
+                            <img id="detail-poster" src="" class="w-28 md:w-48 rounded-2xl shadow-2xl border border-white/10 hidden md:block aspect-[2/3] object-cover bg-dark-800">
                             <div class="flex-1">
                                 <div id="detail-genres" class="flex flex-wrap gap-2 mb-3"></div>
-                                <h1 id="detail-title" class="text-4xl md:text-5xl font-bold mb-2 tracking-tight">Título</h1>
-                                <div class="flex flex-wrap items-center gap-4 text-sm text-gray-300 font-medium mb-3">
-                                    <span id="detail-status" class="px-2 py-1 bg-white/10 rounded-md">Estado</span>
-                                    <span id="detail-runtime"><i class="ph-fill ph-clock mr-1"></i> <span id="detail-runtime-val">0</span>m</span>
-                                    <span id="detail-comm-rating-badge" class="px-2 py-1 bg-accent-purple/20 text-purple-300 border border-purple-500/30 rounded-md flex items-center gap-1"><i class="ph-fill ph-users text-purple-400"></i> <span id="detail-comm-val">--</span>/5</span>
+                                <h1 id="detail-title" class="text-4xl md:text-6xl font-black mb-2 tracking-tight drop-shadow-lg">Título</h1>
+                                <div class="flex flex-wrap items-center gap-4 text-sm text-gray-200 font-medium mb-4">
+                                    <span id="detail-status" class="px-2 py-1 bg-white/10 border border-white/20 rounded-md uppercase tracking-wider font-bold text-[10px]">Estado</span>
+                                    <span id="detail-runtime"><i class="ph-fill ph-clock mr-1 text-gray-400"></i> <span id="detail-runtime-val">0</span>m</span>
+                                    <span id="detail-comm-rating-badge" class="px-2 py-1 bg-accent-purple/20 text-purple-300 border border-purple-500/30 rounded-md flex items-center gap-1 shadow-inner"><i class="ph-fill ph-star text-yellow-400"></i> <span id="detail-comm-val">--</span>/5</span>
                                 </div>
-                                <div id="detail-rating-container" class="flex items-center gap-1 star-rating hidden">
-                                    <span class="text-xs text-gray-400 mr-2 uppercase tracking-wider font-bold">Tu Nota:</span>
+                                <div id="detail-rating-container" class="flex items-center gap-2 star-rating hidden bg-dark-900/50 backdrop-blur border border-white/10 px-4 py-2 rounded-xl w-max">
+                                    <span class="text-xs text-gray-400 uppercase tracking-wider font-bold">Tu Nota:</span>
                                     <i class="ph ph-star text-xl text-yellow-500" data-val="1"></i><i class="ph ph-star text-xl text-yellow-500" data-val="2"></i>
                                     <i class="ph ph-star text-xl text-yellow-500" data-val="3"></i><i class="ph ph-star text-xl text-yellow-500" data-val="4"></i><i class="ph ph-star text-xl text-yellow-500" data-val="5"></i>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="px-6 md:px-10 py-6 grid md:grid-cols-3 gap-8">
+
+                    <!-- Tracker Card & Summary -->
+                    <div class="px-6 md:px-10 py-8 grid md:grid-cols-3 gap-8 border-b border-white/5">
                         <div class="md:col-span-2">
-                            <h3 class="text-xl font-semibold mb-3 border-b border-white/10 pb-2">Sinopsis</h3>
+                            <h3 class="text-xl font-bold mb-3 border-b border-white/10 pb-2">Sinopsis</h3>
                             <div id="detail-summary" class="text-gray-300 text-sm leading-relaxed prose prose-invert"></div>
                         </div>
                         <div class="md:col-span-1">
                             <div id="detail-tracker-card" class="glass-card p-6 rounded-2xl hidden flex-col gap-4 sticky top-24">
-                                <h3 class="font-bold text-lg border-b border-white/10 pb-2">Tu Progreso</h3>
+                                <h3 class="font-bold text-lg border-b border-white/10 pb-2 flex items-center gap-2"><i class="ph-fill ph-chart-donut text-accent-purple"></i> Tu Progreso</h3>
                                 <div class="flex items-center justify-between">
-                                    <span class="text-sm text-gray-400">Vistos</span>
+                                    <span class="text-sm text-gray-400">Episodios Vistos</span>
                                     <span class="font-bold text-xl"><span id="detail-watched-count" class="text-white">0</span> <span class="text-gray-500 text-sm">/ <span id="detail-total-count">0</span></span></span>
                                 </div>
                                 <div class="flex items-center justify-center py-2">
-                                    <div class="relative w-24 h-24">
+                                    <div class="relative w-24 h-24 drop-shadow-xl">
                                         <svg class="w-full h-full" viewBox="0 0 100 100">
                                             <circle class="text-dark-900 stroke-current" stroke-width="8" cx="50" cy="50" r="45" fill="transparent"></circle>
                                             <circle id="detail-progress-circle" class="text-accent-purple stroke-current transition-all duration-500" stroke-width="8" stroke-linecap="round" cx="50" cy="50" r="45" fill="transparent" stroke-dasharray="282.7" stroke-dashoffset="282.7" transform="rotate(-90 50 50)"></circle>
@@ -405,13 +481,54 @@
                             </div>
                         </div>
                     </div>
-                    <div class="px-6 md:px-10 pb-10">
-                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 border-b border-white/10 pb-4 gap-4">
-                            <h3 class="text-xl font-semibold">Episodios</h3>
+
+                    <!-- Inter-Tabs Navigation -->
+                    <div class="px-6 md:px-10 pt-4">
+                        <div class="flex gap-4 border-b border-white/10 pb-3 overflow-x-auto snap-x">
+                            <button onclick="switchDetailTab('eps')" id="tab-det-eps" class="text-accent-purple font-bold border-b-2 border-accent-purple pb-2 px-2 transition-all whitespace-nowrap flex items-center gap-2"><i class="ph-bold ph-list-numbers"></i> Episodios</button>
+                            <button onclick="switchDetailTab('comm')" id="tab-det-comm" class="text-gray-400 hover:text-white pb-2 px-2 transition-all whitespace-nowrap flex items-center gap-2"><i class="ph-bold ph-chats"></i> Comunidad & Notas</button>
+                            <button onclick="switchDetailTab('sim')" id="tab-det-sim" class="text-gray-400 hover:text-white pb-2 px-2 transition-all whitespace-nowrap flex items-center gap-2"><i class="ph-bold ph-sparkle"></i> Similares</button>
+                        </div>
+                    </div>
+
+                    <!-- TAB: EPISODES -->
+                    <div id="det-tab-eps" class="px-6 md:px-10 pb-10 pt-6">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                            <h3 class="text-xl font-bold">Temporadas</h3>
                             <div id="detail-mass-actions" class="flex flex-wrap gap-2"></div>
                         </div>
                         <div id="detail-seasons" class="space-y-6"></div>
                     </div>
+
+                    <!-- TAB: COMMUNITY & RATINGS -->
+                    <div id="det-tab-comm" class="px-6 md:px-10 pb-10 pt-6 hidden flex-col md:flex-row gap-8">
+                        <div class="flex-1 flex flex-col h-[500px]">
+                            <h3 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="ph-fill ph-chat-centered-text text-accent-purple"></i> Comentarios de la Serie</h3>
+                            <div class="flex-1 flex flex-col glass-card rounded-2xl overflow-hidden border border-white/5">
+                                <div id="show-comments-list" class="flex-1 p-4 space-y-4 overflow-y-auto">
+                                    <div class="spinner mx-auto my-10 border-t-accent-purple"></div>
+                                </div>
+                                <div class="p-4 border-t border-white/10 bg-dark-800/80 flex gap-2">
+                                    <input type="text" id="show-comment-input" placeholder="Opina sobre esta serie..." class="flex-1 bg-dark-900 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:border-accent-purple transition-colors">
+                                    <button onclick="postShowComment()" class="bg-accent-purple text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-purple-500 transition shadow-lg"><i class="ph-bold ph-paper-plane-right"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="ph-fill ph-chart-bar text-yellow-400"></i> Notas por Episodio (TVMaze)</h3>
+                            <div class="glass-card p-4 rounded-2xl border border-white/5 max-h-[500px] overflow-y-auto" id="show-ratings-chart">
+                                <!-- Chart Injected -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB: SIMILAR -->
+                    <div id="det-tab-sim" class="px-6 md:px-10 pb-10 pt-6 hidden">
+                        <h3 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="ph-fill ph-magic-wand text-blue-400"></i> Series Recomendadas</h3>
+                        <div id="similars-loading" class="flex justify-center py-10"><div class="spinner border-t-blue-400"></div></div>
+                        <div id="similars-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 hidden"></div>
+                    </div>
+
                 </div>
             </section>
 
@@ -426,15 +543,15 @@
                     <div class="flex flex-col md:flex-row items-center gap-6 mb-12 text-center md:text-left">
                         <div class="w-24 h-24 md:w-32 md:h-32 rounded-full bg-gradient-to-tr from-rose-500 to-purple-600 flex items-center justify-center text-4xl font-black text-white shadow-xl shadow-rose-500/20 border-4 border-dark-900 shrink-0 overflow-hidden" id="pub-avatar"></div>
                         <div>
-                            <h1 class="text-3xl md:text-5xl font-bold mb-3" id="pub-name">Usuario</h1>
-                            <div class="flex flex-wrap justify-center md:justify-start gap-3 text-gray-300 font-medium">
-                                <span class="bg-white/10 px-4 py-1.5 rounded-full border border-white/5 shadow-sm text-sm" id="pub-stat-shows"></span>
-                                <span class="bg-white/10 px-4 py-1.5 rounded-full border border-white/5 shadow-sm text-sm" id="pub-stat-eps"></span>
-                                <span class="bg-white/10 px-4 py-1.5 rounded-full border border-white/5 shadow-sm text-sm" id="pub-stat-time"></span>
+                            <h1 class="text-4xl md:text-6xl font-black mb-4 drop-shadow-md" id="pub-name">Usuario</h1>
+                            <div class="flex flex-wrap justify-center md:justify-start gap-3 text-gray-200 font-medium">
+                                <span class="bg-white/10 px-4 py-2 rounded-xl border border-white/10 shadow-sm flex items-center gap-2" id="pub-stat-shows"></span>
+                                <span class="bg-white/10 px-4 py-2 rounded-xl border border-white/10 shadow-sm flex items-center gap-2" id="pub-stat-eps"></span>
+                                <span class="bg-accent-emerald/20 text-emerald-300 border border-emerald-500/30 px-4 py-2 rounded-xl shadow-sm flex items-center gap-2" id="pub-stat-time"></span>
                             </div>
                         </div>
                     </div>
-                    <h3 class="text-xl font-semibold mb-6 border-b border-white/10 pb-2">Librería de <span id="pub-name-short" class="text-rose-400"></span></h3>
+                    <h3 class="text-2xl font-bold mb-6 border-b border-white/10 pb-2">Librería de <span id="pub-name-short" class="text-rose-400"></span></h3>
                     <div id="pub-shows-empty" class="hidden flex-col items-center justify-center py-10 opacity-50"><i class="ph-duotone ph-ghost text-5xl mb-2"></i><p>No tiene series públicas.</p></div>
                     <div id="pub-shows-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6"></div>
                 </div>
@@ -445,38 +562,38 @@
                 <button onclick="closeEpisodeModal()" class="fixed top-4 right-4 md:top-6 md:right-10 w-12 h-12 rounded-full bg-black/60 text-white flex items-center justify-center z-[110] hover:bg-black transition-colors backdrop-blur"><i class="ph-bold ph-x text-xl"></i></button>
 
                 <div class="relative w-full h-64 md:h-80 bg-dark-800 shrink-0 border-b border-white/10">
-                    <img id="ep-modal-img" src="" class="w-full h-full object-cover opacity-60">
-                    <div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-dark-900/60 to-transparent"></div>
+                    <img id="ep-modal-img" src="" class="w-full h-full object-cover opacity-50 mix-blend-luminosity">
+                    <div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-dark-900/70 to-transparent"></div>
                     <div class="absolute bottom-0 left-0 w-full p-6 md:p-10 pb-4">
                         <span id="ep-modal-badge" class="bg-accent-emerald text-white text-[10px] font-bold px-2 py-1 rounded shadow uppercase tracking-wider mb-2 inline-block"></span>
-                        <h2 id="ep-modal-title" class="text-2xl md:text-3xl font-bold text-white leading-tight"></h2>
+                        <h2 id="ep-modal-title" class="text-3xl md:text-5xl font-black text-white leading-tight drop-shadow-lg"></h2>
                     </div>
                 </div>
 
                 <div class="p-6 md:p-10 max-w-5xl mx-auto w-full flex flex-col md:flex-row gap-8 flex-1">
                     <div class="flex-1 space-y-6">
                         <div>
-                            <h3 class="text-lg font-bold mb-2 border-b border-white/10 pb-2">Sinopsis del episodio</h3>
-                            <div id="ep-modal-summary" class="text-sm text-gray-300 leading-relaxed"></div>
+                            <h3 class="text-xl font-bold mb-3 border-b border-white/10 pb-2">Sinopsis del episodio</h3>
+                            <div id="ep-modal-summary" class="text-sm text-gray-300 leading-relaxed prose prose-invert"></div>
                         </div>
 
-                        <div class="glass-card p-5 rounded-2xl border border-white/5 flex flex-col gap-4">
+                        <div class="glass-card p-6 rounded-2xl border border-white/5 flex flex-col gap-4">
                             <div class="flex items-center justify-between">
                                 <span class="text-sm text-gray-400 font-bold uppercase tracking-wider">Nota Comunidad</span>
                                 <div class="flex items-center gap-2">
-                                    <i class="ph-fill ph-star text-yellow-400 text-xl drop-shadow-md"></i>
-                                    <span id="ep-modal-comm-rating" class="font-bold text-xl">--</span>
-                                    <span id="ep-modal-comm-count" class="text-xs text-gray-500">(0)</span>
+                                    <i class="ph-fill ph-star text-yellow-400 text-2xl drop-shadow-md"></i>
+                                    <span id="ep-modal-comm-rating" class="font-bold text-2xl">--</span>
+                                    <span id="ep-modal-comm-count" class="text-sm text-gray-500">(0)</span>
                                 </div>
                             </div>
-                            <div id="ep-modal-user-rating-section" class="flex items-center justify-between border-t border-white/10 pt-4">
+                            <div id="ep-modal-user-rating-section" class="flex items-center justify-between border-t border-white/10 pt-5 mt-1">
                                 <span class="text-sm text-gray-400 font-bold uppercase tracking-wider">Tu Nota</span>
                                 <div id="ep-modal-user-rating" class="flex items-center gap-1 star-rating">
-                                    <i class="ph ph-star text-xl text-yellow-500" data-ep-val="1"></i>
-                                    <i class="ph ph-star text-xl text-yellow-500" data-ep-val="2"></i>
-                                    <i class="ph ph-star text-xl text-yellow-500" data-ep-val="3"></i>
-                                    <i class="ph ph-star text-xl text-yellow-500" data-ep-val="4"></i>
-                                    <i class="ph ph-star text-xl text-yellow-500" data-ep-val="5"></i>
+                                    <i class="ph ph-star text-2xl text-yellow-500" data-ep-val="1"></i>
+                                    <i class="ph ph-star text-2xl text-yellow-500" data-ep-val="2"></i>
+                                    <i class="ph ph-star text-2xl text-yellow-500" data-ep-val="3"></i>
+                                    <i class="ph ph-star text-2xl text-yellow-500" data-ep-val="4"></i>
+                                    <i class="ph ph-star text-2xl text-yellow-500" data-ep-val="5"></i>
                                 </div>
                             </div>
                         </div>
@@ -485,14 +602,14 @@
                     <div class="flex-1 flex flex-col glass-panel rounded-2xl border border-white/5 overflow-hidden h-[500px]">
                         <div class="p-4 border-b border-white/10 bg-dark-800/50 flex items-center gap-2">
                             <i class="ph-fill ph-chats text-accent-purple text-xl"></i>
-                            <h3 class="font-bold text-lg">Comentarios</h3>
+                            <h3 class="font-bold text-lg">Comentarios del Episodio</h3>
                         </div>
                         <div id="ep-modal-comments-list" class="flex-1 p-4 space-y-4 overflow-y-auto">
                             <!-- Injected -->
                         </div>
                         <div class="p-4 border-t border-white/10 bg-dark-800/50 flex gap-2">
-                            <input type="text" id="ep-modal-comment-input" placeholder="Escribe algo..." class="flex-1 bg-dark-900/80 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:border-accent-purple transition-colors">
-                            <button id="ep-modal-comment-btn" onclick="postEpisodeComment()" class="bg-accent-purple text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-purple-500 transition shadow-lg flex items-center justify-center"><i class="ph-bold ph-paper-plane-right"></i></button>
+                            <input type="text" id="ep-modal-comment-input" placeholder="Escribe algo sobre este episodio..." class="flex-1 bg-dark-900 border border-white/10 rounded-xl px-4 py-3 text-sm text-white outline-none focus:border-accent-purple transition-colors">
+                            <button id="ep-modal-comment-btn" onclick="postEpisodeComment()" class="bg-accent-purple text-white px-5 py-3 rounded-xl font-bold text-sm hover:bg-purple-500 transition shadow-lg flex items-center justify-center"><i class="ph-bold ph-paper-plane-right text-lg"></i></button>
                         </div>
                     </div>
                 </div>
@@ -503,9 +620,14 @@
     <!-- Scripts -->
     <script>
         if ('serviceWorker' in navigator) {
-            const swCode = `const CACHE_NAME = 'bingetracker-v7'; self.addEventListener('install', (e) => self.skipWaiting()); self.addEventListener('activate', (e) => self.clients.claim()); self.addEventListener('fetch', (e) => { e.respondWith(fetch(e.request).catch(() => caches.match(e.request))); });`;
-            const blob = new Blob([swCode], {type: 'application/javascript'});
-            navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(err => console.log('SW Reg failed:', err));
+            const path = window.location.pathname;
+            const manifestStr = `{"name":"BingeTracker","short_name":"BingeTracker","start_url":".${path}","display":"standalone","background_color":"#0B0F19","theme_color":"#0B0F19","icons":[{"src":"icon-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},{"src":"icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}]}`;
+            const manifestBlob = new Blob([manifestStr], {type: 'application/json'});
+            document.querySelector('link[rel="manifest"]').href = URL.createObjectURL(manifestBlob);
+
+            const swCode = `const CACHE_NAME = 'bingetracker-v8'; self.addEventListener('install', (e) => self.skipWaiting()); self.addEventListener('activate', (e) => self.clients.claim()); self.addEventListener('fetch', (e) => { e.respondWith(fetch(e.request).catch(() => caches.match(e.request))); });`;
+            const swBlob = new Blob([swCode], {type: 'application/javascript'});
+            navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(err => console.log('SW Reg failed:', err));
         }
         let deferredPrompt;
         window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; const btn = document.getElementById('btn-install-app'); if(btn) btn.classList.remove('hidden'); });
@@ -524,12 +646,13 @@
         const PUBLIC_APP_ID = "bingetracker"; 
         
         let app, db, auth, user = null;
-        let trackedShows = {}; let followingUsers = {}; let allPublicUsers = [];
+        let trackedShows = {}; let followingUsers = {}; let allPublicUsers = []; let userSettings = { history: [], background: '' };
         let currentDetailShowId = null, currentDetailEpisodesData = []; 
         let tvmazeCache = {}; let currentLibraryFilter = 'watching'; let currentActiveView = 'dashboard';
         
         let currentModalEpId = null;
         let unsubscribeCurrentEpComm = null;
+        let unsubscribeCurrentShowComm = null;
 
         const $ = (id) => document.getElementById(id);
         
@@ -558,6 +681,31 @@
                 const dName = user.displayName || user.email.split('@')[0];
                 avatarDiv.innerHTML = `<span id="user-avatar-text" class="font-bold text-sm">${dName.substring(0,2).toUpperCase()}</span>`;
             }
+        }
+
+        async function compressImage(file, maxSize = 500) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let w = img.width, h = img.height;
+                        if(w > maxSize || h > maxSize) {
+                            if(w > h) { h = Math.round((h/w)*maxSize); w = maxSize; }
+                            else { w = Math.round((w/h)*maxSize); h = maxSize; }
+                        }
+                        canvas.width = w; canvas.height = h;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, w, h);
+                        resolve(canvas.toDataURL('image/jpeg', 0.85)); // Compressed base64
+                    };
+                    img.onerror = (err) => reject(err);
+                };
+                reader.onerror = (err) => reject(err);
+            });
         }
 
         async function init() {
@@ -591,23 +739,47 @@
                         let firstLoad = true;
                         onSnapshot(collection(db, 'users', u.uid, 'shows'), (snap) => {
                             trackedShows = {}; snap.forEach(d => trackedShows[d.id] = d.data());
-                            if(firstLoad) { switchView('dashboard'); firstLoad = false; } else { renderView(currentActiveView); if(currentActiveView === 'profile') renderStats(); if($('view-detail').classList.contains('translate-x-full')===false) renderDetailProgressUI(); }
+                            if(firstLoad) { switchView('dashboard'); firstLoad = false; } 
+                            else { 
+                                if(currentActiveView === 'dashboard') renderDashboard();
+                                if(currentActiveView === 'library') renderLibrary();
+                                if(currentActiveView === 'profile') renderStats(); 
+                                if($('view-detail').classList.contains('translate-x-full')===false) renderDetailProgressUI(); 
+                            }
                         });
+                        
                         onSnapshot(collection(db, 'users', u.uid, 'following'), (snap) => { followingUsers = {}; snap.forEach(d => followingUsers[d.id] = d.data()); if(currentActiveView === 'community') renderCommunity(); });
+                        
+                        onSnapshot(doc(db, 'users', u.uid), (docSnap) => {
+                            if(docSnap.exists()) {
+                                userSettings = { ...userSettings, ...docSnap.data() };
+                                applyCustomBg(userSettings.background);
+                                if(currentActiveView === 'dashboard') renderHistoryUI();
+                            }
+                        });
+
                     } else { user = null; trackedShows = {}; followingUsers = {}; $('app-container').classList.add('hidden'); $('auth-screen').classList.remove('hidden'); $('init-screen').classList.add('hidden'); }
                 });
             } catch (err) { showToast("Error Firebase", "error"); }
         }
 
         window.handleSignOut = async () => { if (auth) await signOut(auth); };
+        
         let discoverLoaded = false;
         window.switchView = (v) => {
             currentActiveView = v; document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active')); const b = $(`nav-${v}`); if(b) b.classList.add('active');
             document.querySelectorAll('.view-section').forEach(s => s.classList.add('hidden')); const sec = $(`view-${v}`); if(sec) sec.classList.remove('hidden');
             renderView(v);
         };
-        function renderView(v) { if(v==='dashboard') renderDashboard(); if(v==='library') renderLibrary(); if(v==='profile') renderStats(); if(v==='search' && !discoverLoaded) { renderDiscover(); discoverLoaded = true; } if(v==='community') renderCommunity(); }
+        function renderView(v) { 
+            if(v==='dashboard') { renderDashboard(); renderHistoryUI(); }
+            if(v==='library') renderLibrary(); 
+            if(v==='profile') renderStats(); 
+            if(v==='search' && !discoverLoaded) { renderDiscover(); discoverLoaded = true; } 
+            if(v==='community') renderCommunity(); 
+        }
 
+        // --- Customization & Profile ---
         window.updateUserProfile = async () => {
             if(!user) return; const newName = $('profile-name-input').value.trim(); if(!newName) return;
             try { await updateProfile(user, { displayName: newName }); $('dash-user-name').innerText = newName; updateNavbarAvatar();
@@ -622,15 +794,7 @@
         window.renderAvatarOptions = () => {
             const grid = $('profile-avatar-grid');
             if(!grid) return;
-            
-            const defaultAvatars = [
-                'https://static.tvmaze.com/uploads/images/medium_portrait/497/1244306.jpg',
-                'https://static.tvmaze.com/uploads/images/medium_portrait/397/993710.jpg',
-                'https://static.tvmaze.com/uploads/images/medium_portrait/402/1007479.jpg',
-                'https://static.tvmaze.com/uploads/images/medium_portrait/498/1245276.jpg',
-                'https://static.tvmaze.com/uploads/images/medium_portrait/184/461502.jpg'
-            ];
-            
+            const defaultAvatars = ['https://static.tvmaze.com/uploads/images/medium_portrait/497/1244306.jpg','https://static.tvmaze.com/uploads/images/medium_portrait/397/993710.jpg','https://static.tvmaze.com/uploads/images/medium_portrait/402/1007479.jpg','https://static.tvmaze.com/uploads/images/medium_portrait/498/1245276.jpg','https://static.tvmaze.com/uploads/images/medium_portrait/184/461502.jpg'];
             const userShowImages = Object.values(trackedShows).map(s => s.image).filter(img => typeof img === 'string' && img.length > 0);
             const allAvatars = [...new Set([...defaultAvatars, ...userShowImages])]; 
             
@@ -646,18 +810,90 @@
 
         window.updateUserAvatar = async (url) => {
             if(!user) return;
-            try {
-                await updateProfile(user, { photoURL: url });
-                await updateDoc(doc(db, 'public_users', user.uid), { photoURL: url }, { merge: true });
-                showToast("Foto de perfil actualizada", "success");
-                updateNavbarAvatar();
-                renderAvatarOptions();
-            } catch(e) {
-                showToast("Error al actualizar la foto", "error");
-            }
+            try { await updateProfile(user, { photoURL: url }); await updateDoc(doc(db, 'public_users', user.uid), { photoURL: url }, { merge: true }); showToast("Foto actualizada", "success"); updateNavbarAvatar(); renderAvatarOptions(); } catch(e) { showToast("Error", "error"); }
         };
 
-        window.closeDetailView = () => { $('view-detail').classList.add('translate-x-full'); setTimeout(() => { $('detail-content').classList.add('hidden'); currentDetailShowId = null; currentDetailEpisodesData = []; }, 300); };
+        window.uploadCustomAvatar = async (e) => {
+            if(!e.target.files || !e.target.files[0]) return;
+            try {
+                showToast("Procesando imagen...", "info");
+                const b64 = await compressImage(e.target.files[0], 400);
+                await updateUserAvatar(b64);
+            } catch(err) { showToast("Error al procesar la imagen", "error"); }
+        };
+
+        function applyCustomBg(bgStr) {
+            const bgEl = $('custom-bg');
+            if(bgStr && bgStr.length > 0) {
+                bgEl.style.backgroundImage = `url(${bgStr})`;
+                bgEl.classList.remove('hidden');
+            } else {
+                bgEl.style.backgroundImage = '';
+                bgEl.classList.add('hidden');
+            }
+        }
+
+        window.setCustomBg = async (url) => {
+            if(!user) return;
+            applyCustomBg(url);
+            try { await setDoc(doc(db, 'users', user.uid), { background: url }, { merge: true }); showToast("Fondo aplicado", "success"); } catch(e){}
+        };
+
+        window.uploadCustomBg = async (e) => {
+            if(!e.target.files || !e.target.files[0]) return;
+            try {
+                showToast("Comprimiendo fondo...", "info");
+                const b64 = await compressImage(e.target.files[0], 1280); // Keep it decent for bg
+                await setCustomBg(b64);
+            } catch(err) { showToast("Error al subir fondo", "error"); }
+        };
+
+        window.removeCustomBg = () => { setCustomBg(''); };
+
+        // --- History Logging ---
+        async function logHistory(showId, showName, epId, epName, s, e, epImg) {
+            if(!user) return;
+            let hist = userSettings.history || [];
+            const entry = { showId, showName, epId, epName, s, e, img: epImg, date: new Date().toISOString() };
+            // Remove duplicates of same episode if recently watched again, put at top
+            hist = hist.filter(h => h.epId !== epId);
+            hist.unshift(entry);
+            if(hist.length > 20) hist = hist.slice(0, 20); // Keep last 20
+            try { await setDoc(doc(db, 'users', user.uid), { history: hist }, { merge: true }); } catch(err){}
+        }
+
+        function renderHistoryUI() {
+            const hist = userSettings.history || [];
+            const grid = $('dash-history-list');
+            if(hist.length === 0) { $('dash-history-empty').classList.remove('hidden'); grid.classList.add('hidden'); return; }
+            $('dash-history-empty').classList.add('hidden'); grid.classList.remove('hidden');
+            
+            grid.innerHTML = hist.map(h => {
+                const dateStr = new Date(h.date).toLocaleDateString('es-ES', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'});
+                return `
+                    <div class="flex-none w-64 glass-card rounded-2xl overflow-hidden snap-start relative group cursor-pointer border border-white/5" onclick="openShowDetail(${h.showId})">
+                        <div class="h-32 overflow-hidden relative">
+                            <img src="${h.img || 'https://placehold.co/300x170/1F293F/ffffff'}" class="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-500">
+                            <div class="absolute inset-0 bg-gradient-to-t from-dark-900 to-transparent"></div>
+                            <div class="absolute bottom-2 left-3 right-3 flex justify-between items-end">
+                                <div><h4 class="font-bold text-sm text-white drop-shadow truncate w-40">${h.showName}</h4><span class="text-[10px] text-accent-emerald font-bold bg-black/80 px-1.5 py-0.5 rounded shadow">T${String(h.s).padStart(2,'0')}E${String(h.e).padStart(2,'0')}</span></div>
+                            </div>
+                        </div>
+                        <div class="p-3 bg-dark-800/50 flex justify-between items-center">
+                            <p class="text-[10px] text-gray-400 line-clamp-1 flex-1 pr-2">${h.epName}</p>
+                            <span class="text-[9px] text-gray-500 whitespace-nowrap">${dateStr}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // --- Core Helpers ---
+        window.closeDetailView = () => { 
+            $('view-detail').classList.add('translate-x-full'); 
+            if(unsubscribeCurrentShowComm) { unsubscribeCurrentShowComm(); unsubscribeCurrentShowComm = null; }
+            setTimeout(() => { $('detail-content').classList.add('hidden'); currentDetailShowId = null; currentDetailEpisodesData = []; }, 300); 
+        };
         
         async function loadShowCommunityRating(showId) {
             const elVal = $('detail-comm-val'); elVal.innerText = '--';
@@ -665,10 +901,7 @@
                 const snap = await getDoc(doc(db, 'artifacts', PUBLIC_APP_ID, 'public', 'data', 'community_shows', showId.toString()));
                 if(snap.exists() && snap.data().ratings) {
                     const ratings = Object.values(snap.data().ratings);
-                    if(ratings.length > 0) {
-                        const avg = (ratings.reduce((a,b)=>a+b,0) / ratings.length).toFixed(1);
-                        elVal.innerText = avg;
-                    }
+                    if(ratings.length > 0) elVal.innerText = (ratings.reduce((a,b)=>a+b,0) / ratings.length).toFixed(1);
                 }
             } catch(e) {}
         }
@@ -692,49 +925,39 @@
             $('ep-modal-summary').innerHTML = ep.summary || 'Sin sinopsis disponible.';
             
             $('ep-modal-comment-input').value = '';
-            $('ep-modal-comments-list').innerHTML = '<div class="spinner mx-auto my-10"></div>';
+            $('ep-modal-comments-list').innerHTML = '<div class="spinner mx-auto my-10 border-t-accent-purple"></div>';
             $('ep-modal-comm-rating').innerText = '--';
             $('ep-modal-comm-count').innerText = '(0)';
             
-            $('ep-modal-user-rating').querySelectorAll('.ph-star').forEach(s => {
-                s.classList.remove('ph-fill');
-                s.onclick = () => rateEpisodeCommunity(ep.id, parseInt(s.dataset.epVal));
-            });
+            $('ep-modal-user-rating').querySelectorAll('.ph-star').forEach(s => { s.classList.remove('ph-fill'); s.onclick = () => rateEpisodeCommunity(ep.id, parseInt(s.dataset.epVal)); });
             
             if(unsubscribeCurrentEpComm) unsubscribeCurrentEpComm();
             unsubscribeCurrentEpComm = onSnapshot(doc(db, 'artifacts', PUBLIC_APP_ID, 'public', 'data', 'community_episodes', epId.toString()), (docSnap) => {
                 const data = docSnap.exists() ? docSnap.data() : null;
-                
                 if(data && data.ratings) {
                     const ratings = Object.values(data.ratings);
-                    if(ratings.length > 0) {
-                        $('ep-modal-comm-rating').innerText = (ratings.reduce((a,b)=>a+b,0) / ratings.length).toFixed(1);
-                        $('ep-modal-comm-count').innerText = `(${ratings.length})`;
-                    }
-                    if(data.ratings[user.uid]) {
-                        $('ep-modal-user-rating').querySelectorAll('.ph-star').forEach((s, idx) => s.classList.toggle('ph-fill', idx < data.ratings[user.uid]));
-                    }
+                    if(ratings.length > 0) { $('ep-modal-comm-rating').innerText = (ratings.reduce((a,b)=>a+b,0) / ratings.length).toFixed(1); $('ep-modal-comm-count').innerText = `(${ratings.length})`; }
+                    if(data.ratings[user.uid]) $('ep-modal-user-rating').querySelectorAll('.ph-star').forEach((s, idx) => s.classList.toggle('ph-fill', idx < data.ratings[user.uid]));
                 }
-                
                 const list = $('ep-modal-comments-list'); list.innerHTML = '';
                 if(data && data.comments && data.comments.length > 0) {
                     data.comments.slice().reverse().forEach(c => {
-                        const date = new Date(c.date).toLocaleDateString();
+                        const date = new Date(c.date).toLocaleDateString('es-ES', {month:'short', day:'numeric'});
                         const avatarHTML = c.photoURL ? `<img src="${c.photoURL}" class="w-full h-full object-cover">` : c.name.substring(0,2).toUpperCase();
                         list.innerHTML += `
-                            <div class="flex gap-3 bg-dark-900/50 p-3 rounded-xl border border-white/5">
-                                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-rose-500 to-purple-600 flex items-center justify-center font-bold text-[10px] shrink-0 overflow-hidden border border-white/10">${avatarHTML}</div>
+                            <div class="flex gap-3 bg-dark-900/50 p-4 rounded-2xl border border-white/5 shadow-sm">
+                                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-rose-500 to-purple-600 flex items-center justify-center font-bold text-xs shrink-0 overflow-hidden border border-white/10 shadow-lg cursor-pointer hover:scale-105 transition" onclick="closeEpisodeModal(); closeDetailView(); openPublicProfile('${c.uid}')">${avatarHTML}</div>
                                 <div class="flex-1">
                                     <div class="flex justify-between items-baseline mb-1">
-                                        <span class="font-bold text-xs text-purple-300">${c.name}</span>
-                                        <span class="text-[9px] text-gray-500">${date}</span>
+                                        <span class="font-bold text-sm text-purple-300">${c.name}</span>
+                                        <span class="text-[10px] text-gray-500">${date}</span>
                                     </div>
                                     <p class="text-sm text-gray-200 leading-snug">${c.text}</p>
                                 </div>
                             </div>
                         `;
                     });
-                } else { list.innerHTML = '<div class="text-center text-gray-500 text-sm py-10">Sé el primero en comentar.</div>'; }
+                } else { list.innerHTML = '<div class="flex flex-col items-center justify-center py-10 text-gray-500"><i class="ph-duotone ph-chat-teardrop text-4xl mb-2"></i><span class="text-sm">Sé el primero en comentar.</span></div>'; }
             }, (e)=>{});
         };
 
@@ -752,7 +975,6 @@
         window.postEpisodeComment = async () => {
             if(!user || !currentModalEpId) return;
             const input = $('ep-modal-comment-input'); const text = input.value.trim(); if(!text) return;
-            
             const btn = $('ep-modal-comment-btn'); btn.disabled = true; input.disabled = true;
             try {
                 const ref = doc(db, 'artifacts', PUBLIC_APP_ID, 'public', 'data', 'community_episodes', currentModalEpId.toString());
@@ -776,7 +998,7 @@
                 data.status = 'completed'; if($('detail-status')) $('detail-status').textContent = 'Terminado'; showToast("¡Serie completada!", "success");
                 updateDoc(doc(db, 'users', user.uid, 'shows', sId.toString()), { status: 'completed' }).catch(()=>{});
             } else if (watched < airedEps.length && data.status === 'completed') {
-                data.status = 'watching'; if($('detail-status')) $('detail-status').textContent = 'Viendo'; showToast("Serie devuelta a 'Viendo'", "info");
+                data.status = 'watching'; if($('detail-status')) $('detail-status').textContent = 'Viendo';
                 updateDoc(doc(db, 'users', user.uid, 'shows', sId.toString()), { status: 'watching' }).catch(()=>{});
             }
         }
@@ -784,7 +1006,11 @@
         // --- DASHBOARD ---
         async function renderDashboard() {
             if(!user) return; const allShows = Object.values(trackedShows);
-            if(allShows.length===0) { $('dash-continue-empty').classList.remove('hidden'); $('dash-upcoming-empty').classList.remove('hidden'); return; }
+            if(allShows.length===0) { 
+                $('dash-continue-empty').classList.remove('hidden'); $('dash-upcoming-empty').classList.remove('hidden'); 
+                $('dash-loading').classList.add('hidden');
+                return; 
+            }
             $('dash-loading').classList.remove('hidden'); $('dash-continue-grid').innerHTML = ''; $('dash-upcoming-list').innerHTML = '';
             
             let hasCont = false, upcoming = [];
@@ -801,12 +1027,16 @@
                             card.innerHTML = `
                                 <div class="h-36 overflow-hidden relative" onclick="openShowDetail(${dbShow.showId})">
                                     <img src="${img}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                                    <div class="absolute inset-0 bg-gradient-to-t from-dark-900 to-transparent"></div>
-                                    <div class="absolute bottom-2 left-3"><h4 class="font-bold text-sm text-white drop-shadow">${dbShow.name}</h4><span class="text-[10px] text-accent-emerald font-bold bg-black/60 px-1.5 py-0.5 rounded shadow">T${String(nextEp.season).padStart(2,'0')}E${String(nextEp.number).padStart(2,'0')}</span></div>
+                                    <div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-dark-900/40 to-transparent"></div>
+                                    <div class="absolute bottom-2 left-3 right-3 flex justify-between items-end">
+                                        <div><h4 class="font-bold text-sm text-white drop-shadow truncate w-40">${dbShow.name}</h4><span class="text-[10px] text-accent-emerald font-bold bg-black/80 px-1.5 py-0.5 rounded shadow">T${String(nextEp.season).padStart(2,'0')}E${String(nextEp.number).padStart(2,'0')}</span></div>
+                                        <div class="bg-black/60 rounded px-1 text-[9px] font-bold text-white border border-white/20">${Math.round((Object.keys(map).filter(k=>map[k]>0).length/Math.max(1, aired.length))*100)}%</div>
+                                    </div>
+                                    <div class="absolute bottom-0 left-0 h-1 bg-accent-emerald transition-all" style="width: ${Math.round((Object.keys(map).filter(k=>map[k]>0).length/Math.max(1, aired.length))*100)}%"></div>
                                 </div>
-                                <div class="p-3 flex items-center justify-between">
-                                    <p class="text-[11px] text-gray-400 line-clamp-1 pr-2">${nextEp.name}</p>
-                                    <button onclick="quickMarkWatch('${dbShow.showId}', '${nextEp.id}')" class="bg-white/5 hover:bg-accent-emerald text-emerald-400 hover:text-white w-8 h-8 rounded-full flex items-center justify-center transition border border-white/10 shrink-0"><i class="ph-bold ph-check"></i></button>
+                                <div class="p-3 bg-dark-800/50 flex items-center justify-between">
+                                    <p class="text-[11px] text-gray-300 line-clamp-1 pr-2 font-medium">${nextEp.name}</p>
+                                    <button onclick="quickMarkWatch('${dbShow.showId}', '${dbShow.name}', '${nextEp.id}', '${nextEp.name.replace(/'/g,"\\'")}', ${nextEp.season}, ${nextEp.number}, '${img}')" class="bg-white/5 hover:bg-accent-emerald text-emerald-400 hover:text-white w-8 h-8 rounded-full flex items-center justify-center transition border border-white/10 shrink-0"><i class="ph-bold ph-check"></i></button>
                                 </div>
                             `;
                             $('dash-continue-grid').appendChild(card);
@@ -814,7 +1044,7 @@
                     }
                     if (dbShow.status !== 'dropped') {
                         const futureEps = apiData._embedded.episodes.filter(ep => ep.airdate && ep.airdate > new Date().toISOString().split('T')[0]);
-                        if(futureEps.length > 0) upcoming.push({ showName: dbShow.name, showId: dbShow.showId, ep: futureEps[0] });
+                        if(futureEps.length > 0) upcoming.push({ showName: dbShow.name, showId: dbShow.showId, ep: futureEps[0], img: apiData.image?.medium });
                     }
                 });
                 await Promise.all(loadPromises);
@@ -824,12 +1054,13 @@
                     upcoming.sort((a,b) => new Date(a.ep.airdate) - new Date(b.ep.airdate)).slice(0,6).forEach(ev => {
                         const dObj = new Date(ev.ep.airdate);
                         $('dash-upcoming-list').innerHTML += `
-                            <div class="glass-panel p-4 rounded-xl flex items-center gap-4 cursor-pointer hover:bg-white/5 transition border border-white/5" onclick="openShowDetail(${ev.showId})">
-                                <div class="bg-accent-purple/20 text-accent-purple rounded-lg p-2 flex flex-col items-center justify-center min-w-[3.5rem] border border-accent-purple/30">
-                                    <span class="text-[9px] uppercase font-bold">${dObj.toLocaleDateString('es-ES', { weekday:'short' })}</span>
-                                    <span class="text-xl font-black">${dObj.getDate()}</span>
+                            <div class="glass-card p-4 rounded-xl flex items-center gap-4 cursor-pointer hover:bg-white/5 transition border border-white/5 group" onclick="openShowDetail(${ev.showId})">
+                                <div class="w-12 h-16 rounded overflow-hidden shrink-0"><img src="${ev.img||'https://placehold.co/210x295'}" class="w-full h-full object-cover"></div>
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="font-bold text-sm text-white truncate group-hover:text-accent-purple transition-colors">${ev.showName}</h4>
+                                    <p class="text-[10px] text-gray-400 truncate mb-1">T${ev.ep.season}E${ev.ep.number}: ${ev.ep.name}</p>
+                                    <span class="text-[9px] bg-accent-purple/20 text-purple-300 font-bold px-2 py-0.5 rounded border border-purple-500/20 uppercase">${dObj.toLocaleDateString('es-ES', { weekday:'short', day:'numeric', month:'short' })}</span>
                                 </div>
-                                <div class="flex-1 min-w-0"><h4 class="font-bold text-sm text-white truncate">${ev.showName}</h4><p class="text-[10px] text-gray-400 truncate">T${ev.ep.season}E${ev.ep.number}: ${ev.ep.name}</p></div>
                             </div>`;
                     });
                 } else $('dash-upcoming-empty').classList.remove('hidden');
@@ -838,11 +1069,18 @@
             } catch (err) {} finally { $('dash-loading').classList.add('hidden'); }
         }
 
-        window.quickMarkWatch = (sId, epId) => {
+        window.quickMarkWatch = (sId, sName, epId, epName, s, e, epImg) => {
             if(!user) return; const data = trackedShows[sId]; if(!data) return;
             const cur = (data.episodesWatched && data.episodesWatched[epId]) || 0;
             if(!data.episodesWatched) data.episodesWatched = {}; data.episodesWatched[epId] = cur + 1;
-            renderDashboard(); updateDoc(doc(db, 'users', user.uid, 'shows', sId.toString()), { [`episodesWatched.${epId}`]: cur + 1 }).catch(()=>{});
+            
+            // Optimistic update
+            renderDashboard(); 
+            logHistory(sId, sName, epId, epName, s, e, epImg);
+            
+            updateDoc(doc(db, 'users', user.uid, 'shows', sId.toString()), { [`episodesWatched.${epId}`]: cur + 1 }).then(()=>{
+                checkOptimisticCompletion(sId);
+            }).catch(()=>{});
         };
 
         function renderStats() {
@@ -867,10 +1105,10 @@
                 const tot = s.totalEpisodes || 1; const pct = Math.min(Math.round((wCount/tot)*100), 100);
                 const color = pct===100 ? 'bg-accent-emerald' : (pct>0 ? 'bg-accent-purple' : 'bg-blue-500');
                 container.innerHTML += `
-                    <div class="glass-card rounded-2xl overflow-hidden cursor-pointer group flex flex-col relative animate-fade-in" onclick="openShowDetail(${s.showId})">
-                        <div class="relative aspect-[2/3] bg-dark-800 border-b border-white/5"><img src="${s.image||'https://placehold.co/210x295'}" class="w-full h-full object-cover group-hover:scale-105 transition-transform"><div class="absolute top-2 right-2 bg-black/80 backdrop-blur text-white text-[9px] font-bold px-2 py-1 rounded border border-white/10 uppercase">${labels[s.status||'planned']}</div></div>
-                        <div class="h-1.5 w-full bg-dark-700 relative"><div class="h-full ${color} transition-all shadow-[0_0_10px_currentColor]" style="width:${pct}%"></div></div>
-                        <div class="p-3 flex-1 flex flex-col"><h3 class="font-bold text-sm line-clamp-1">${s.name}</h3><div class="mt-auto flex justify-between text-[11px] text-gray-400 font-medium"><span>${wCount}/${tot} EP</span><span class="${pct===100?'text-accent-emerald font-bold':''}">${pct}%</span></div></div>
+                    <div class="glass-card rounded-2xl overflow-hidden cursor-pointer group flex flex-col relative animate-fade-in hover:border-white/20 transition-all hover:scale-[1.02]" onclick="openShowDetail(${s.showId})">
+                        <div class="relative aspect-[2/3] bg-dark-800 border-b border-white/5"><img src="${s.image||'https://placehold.co/210x295'}" class="w-full h-full object-cover group-hover:scale-105 transition-transform"><div class="absolute top-2 right-2 bg-black/80 backdrop-blur text-white text-[9px] font-bold px-2 py-1 rounded border border-white/10 uppercase drop-shadow">${labels[s.status||'planned']}</div></div>
+                        <div class="h-1.5 w-full bg-dark-900 relative"><div class="h-full ${color} transition-all shadow-[0_0_10px_currentColor]" style="width:${pct}%"></div></div>
+                        <div class="p-3 flex-1 flex flex-col bg-dark-800/50"><h3 class="font-bold text-sm line-clamp-1 drop-shadow-sm">${s.name}</h3><div class="mt-auto flex justify-between text-[11px] text-gray-400 font-medium"><span>${wCount}/${tot} EP</span><span class="${pct===100?'text-accent-emerald font-bold':''}">${pct}%</span></div></div>
                     </div>`;
             });
         }
@@ -883,9 +1121,9 @@
                 const showsMap = {}; data.forEach(item => { if(item.show && item.show.image) showsMap[item.show.id] = item.show; });
                 const shows = Object.values(showsMap).slice(0, 10);
                 $('discover-grid').innerHTML = shows.map(show => `
-                    <div class="glass-card rounded-2xl overflow-hidden cursor-pointer group flex flex-col relative" onclick="openShowDetail(${show.id})">
-                        <div class="relative aspect-[2/3] bg-dark-800"><img src="${show.image.medium}" class="w-full h-full object-cover group-hover:scale-105 transition-transform"><div class="absolute bottom-0 w-full p-2 bg-gradient-to-t from-dark-900 to-transparent"><span class="text-xs font-bold text-yellow-400"><i class="ph-fill ph-star"></i> ${show.rating?.average||'-'}</span></div></div>
-                        <div class="p-3"><h3 class="font-bold text-sm line-clamp-1">${show.name}</h3><p class="text-[10px] text-gray-400 uppercase">${show.network?.name||'Web'}</p></div>
+                    <div class="glass-card rounded-2xl overflow-hidden cursor-pointer group flex flex-col relative border border-white/5 hover:border-white/20 transition-all hover:scale-[1.02]" onclick="openShowDetail(${show.id})">
+                        <div class="relative aspect-[2/3] bg-dark-800"><img src="${show.image.medium}" class="w-full h-full object-cover group-hover:scale-105 transition-transform"><div class="absolute bottom-0 w-full p-3 bg-gradient-to-t from-dark-900 via-dark-900/80 to-transparent flex justify-between items-end"><span class="text-xs font-bold text-yellow-400 drop-shadow flex items-center gap-1"><i class="ph-fill ph-star"></i> ${show.rating?.average||'-'}</span></div></div>
+                        <div class="p-3 bg-dark-800/80 backdrop-blur"><h3 class="font-bold text-sm line-clamp-1">${show.name}</h3><p class="text-[9px] text-gray-400 uppercase font-bold tracking-wider mt-1">${show.network?.name||'Web'}</p></div>
                     </div>`).join('');
                 $('discover-loading').classList.add('hidden'); $('discover-grid').classList.remove('hidden');
             } catch(e) { $('discover-loading').classList.add('hidden'); }
@@ -900,7 +1138,7 @@
             availableGenres.forEach(genre => {
                 const isActive = selectedGenres.has(genre);
                 const btn = document.createElement('button'); btn.textContent = genre;
-                btn.className = `px-4 py-1.5 border rounded-full text-xs transition-all cursor-pointer select-none tracking-wide ${isActive ? 'border-white text-white bg-white/20 font-bold shadow-lg' : 'border-white/10 text-gray-400 hover:border-white/30 hover:text-gray-200 bg-transparent font-medium'}`;
+                btn.className = `px-4 py-2 border rounded-xl text-xs transition-all cursor-pointer select-none tracking-wider font-bold ${isActive ? 'border-white text-white bg-white/20 shadow-[0_0_15px_rgba(255,255,255,0.2)] scale-105' : 'border-white/10 text-gray-400 hover:border-white/30 hover:text-gray-200 bg-dark-800/50'}`;
                 btn.onclick = () => { if(selectedGenres.has(genre)) selectedGenres.delete(genre); else selectedGenres.add(genre); renderGenreChips(); performSearch(); };
                 container.appendChild(btn);
             });
@@ -916,7 +1154,7 @@
             if (q.length > 0 || hasAdv) {
                 resetSearchEngine(); $('search-initial').classList.add('hidden'); $('search-no-results').classList.add('hidden');
                 if(q.length > 0) {
-                    $('search-loading').classList.remove('hidden'); $('search-loading').classList.add('flex');
+                    $('search-loading').classList.remove('hidden'); $('search-loading').classList.add('flex'); $('search-loading-text').textContent = 'Buscando título...';
                     searchTimeout = setTimeout(async () => {
                         const myScanId = ++currentScanId;
                         try {
@@ -927,7 +1165,7 @@
                             if (showsData.length === 0) { $('search-no-results').classList.remove('hidden'); $('search-no-results').classList.add('flex'); } else renderSearchResults(showsData);
                         } catch(e) {}
                     }, 600);
-                } else loadSearchPage(1);
+                } else { $('search-loading-text').textContent = 'Escaneando base de datos mundial...'; loadSearchPage(1); }
             } else { resetSearchEngine(); $('search-initial').classList.remove('hidden'); $('search-no-results').classList.add('hidden'); $('search-loading').classList.add('hidden'); $('search-loading').classList.remove('flex'); }
         };
 
@@ -980,9 +1218,9 @@
             $('search-results').innerHTML = showsData.map(show => {
                 if(!show) return '';
                 return `
-                    <div class="glass-card rounded-2xl overflow-hidden cursor-pointer group flex flex-col relative animate-fade-in" onclick="openShowDetail(${show.id})">
-                        <div class="relative aspect-[2/3] bg-dark-800"><img src="${show.image?.medium||'https://placehold.co/210x295'}" class="w-full h-full object-cover group-hover:scale-105 transition-transform"><div class="absolute bottom-0 w-full p-2 bg-gradient-to-t from-dark-900 to-transparent flex justify-between items-end"><span class="text-xs font-bold text-yellow-400 drop-shadow"><i class="ph-fill ph-star"></i> ${show.rating?.average||'-'}</span><span class="text-[9px] font-bold text-white bg-black/60 px-1.5 py-0.5 rounded border border-white/10 uppercase">${show.type||'Web'}</span></div></div>
-                        <div class="p-3"><h3 class="font-bold text-sm line-clamp-1 mb-1">${show.name}</h3><div class="flex justify-between items-center text-[10px] uppercase font-bold tracking-wider"><span class="text-gray-400">${show.premiered?.substring(0,4)||'N/A'}</span><span class="${show.status==='Running'?'text-accent-emerald':(show.status==='Ended'?'text-red-400':'text-gray-500')}">${show.status||''}</span></div></div>
+                    <div class="glass-card rounded-2xl overflow-hidden cursor-pointer group flex flex-col relative animate-fade-in border border-white/5 hover:border-white/20 transition-all hover:scale-[1.02]" onclick="openShowDetail(${show.id})">
+                        <div class="relative aspect-[2/3] bg-dark-800"><img src="${show.image?.medium||'https://placehold.co/210x295'}" class="w-full h-full object-cover group-hover:scale-105 transition-transform"><div class="absolute bottom-0 w-full p-3 bg-gradient-to-t from-dark-900 via-dark-900/80 to-transparent flex justify-between items-end"><span class="text-xs font-bold text-yellow-400 drop-shadow flex items-center gap-1"><i class="ph-fill ph-star"></i> ${show.rating?.average||'-'}</span><span class="text-[9px] font-bold text-white bg-black/60 px-1.5 py-0.5 rounded border border-white/10 uppercase">${show.type||'Web'}</span></div></div>
+                        <div class="p-3 bg-dark-800/80 backdrop-blur"><h3 class="font-bold text-sm line-clamp-1 mb-1 drop-shadow-sm">${show.name}</h3><div class="flex justify-between items-center text-[9px] uppercase font-bold tracking-wider"><span class="text-gray-400">${show.premiered?.substring(0,4)||'N/A'}</span><span class="${show.status==='Running'?'text-accent-emerald':(show.status==='Ended'?'text-red-400':'text-gray-500')}">${show.status||''}</span></div></div>
                     </div>`;
             }).join('');
         }
@@ -992,15 +1230,42 @@
 
 
         // --- DETAILS VIEW ---
+        window.switchDetailTab = (tab) => {
+            ['eps', 'comm', 'sim'].forEach(t => {
+                const btn = $(`tab-det-${t}`), panel = $(`det-tab-${t}`);
+                if(t === tab) {
+                    btn.className = "text-accent-purple font-bold border-b-2 border-accent-purple pb-2 px-2 transition-all whitespace-nowrap flex items-center gap-2";
+                    panel.classList.remove('hidden');
+                    if(t === 'comm') panel.classList.add('flex');
+                } else {
+                    btn.className = "text-gray-400 hover:text-white pb-2 px-2 transition-all whitespace-nowrap flex items-center gap-2";
+                    panel.classList.add('hidden');
+                    panel.classList.remove('flex');
+                }
+            });
+            if(tab === 'sim') loadSimilarShows();
+        }
+
         window.openShowDetail = async (id) => {
+            if($('view-detail').classList.contains('translate-x-full') === false) {
+                // Already open, transition smoothly
+                $('detail-content').classList.add('hidden'); $('detail-loading').classList.remove('hidden');
+            } else {
+                $('view-detail').classList.remove('translate-x-full'); $('detail-content').classList.add('hidden'); $('detail-loading').classList.remove('hidden'); $('detail-actions').innerHTML = '';
+            }
+            
             currentDetailShowId = id.toString();
-            $('view-detail').classList.remove('translate-x-full'); $('detail-content').classList.add('hidden'); $('detail-loading').classList.remove('hidden'); $('detail-actions').innerHTML = '';
+            switchDetailTab('eps'); // Default tab
+            
             try {
                 const apiData = await fetchTVMaze(id); if(!apiData) { showToast("Error TVMaze.", "error"); closeDetailView(); return; }
                 currentDetailEpisodesData = apiData._embedded.episodes;
                 let gCount = 1; currentDetailEpisodesData.forEach(ep => { if (ep.season > 0 && ep.number !== null && ep.airdate) ep.globalNumber = gCount++; });
+                
                 renderDetail(apiData);
                 loadShowCommunityRating(id);
+                loadShowComments(id);
+                renderShowRatingsChart();
             } catch(e) { showToast("Error al cargar la serie", "error"); closeDetailView(); }
         };
 
@@ -1011,7 +1276,9 @@
             $('detail-hero-img').style.backgroundImage = `url(${img})`; $('detail-poster').src = show.image?.medium || 'https://placehold.co/210x295';
             $('detail-title').textContent = show.name; $('detail-summary').innerHTML = show.summary || 'Sin sinopsis.';
             $('detail-status').textContent = show.status; $('detail-runtime-val').textContent = show.averageRuntime || show.runtime || 0;
-            $('detail-genres').innerHTML = (show.genres||[]).map(g=>`<span class="px-3 py-1 border border-white/20 bg-dark-900/50 backdrop-blur rounded-full text-xs font-medium">${g}</span>`).join('');
+            
+            // Genres styled like TVMaze chips
+            $('detail-genres').innerHTML = (show.genres||[]).map(g=>`<span class="px-3 py-1 border border-white/20 bg-dark-900/50 backdrop-blur rounded-full text-xs font-bold shadow-sm">${g}</span>`).join('');
             
             const rCont = $('detail-rating-container');
             if(isTracked) { rCont.classList.remove('hidden'); const mRat = trackedShows[show.id].rating || 0; rCont.querySelectorAll('.ph-star').forEach((s, i) => { s.classList.toggle('ph-fill', i < mRat); s.onclick = () => rateShow(show.id, i + 1); });
@@ -1019,12 +1286,12 @@
 
             const aCont = $('detail-actions');
             if (isTracked) {
-                aCont.innerHTML = `<button onclick="removeShow(${show.id})" class="bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20 px-3 py-2 rounded-xl text-[10px] font-bold uppercase transition"><i class="ph-bold ph-trash mr-1"></i> Borrar</button>`;
+                aCont.innerHTML = `<button onclick="removeShow(${show.id})" class="bg-dark-800/80 backdrop-blur text-red-400 hover:bg-red-500 hover:text-white border border-white/10 hover:border-red-500 px-4 py-2 rounded-xl text-xs font-bold uppercase transition flex items-center shadow-lg"><i class="ph-bold ph-trash mr-2"></i> Borrar</button>`;
                 $('detail-tracker-card').classList.remove('hidden'); $('detail-tracker-card').classList.add('flex');
                 const stat = trackedShows[show.id].status;
-                $('detail-status-container').innerHTML = `<label class="text-[10px] text-gray-400 mb-1 block uppercase font-bold tracking-wider">Estado (Auto)</label><select onchange="forceStatus('${show.id}', this.value)" class="w-full bg-dark-900 border border-white/10 text-white text-sm rounded-lg p-2 outline-none appearance-none"><option value="planned" disabled ${stat==='planned'?'selected':''}>Sin comenzar</option><option value="watching" disabled ${stat==='watching'?'selected':''}>Viendo</option><option value="completed" disabled ${stat==='completed'?'selected':''}>Terminado</option><option value="dropped" ${stat==='dropped'?'selected':''}>Abandonado (Forzar)</option>${stat!=='dropped' ? `<option value="${stat}" selected class="hidden">${stat}</option>` : ''}</select>`;
+                $('detail-status-container').innerHTML = `<label class="text-[10px] text-gray-400 mb-1 block uppercase font-bold tracking-wider">Forzar Estado</label><select onchange="forceStatus('${show.id}', this.value)" class="w-full bg-dark-900/80 border border-white/10 text-white text-sm rounded-xl p-3 outline-none appearance-none font-medium cursor-pointer"><option value="planned" disabled ${stat==='planned'?'selected':''}>Sin comenzar</option><option value="watching" disabled ${stat==='watching'?'selected':''}>Viendo</option><option value="completed" disabled ${stat==='completed'?'selected':''}>Terminado</option><option value="dropped" ${stat==='dropped'?'selected':''}>Abandonar Serie</option>${stat!=='dropped' ? `<option value="${stat}" selected class="hidden">${stat}</option>` : ''}</select>`;
             } else {
-                aCont.innerHTML = `<button onclick="addShow(${show.id}, '${show.name.replace(/'/g,"\\'")}', '${show.image?.medium||''}', ${show.averageRuntime||30})" class="bg-accent-purple text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg hover:bg-purple-500 transition"><i class="ph-bold ph-plus mr-1"></i> Seguir</button>`;
+                aCont.innerHTML = `<button onclick="addShow(${show.id}, '${show.name.replace(/'/g,"\\'")}', '${show.image?.medium||''}', ${show.averageRuntime||30})" class="bg-accent-purple text-white px-6 py-2.5 rounded-xl text-sm font-bold shadow-xl shadow-purple-500/20 hover:bg-purple-500 transition flex items-center"><i class="ph-bold ph-plus mr-2"></i> Seguir Serie</button>`;
                 $('detail-tracker-card').classList.add('hidden'); $('detail-tracker-card').classList.remove('flex');
             }
 
@@ -1036,32 +1303,32 @@
                 const block = document.createElement('div'); block.className = "bg-dark-800/40 rounded-2xl border border-white/5 overflow-hidden";
                 const head = document.createElement('div'); head.className = "bg-dark-700/50 p-4 flex items-center justify-between cursor-pointer hover:bg-dark-700/80 transition group";
                 head.id = `sh-${sNum}`;
-                const list = document.createElement('div'); list.className = "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 hidden";
+                const list = document.createElement('div'); list.className = "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 p-4 hidden";
                 head.onclick = (e) => { if(e.target.closest('button')) return; list.classList.toggle('hidden'); const icon = head.querySelector('.ph-caret-down'); if(icon) icon.classList.toggle('rotate-180'); };
                 
                 eps.forEach(ep => {
                     const epId = ep.id.toString(), isAired = ep.airdate && new Date(ep.airdate) <= today;
                     const row = document.createElement('div'); row.id = `ep-row-${epId}`;
-                    row.className = `glass-card rounded-xl border border-white/5 overflow-hidden flex flex-col relative group transition-colors cursor-pointer ${!isAired?'opacity-50 grayscale':''}`;
+                    row.className = `glass-card rounded-xl border border-white/5 overflow-hidden flex flex-col relative group transition-all cursor-pointer hover:scale-105 ${!isAired?'opacity-50 grayscale hover:scale-100':''}`;
                     row.onclick = () => { if(isAired) openEpisodeModal(epId); }
                     
                     row.innerHTML = `
                         <div class="relative aspect-video bg-dark-900 overflow-hidden border-b border-white/5">
                             <img src="${ep.image?.medium || show.image?.medium || 'https://placehold.co/300x170/1F293F/ffffff'}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                             <div class="absolute inset-0 bg-gradient-to-t from-dark-900/90 to-transparent"></div>
-                            <div class="absolute top-2 left-2 bg-accent-purple/90 backdrop-blur text-white text-[10px] font-bold px-2 py-1 rounded shadow-lg uppercase border border-white/20 tracking-wider flex items-center">
+                            <div class="absolute top-2 left-2 bg-accent-purple/90 backdrop-blur text-white text-[10px] font-bold px-2 py-1 rounded shadow-lg uppercase border border-white/20 tracking-wider flex items-center drop-shadow">
                                 T${String(ep.season).padStart(2,'0')}E${String(ep.number).padStart(2,'0')} ${ep.globalNumber ? `<span class="bg-black/70 px-1.5 py-0.5 rounded ml-1 text-[9px]">#${ep.globalNumber}</span>` : ''}
                             </div>
                         </div>
-                        <div class="p-3 flex-1 flex flex-col relative z-10 pointer-events-none">
-                            <h4 class="font-bold text-xs line-clamp-2 mb-1 leading-tight text-gray-200">${ep.name}</h4>
-                            <p class="text-[10px] text-gray-400 font-medium mb-2">${ep.airdate ? new Date(ep.airdate).toLocaleDateString('es-ES') : 'Por anunciar'}</p>
+                        <div class="p-3 flex-1 flex flex-col relative z-10 pointer-events-none bg-dark-800/80">
+                            <h4 class="font-bold text-xs line-clamp-2 mb-1 leading-tight text-white drop-shadow-sm">${ep.name}</h4>
+                            <p class="text-[9px] text-gray-400 font-bold uppercase tracking-wider mb-2">${ep.airdate ? new Date(ep.airdate).toLocaleDateString('es-ES', {month:'short', day:'numeric', year:'numeric'}) : 'Por anunciar'}</p>
                         </div>
-                        <div class="mt-auto flex items-center justify-between border-t border-white/10 pt-3 p-3 bg-dark-800/50" onclick="event.stopPropagation()">
+                        <div class="mt-auto flex items-center justify-between border-t border-white/10 pt-3 p-3 bg-dark-900/80" onclick="event.stopPropagation()">
                             ${isTracked && isAired ? `
-                                <button onclick="updateEp('${show.id}', '${epId}', -1)" class="w-7 h-7 rounded-full bg-white/5 hover:bg-white/20 flex items-center justify-center text-gray-400 hover:text-white transition border border-white/5" id="dec-${epId}"><i class="ph-bold ph-minus text-xs"></i></button>
+                                <button onclick="updateEp('${show.id}', '${show.name.replace(/'/g,"\\'")}', '${epId}', '${ep.name.replace(/'/g,"\\'")}', ${ep.season}, ${ep.number}, '${ep.image?.medium || img}', -1)" class="w-7 h-7 rounded-full bg-white/5 hover:bg-red-500/20 flex items-center justify-center text-gray-400 hover:text-red-400 transition border border-white/5" id="dec-${epId}"><i class="ph-bold ph-minus text-xs"></i></button>
                                 <span class="font-bold text-sm w-8 text-center text-white" id="cnt-${epId}">0</span>
-                                <button onclick="updateEp('${show.id}', '${epId}', 1)" class="w-7 h-7 rounded-full bg-accent-emerald/20 hover:bg-accent-emerald text-accent-emerald hover:text-white flex items-center justify-center transition border border-emerald-500/20" id="inc-${epId}"><i class="ph-bold ph-plus text-xs"></i></button>
+                                <button onclick="updateEp('${show.id}', '${show.name.replace(/'/g,"\\'")}', '${epId}', '${ep.name.replace(/'/g,"\\'")}', ${ep.season}, ${ep.number}, '${ep.image?.medium || img}', 1)" class="w-7 h-7 rounded-full bg-accent-emerald/20 hover:bg-accent-emerald text-accent-emerald hover:text-white flex items-center justify-center transition border border-emerald-500/20 shadow-inner" id="inc-${epId}"><i class="ph-bold ph-plus text-xs"></i></button>
                             ` : (!isAired ? '<span class="text-[9px] text-gray-500 uppercase font-bold tracking-wider mx-auto">No Emitido</span>' : '<span class="text-[9px] text-gray-500 uppercase font-bold tracking-wider mx-auto">Sigue la serie</span>')}
                         </div>
                     `;
@@ -1070,6 +1337,7 @@
                 block.appendChild(head); block.appendChild(list); sCont.appendChild(block);
             });
 
+            // Auto-open first season safely
             setTimeout(() => {
                 if(isTracked && Object.keys(sMap).length > 0) {
                     const firstSeason = sCont.querySelector(`#sh-${Object.keys(sMap)[0]}`);
@@ -1078,7 +1346,7 @@
                         const icon = firstSeason.querySelector('.ph-caret-down'); if(icon) icon.classList.add('rotate-180');
                     }
                 }
-            }, 50);
+            }, 100);
             renderDetailProgressUI();
         }
 
@@ -1096,18 +1364,21 @@
 
             const mAct = $('detail-mass-actions'); mAct.innerHTML = '';
             if(pct === 100 && total > 0) {
-                mAct.innerHTML += `<button onclick="unmarkAllShow('${currentDetailShowId}')" class="text-[10px] bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white px-3 py-1.5 rounded-lg font-bold uppercase transition border border-red-500/20"><i class="ph-bold ph-x-circle mr-1"></i>Desmarcar Serie</button>`;
+                mAct.innerHTML += `<button onclick="unmarkAllShow('${currentDetailShowId}')" class="text-xs bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white px-4 py-2 rounded-xl font-bold uppercase transition border border-red-500/30 flex items-center shadow-lg"><i class="ph-bold ph-x-circle mr-1 text-lg"></i>Desmarcar Serie</button>`;
             } else if (total > 0) {
-                mAct.innerHTML += `<button onclick="markAllShow('${currentDetailShowId}')" class="text-[10px] bg-accent-emerald/20 text-accent-emerald hover:bg-accent-emerald hover:text-white px-3 py-1.5 rounded-lg font-bold uppercase transition border border-emerald-500/20"><i class="ph-bold ph-check-double mr-1"></i>Marcar Serie</button>`;
+                mAct.innerHTML += `<button onclick="markAllShow('${currentDetailShowId}', '${data.name.replace(/'/g,"\\'")}')" class="text-xs bg-accent-emerald/20 text-accent-emerald hover:bg-accent-emerald hover:text-white px-4 py-2 rounded-xl font-bold uppercase transition border border-emerald-500/30 flex items-center shadow-lg"><i class="ph-bold ph-check-double mr-1 text-lg"></i>Marcar Serie</button>`;
             }
-            if(total > 0) mAct.innerHTML += `<button onclick="rewatchAllShow('${currentDetailShowId}')" class="text-[10px] bg-accent-purple/20 text-accent-purple hover:bg-accent-purple hover:text-white px-3 py-1.5 rounded-lg font-bold uppercase transition border border-purple-500/20"><i class="ph-bold ph-arrows-clockwise mr-1"></i>Re-ver todo (+1)</button>`;
+            if(total > 0) mAct.innerHTML += `<button onclick="rewatchAllShow('${currentDetailShowId}', '${data.name.replace(/'/g,"\\'")}')" class="text-xs bg-accent-purple/20 text-accent-purple hover:bg-accent-purple hover:text-white px-4 py-2 rounded-xl font-bold uppercase transition border border-purple-500/30 flex items-center shadow-lg"><i class="ph-bold ph-arrows-clockwise mr-1 text-lg"></i>Re-ver (+1)</button>`;
 
             currentDetailEpisodesData.forEach(ep => {
                 const id = ep.id.toString(), v = map[id]||0;
                 if($(`cnt-${id}`)) $(`cnt-${id}`).textContent = v;
                 if($(`dec-${id}`)) $(`dec-${id}`).disabled = v<=0;
                 const r = $(`ep-row-${id}`);
-                if(r) { if(v>0){ r.classList.add('border-accent-emerald'); r.classList.remove('border-white/5'); } else { r.classList.remove('border-accent-emerald'); r.classList.add('border-white/5'); } }
+                if(r) { 
+                    if(v>0){ r.classList.add('border-accent-emerald', 'shadow-[0_0_15px_rgba(16,185,129,0.15)]'); r.classList.remove('border-white/5'); } 
+                    else { r.classList.remove('border-accent-emerald', 'shadow-[0_0_15px_rgba(16,185,129,0.15)]'); r.classList.add('border-white/5'); } 
+                }
             });
 
             const sMap = {}; airedEps.forEach(ep=>{ if(!sMap[ep.season]) sMap[ep.season]=[]; sMap[ep.season].push(ep); });
@@ -1118,18 +1389,109 @@
                     const rot = head.querySelector('.ph-caret-down')?.classList.contains('rotate-180') ? 'rotate-180' : '';
                     head.innerHTML = `
                         <div class="flex-1 pr-4 pointer-events-none">
-                            <div class="flex justify-between text-sm mb-1.5"><span class="font-bold text-gray-200">Temporada ${sNum}</span><span class="text-[10px] uppercase font-bold text-gray-400">${sWatch}/${sTotal}</span></div>
-                            <div class="h-1.5 w-full bg-dark-900 rounded overflow-hidden border border-white/5"><div class="h-full bg-accent-emerald transition-all shadow-[0_0_10px_currentColor]" style="width:${sPct}%"></div></div>
+                            <div class="flex justify-between text-sm mb-1.5"><span class="font-bold text-gray-200 text-lg drop-shadow-md">Temporada ${sNum}</span><span class="text-xs uppercase font-bold text-gray-400 bg-black/50 px-2 py-0.5 rounded">${sWatch}/${sTotal}</span></div>
+                            <div class="h-2 w-full bg-dark-900 rounded-full overflow-hidden border border-white/5"><div class="h-full bg-accent-emerald transition-all shadow-[0_0_10px_currentColor]" style="width:${sPct}%"></div></div>
                         </div>
-                        <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-4">
                             ${sWatch < sTotal 
-                                ? `<button onclick="markSeason('${currentDetailShowId}', ${sNum})" class="bg-white/10 hover:bg-emerald-500 hover:text-white px-2.5 py-1.5 rounded-lg text-[10px] uppercase font-bold text-gray-300 transition border border-white/10"><i class="ph-bold ph-check"></i></button>` 
-                                : `<button onclick="unmarkSeason('${currentDetailShowId}', ${sNum})" class="bg-accent-emerald hover:bg-red-500 hover:border-red-500 text-white px-2.5 py-1.5 rounded-lg text-[10px] uppercase font-bold transition border border-emerald-500 group"><i class="ph-bold ph-check group-hover:hidden"></i><i class="ph-bold ph-x group-hover:block hidden"></i></button>`}
-                            <i class="ph-bold ph-caret-down text-gray-400 transition-transform ${rot} pointer-events-none"></i>
+                                ? `<button onclick="markSeason('${currentDetailShowId}', '${data.name.replace(/'/g,"\\'")}', ${sNum})" class="bg-white/10 hover:bg-emerald-500 hover:text-white px-3 py-2 rounded-xl text-xs uppercase font-bold text-gray-300 transition border border-white/10 shadow"><i class="ph-bold ph-check text-lg"></i></button>` 
+                                : `<button onclick="unmarkSeason('${currentDetailShowId}', ${sNum})" class="bg-accent-emerald hover:bg-red-500 hover:border-red-500 text-white px-3 py-2 rounded-xl text-xs uppercase font-bold transition border border-emerald-500 group shadow-lg shadow-emerald-500/20 hover:shadow-red-500/20"><i class="ph-bold ph-check group-hover:hidden text-lg"></i><i class="ph-bold ph-x group-hover:block hidden text-lg"></i></button>`}
+                            <i class="ph-bold ph-caret-down text-gray-400 text-xl transition-transform ${rot} pointer-events-none bg-white/5 p-2 rounded-full"></i>
                         </div>
                     `;
                 }
             });
+        }
+
+        function renderShowRatingsChart() {
+            const chartDiv = $('show-ratings-chart'); chartDiv.innerHTML = '';
+            const airedEps = currentDetailEpisodesData.filter(ep => ep.airdate && new Date(ep.airdate) <= new Date());
+            if(airedEps.length === 0) { chartDiv.innerHTML = '<p class="text-gray-500 text-sm text-center py-10">Sin episodios emitidos.</p>'; return; }
+            
+            airedEps.forEach(ep => {
+                const rat = ep.rating?.average || 0;
+                const pct = (rat / 10) * 100;
+                const color = rat >= 8 ? 'bg-accent-emerald' : (rat >= 6 ? 'bg-yellow-400' : (rat > 0 ? 'bg-red-400' : 'bg-gray-600'));
+                
+                chartDiv.innerHTML += `
+                    <div class="flex items-center gap-3 mb-2 group">
+                        <span class="text-[10px] font-bold text-gray-400 w-12 text-right">S${String(ep.season).padStart(2,'0')}E${String(ep.number).padStart(2,'0')}</span>
+                        <div class="flex-1 h-3 bg-dark-900 rounded-full overflow-hidden flex items-center">
+                            <div class="h-full ${color} transition-all duration-1000" style="width: ${pct}%"></div>
+                        </div>
+                        <span class="text-xs font-bold w-6 text-white group-hover:text-yellow-400 transition-colors">${rat > 0 ? rat : '-'}</span>
+                    </div>
+                `;
+            });
+        }
+
+        async function loadShowComments(showId) {
+            const list = $('show-comments-list'); list.innerHTML = '<div class="spinner mx-auto my-10 border-t-accent-purple"></div>';
+            if(unsubscribeCurrentShowComm) unsubscribeCurrentShowComm();
+            
+            unsubscribeCurrentShowComm = onSnapshot(doc(db, 'artifacts', PUBLIC_APP_ID, 'public', 'data', 'community_shows', showId.toString()), (docSnap) => {
+                list.innerHTML = '';
+                const data = docSnap.exists() ? docSnap.data() : null;
+                if(data && data.comments && data.comments.length > 0) {
+                    data.comments.slice().reverse().forEach(c => {
+                        const date = new Date(c.date).toLocaleDateString('es-ES', {month:'short', day:'numeric'});
+                        const avatarHTML = c.photoURL ? `<img src="${c.photoURL}" class="w-full h-full object-cover">` : c.name.substring(0,2).toUpperCase();
+                        list.innerHTML += `
+                            <div class="flex gap-3 bg-dark-900/50 p-4 rounded-2xl border border-white/5 shadow-sm">
+                                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-rose-500 to-purple-600 flex items-center justify-center font-bold text-xs shrink-0 overflow-hidden border border-white/10 shadow-lg cursor-pointer hover:scale-105 transition" onclick="closeDetailView(); openPublicProfile('${c.uid}')">${avatarHTML}</div>
+                                <div class="flex-1">
+                                    <div class="flex justify-between items-baseline mb-1">
+                                        <span class="font-bold text-sm text-purple-300">${c.name}</span>
+                                        <span class="text-[10px] text-gray-500">${date}</span>
+                                    </div>
+                                    <p class="text-sm text-gray-200 leading-snug">${c.text}</p>
+                                </div>
+                            </div>
+                        `;
+                    });
+                } else { list.innerHTML = '<div class="flex flex-col items-center justify-center py-10 text-gray-500"><i class="ph-duotone ph-chat-teardrop text-4xl mb-2"></i><span class="text-sm">Sé el primero en comentar la serie.</span></div>'; }
+            }, (e)=>{});
+        }
+
+        window.postShowComment = async () => {
+            if(!user || !currentDetailShowId) return;
+            const input = $('show-comment-input'); const text = input.value.trim(); if(!text) return;
+            try {
+                const ref = doc(db, 'artifacts', PUBLIC_APP_ID, 'public', 'data', 'community_shows', currentDetailShowId.toString());
+                const snap = await getDoc(ref);
+                const currentComments = snap.exists() && snap.data().comments ? snap.data().comments : [];
+                currentComments.push({ uid: user.uid, name: user.displayName || 'Usuario', photoURL: user.photoURL || null, text: text, date: new Date().toISOString() });
+                await setDoc(ref, { comments: currentComments }, { merge: true });
+                input.value = '';
+            } catch(e) { showToast("Error", "error"); }
+        }
+
+        async function loadSimilarShows() {
+            const grid = $('similars-grid'); const loader = $('similars-loading');
+            grid.classList.add('hidden'); loader.classList.remove('hidden');
+            grid.innerHTML = '';
+            
+            try {
+                const showData = tvmazeCache[currentDetailShowId];
+                if(showData && showData.genres && showData.genres.length > 0) {
+                    const genre = showData.genres[0]; // Pick first genre
+                    const res = await fetch(`https://api.tvmaze.com/search/shows?q=${genre}`);
+                    const data = await res.json();
+                    
+                    const similar = data.map(item => item.show).filter(s => s && s.id.toString() !== currentDetailShowId.toString()).slice(0, 5);
+                    
+                    if(similar.length > 0) {
+                        grid.innerHTML = similar.map(show => `
+                            <div class="glass-card rounded-2xl overflow-hidden cursor-pointer border border-white/5 hover:border-white/20 transition-all hover:scale-[1.05]" onclick="openShowDetail(${show.id})">
+                                <div class="relative aspect-[2/3] bg-dark-800"><img src="${show.image?.medium||'https://placehold.co/210x295'}" class="w-full h-full object-cover"></div>
+                                <div class="p-2 bg-dark-800/80 text-center"><h3 class="font-bold text-xs line-clamp-1 truncate text-white">${show.name}</h3></div>
+                            </div>
+                        `).join('');
+                    } else { grid.innerHTML = '<div class="col-span-full text-center text-gray-500 py-6">No se encontraron series similares.</div>'; }
+                } else { grid.innerHTML = '<div class="col-span-full text-center text-gray-500 py-6">Faltan géneros para recomendar.</div>'; }
+            } catch(e) { grid.innerHTML = '<div class="col-span-full text-center text-gray-500 py-6">Error al buscar.</div>'; }
+            
+            loader.classList.add('hidden'); grid.classList.remove('hidden');
         }
 
         // --- DATA MUTATIONS ---
@@ -1139,63 +1501,89 @@
             showToast("Serie añadida", "success"); openShowDetail(id);
         };
         window.removeShow = async (id) => { if(!user) return; await deleteDoc(doc(db, 'users', user.uid, 'shows', id.toString())); showToast("Serie eliminada", "info"); closeDetailView(); };
-        window.forceStatus = async (sId, status) => { if(!user) return; await updateDoc(doc(db, 'users', user.uid, 'shows', sId.toString()), { status }); showToast("Estado forzado", "info"); };
+        window.forceStatus = async (sId, status) => { if(!user) return; await updateDoc(doc(db, 'users', user.uid, 'shows', sId.toString()), { status }); showToast("Estado forzado", "info"); renderDetailProgressUI(); };
 
-        window.updateEp = (sId, epId, delta) => {
+        window.updateEp = (sId, sName, epId, epName, s, e, epImg, delta) => {
             if(!user) return; const data = trackedShows[sId]; if(!data) return;
             const cur = (data.episodesWatched && data.episodesWatched[epId]) || 0; let nxt = cur + delta; if(nxt<0) nxt=0; if(nxt===cur) return;
-            if(delta===1 && cur===0) {
-                const idx = currentDetailEpisodesData.findIndex(ep=>ep.id.toString()===epId.toString()), unwatched = [];
-                for(let i=0; i<idx; i++) {
-                    const pId = currentDetailEpisodesData[i].id.toString();
-                    if(currentDetailEpisodesData[i].airdate && new Date(currentDetailEpisodesData[i].airdate) <= new Date() && ((data.episodesWatched||{})[pId]||0)===0) unwatched.push(pId);
-                }
-                if(unwatched.length>0) {
-                    showConfirm("Ponerse al día", "¿Marcar los anteriores como vistos?", () => {
-                        const upd = {}; if(!data.episodesWatched) data.episodesWatched = {};
-                        [...unwatched, epId].forEach(i => { upd[`episodesWatched.${i}`] = 1; data.episodesWatched[i] = 1; });
-                        renderDetailProgressUI(); checkOptimisticCompletion(sId); updateDoc(doc(db, 'users', user.uid, 'shows', sId.toString()), upd);
-                    }); return;
-                }
-            }
+            
             if(!data.episodesWatched) data.episodesWatched = {};
             if(nxt > 0) data.episodesWatched[epId] = nxt; else delete data.episodesWatched[epId];
-            renderDetailProgressUI(); checkOptimisticCompletion(sId); 
-            updateDoc(doc(db, 'users', user.uid, 'shows', sId.toString()), { [`episodesWatched.${epId}`]: nxt>0?nxt:deleteField() }).catch(()=>{});
+            
+            // Auto revert status if dropped from 100%
+            if(nxt === 0 && data.status === 'completed') data.status = 'watching';
+            
+            renderDetailProgressUI(); 
+            if(nxt > cur) logHistory(sId, sName, epId, epName, s, e, epImg);
+
+            updateDoc(doc(db, 'users', user.uid, 'shows', sId.toString()), { 
+                [`episodesWatched.${epId}`]: nxt>0?nxt:deleteField(),
+                ...(nxt === 0 && data.status === 'completed' ? { status: 'watching' } : {})
+            }).then(() => checkOptimisticCompletion(sId)).catch(()=>{});
         };
 
-        window.markSeason = (sId, sNum) => {
+        window.markSeason = (sId, sName, sNum) => {
             const eps = currentDetailEpisodesData.filter(ep=>ep.season===sNum && ep.airdate && new Date(ep.airdate)<=new Date());
             const upd = {}, data = trackedShows[sId]; if(!data.episodesWatched) data.episodesWatched = {};
-            eps.forEach(ep => { if((data.episodesWatched[ep.id]||0)===0) { upd[`episodesWatched.${ep.id}`] = 1; data.episodesWatched[ep.id] = 1; } });
-            if(Object.keys(upd).length>0) { renderDetailProgressUI(); checkOptimisticCompletion(sId); updateDoc(doc(db, 'users', user.uid, 'shows', sId.toString()), upd); }
+            let logged = false;
+            eps.forEach(ep => { 
+                if((data.episodesWatched[ep.id]||0)===0) { 
+                    upd[`episodesWatched.${ep.id}`] = 1; data.episodesWatched[ep.id] = 1; 
+                    if(!logged) { logHistory(sId, sName, ep.id, ep.name, ep.season, ep.number, ep.image?.medium); logged = true; } // log at least one
+                } 
+            });
+            if(Object.keys(upd).length>0) { 
+                renderDetailProgressUI(); 
+                updateDoc(doc(db, 'users', user.uid, 'shows', sId.toString()), upd).then(()=>checkOptimisticCompletion(sId)); 
+            }
         };
+        
         window.unmarkSeason = (sId, sNum) => {
             showConfirm("Desmarcar Temporada", `¿Borrar el progreso de la Temporada ${sNum}?`, () => {
                 const eps = currentDetailEpisodesData.filter(ep=>ep.season===sNum && ep.airdate && new Date(ep.airdate)<=new Date());
                 const upd = {}, data = trackedShows[sId]; if(!data.episodesWatched) return;
                 eps.forEach(ep => { if((data.episodesWatched[ep.id]||0) > 0) { upd[`episodesWatched.${ep.id}`] = deleteField(); delete data.episodesWatched[ep.id]; } });
-                if(Object.keys(upd).length>0) { renderDetailProgressUI(); checkOptimisticCompletion(sId); updateDoc(doc(db, 'users', user.uid, 'shows', sId.toString()), upd); }
+                if(data.status === 'completed') { upd.status = 'watching'; data.status = 'watching'; } // auto revert
+                if(Object.keys(upd).length>0) { 
+                    renderDetailProgressUI(); 
+                    updateDoc(doc(db, 'users', user.uid, 'shows', sId.toString()), upd).then(()=>checkOptimisticCompletion(sId)); 
+                }
             });
         };
-        window.markAllShow = (sId) => {
+        
+        window.markAllShow = (sId, sName) => {
             const eps = currentDetailEpisodesData.filter(ep=>ep.airdate && new Date(ep.airdate)<=new Date());
             const upd = {}, data = trackedShows[sId]; if(!data.episodesWatched) data.episodesWatched = {};
-            eps.forEach(ep => { if((data.episodesWatched[ep.id]||0)===0) { upd[`episodesWatched.${ep.id}`] = 1; data.episodesWatched[ep.id] = 1; } });
-            if(Object.keys(upd).length>0) { renderDetailProgressUI(); checkOptimisticCompletion(sId); updateDoc(doc(db, 'users', user.uid, 'shows', sId.toString()), upd); }
+            let logged = false;
+            eps.forEach(ep => { 
+                if((data.episodesWatched[ep.id]||0)===0) { 
+                    upd[`episodesWatched.${ep.id}`] = 1; data.episodesWatched[ep.id] = 1;
+                    if(!logged) { logHistory(sId, sName, ep.id, ep.name, ep.season, ep.number, ep.image?.medium); logged = true; }
+                } 
+            });
+            if(Object.keys(upd).length>0) { 
+                renderDetailProgressUI(); 
+                updateDoc(doc(db, 'users', user.uid, 'shows', sId.toString()), upd).then(()=>checkOptimisticCompletion(sId)); 
+            }
         };
+        
         window.unmarkAllShow = (sId) => {
             showConfirm("Desmarcar", "¿Borrar TODO el progreso de esta serie?", () => {
-                const data = trackedShows[sId]; data.episodesWatched = {}; renderDetailProgressUI(); checkOptimisticCompletion(sId);
-                updateDoc(doc(db, 'users', user.uid, 'shows', sId.toString()), { episodesWatched: {} });
+                const data = trackedShows[sId]; data.episodesWatched = {}; data.status = 'watching'; renderDetailProgressUI(); 
+                updateDoc(doc(db, 'users', user.uid, 'shows', sId.toString()), { episodesWatched: {}, status: 'watching' }).then(()=>checkOptimisticCompletion(sId));
             });
         };
-        window.rewatchAllShow = (sId) => {
+        
+        window.rewatchAllShow = (sId, sName) => {
             showConfirm("Re-ver serie (+1)", "Sumará +1 visionado a TODOS los episodios emitidos. ¿Continuar?", () => {
                 const eps = currentDetailEpisodesData.filter(ep=>ep.airdate && new Date(ep.airdate)<=new Date());
                 const upd = {}, data = trackedShows[sId]; if(!data.episodesWatched) data.episodesWatched = {};
-                eps.forEach(ep => { const cur = data.episodesWatched[ep.id] || 0; upd[`episodesWatched.${ep.id}`] = cur + 1; data.episodesWatched[ep.id] = cur + 1; });
-                if(Object.keys(upd).length>0) { renderDetailProgressUI(); checkOptimisticCompletion(sId); updateDoc(doc(db, 'users', user.uid, 'shows', sId.toString()), upd); showToast("¡Rewatch +1!", "success"); }
+                let logged = false;
+                eps.forEach(ep => { 
+                    const cur = data.episodesWatched[ep.id] || 0; upd[`episodesWatched.${ep.id}`] = cur + 1; data.episodesWatched[ep.id] = cur + 1; 
+                    if(!logged) { logHistory(sId, sName, ep.id, ep.name, ep.season, ep.number, ep.image?.medium); logged = true; }
+                });
+                if(Object.keys(upd).length>0) { renderDetailProgressUI(); updateDoc(doc(db, 'users', user.uid, 'shows', sId.toString()), upd).then(()=>checkOptimisticCompletion(sId)); showToast("¡Rewatch +1!", "success"); }
             });
         };
 
@@ -1269,9 +1657,9 @@
                 showsSnap.forEach(d => { const data = d.data(); pubShows.push(data); const wCount = Object.values(data.episodesWatched||{}).filter(v=>v>0).length; totalEps += wCount; totalTime += wCount * (data.runtime || 30); });
 
                 const h = Math.floor(totalTime/60), d = Math.floor(h/24), rh = h%24;
-                $('pub-stat-shows').innerHTML = `<i class="ph-fill ph-television-simple text-accent-purple"></i> ${pubShows.length} Series`;
-                $('pub-stat-eps').innerHTML = `<i class="ph-fill ph-popcorn text-yellow-400"></i> ${totalEps} Episodios`;
-                $('pub-stat-time').innerHTML = `<i class="ph-fill ph-clock text-accent-emerald"></i> ${d}d ${rh}h`;
+                $('pub-stat-shows').innerHTML = `<i class="ph-fill ph-television-simple text-accent-purple text-lg"></i> ${pubShows.length} Series`;
+                $('pub-stat-eps').innerHTML = `<i class="ph-fill ph-popcorn text-yellow-400 text-lg"></i> ${totalEps} Episodios`;
+                $('pub-stat-time').innerHTML = `<i class="ph-fill ph-clock text-emerald-400 text-lg"></i> ${d}d ${rh}h`;
 
                 const grid = $('pub-shows-grid'); grid.innerHTML = '';
                 if (pubShows.length === 0) { $('pub-shows-empty').classList.remove('hidden'); $('pub-shows-empty').classList.add('flex');
@@ -1297,6 +1685,7 @@
             const uInfo = allPublicUsers.find(u => u.uid === uid) || { uid, displayName: $('pub-name').innerText, photoURL: $('pub-avatar img')?.src || null };
             try { if(isF) await deleteDoc(ref); else await setDoc(ref, uInfo); showToast(isF ? "Dejaste de seguir" : "Siguiendo", "success"); openPublicProfile(uid); } catch(e) {}
         }
+
         window.addEventListener('DOMContentLoaded', init);
     </script>
     <script type="text/javascript"> function googleTranslateElementInit() { new google.translate.TranslateElement({ pageLanguage: 'es', includedLanguages: 'es,en,fr,de,it,pt,ja,ko,zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, autoDisplay: false }, 'google_translate_element'); } </script>
