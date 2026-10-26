@@ -71,7 +71,7 @@
         .goog-te-gadget { color: transparent !important; font-size: 0 !important; }
         .goog-te-gadget .goog-te-combo { margin: 0; }
         
-        #custom-bg { background-size: cover; background-position: center; opacity: 0.15; z-index: -1; mix-blend-mode: overlay; }
+        #custom-bg { background-size: cover; background-position: center; opacity: 0.40; z-index: -1; mix-blend-mode: overlay; }
     </style>
 </head>
 <body class="antialiased selection:bg-accent-purple selection:text-white relative">
@@ -119,7 +119,7 @@
 
     <div id="app-container" class="hidden opacity-0 transition-opacity duration-500">
         
-        <!-- Navigation -->
+        <!-- Navigation (5 Tabs) -->
         <nav class="glass-panel fixed bottom-0 w-full md:w-24 md:h-screen md:left-0 md:top-0 z-40 flex md:flex-col items-center justify-around md:justify-start md:pt-8 md:gap-6 pb-safe pt-2 md:pb-8 border-t md:border-t-0 md:border-r border-white/10 bg-dark-900/80">
             <div class="hidden md:flex flex-col items-center mb-4"><i class="ph-fill ph-television-simple text-3xl text-accent-purple"></i></div>
 
@@ -219,7 +219,7 @@
                 <div id="search-initial" class="w-full pb-10">
                     <div class="flex items-center gap-2 mb-6"><i class="ph-fill ph-sparkle text-2xl text-yellow-400"></i><h2 class="text-2xl font-bold">Estrenos y Tendencias</h2></div>
                     <div id="discover-loading" class="flex justify-center py-12"><div class="spinner border-t-yellow-400"></div></div>
-                    <div id="discover-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 hidden"></div>
+                    <div id="discover-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 hidden custom-scrollbar overflow-x-auto pb-4"></div>
                 </div>
                 
                 <div id="search-no-results" class="hidden flex-col items-center justify-center py-20 text-center"><i class="ph-duotone ph-ghost text-5xl text-gray-500 mb-3"></i><p class="text-gray-400">Sin resultados.</p></div>
@@ -263,6 +263,7 @@
                     <h1 class="text-3xl md:text-4xl font-bold mb-2">Tu <span class="text-gradient">Perfil</span></h1>
                 </header>
 
+                <!-- Stats Grid -->
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
                     <div class="glass-card p-6 rounded-3xl flex flex-col items-center text-center"><i class="ph-fill ph-television-simple text-4xl text-accent-purple mb-3"></i><h3 class="text-gray-400 text-xs font-bold uppercase mb-1">Series</h3><span id="stat-shows" class="text-4xl font-black text-white">0</span></div>
                     <div class="glass-card p-6 rounded-3xl flex flex-col items-center text-center"><i class="ph-fill ph-popcorn text-4xl text-yellow-400 mb-3"></i><h3 class="text-gray-400 text-xs font-bold uppercase mb-1">Episodios</h3><span id="stat-episodes" class="text-4xl font-black text-white">0</span></div>
@@ -273,13 +274,13 @@
                     <!-- Datos -->
                     <div class="glass-card p-6 rounded-2xl"><div class="flex items-center gap-3 mb-4"><i class="ph-fill ph-identification-card text-2xl text-blue-400"></i><h2 class="text-xl font-bold">Datos Personales</h2></div><div class="flex gap-3"><input type="text" id="profile-name-input" class="flex-1 bg-dark-800/80 rounded-xl py-3 px-4 text-white border border-white/10 outline-none focus:border-blue-400"><button onclick="updateUserProfile()" class="bg-blue-500 text-white px-6 py-3 rounded-xl font-bold transition-transform hover:scale-105 active:scale-95">Actualizar</button></div></div>
                     
-                    <!-- Avatar -->
+                    <!-- Avatar Customization -->
                     <div class="glass-card p-6 rounded-2xl">
                         <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-4"><h2 class="text-xl font-bold flex items-center gap-2"><i class="ph-fill ph-user-circle text-2xl text-accent-purple"></i> Foto de Perfil</h2><div class="relative bg-white/10 hover:bg-white/20 transition-all rounded-xl px-4 py-2 border border-white/20 cursor-pointer"><span class="text-sm font-bold text-white flex items-center gap-2"><i class="ph-bold ph-upload-simple"></i> Subir foto</span><input type="file" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="uploadCustomAvatar(event)"></div></div>
                         <div id="profile-avatar-grid" class="flex gap-4 overflow-x-auto pb-4 snap-x custom-scrollbar"></div>
                     </div>
 
-                    <!-- Background -->
+                    <!-- Background Customization -->
                     <div class="glass-card p-6 rounded-2xl">
                         <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-4"><h2 class="text-xl font-bold flex items-center gap-2"><i class="ph-fill ph-paint-brush text-2xl text-yellow-400"></i> Fondo de la App</h2><div class="flex gap-2"><button onclick="setCustomBg('')" class="bg-red-500/20 text-red-400 hover:bg-red-500/40 hover:text-white transition-all rounded-xl px-4 py-2 text-sm font-bold border border-red-500/20">Quitar</button><div class="relative bg-white/10 hover:bg-white/20 transition-all rounded-xl px-4 py-2 border border-white/20 cursor-pointer"><span class="text-sm font-bold text-white flex items-center gap-2"><i class="ph-bold ph-upload-simple"></i> Subir</span><input type="file" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="uploadCustomBg(event)"></div></div></div>
                         <div id="profile-bg-grid" class="flex gap-4 overflow-x-auto pb-4 snap-x custom-scrollbar"></div>
@@ -317,7 +318,7 @@
                                 <div class="flex flex-wrap items-center gap-4 text-sm text-gray-200 font-medium mb-4">
                                     <span id="detail-status" class="px-2 py-1 bg-white/10 border border-white/20 rounded-md uppercase font-bold text-[10px]"></span>
                                     <span><i class="ph-fill ph-clock mr-1"></i> <span id="detail-runtime-val">0</span>m</span>
-                                    <span class="px-2 py-1 bg-accent-purple/20 text-purple-300 border border-purple-500/30 rounded-md flex items-center gap-1 shadow-inner"><i class="ph-fill ph-users text-purple-400"></i> <span id="detail-comm-val" class="font-bold">--</span>/10</span>
+                                    <span class="px-3 py-1 bg-accent-purple/20 text-purple-300 border border-purple-500/30 rounded-full flex items-center gap-1.5 shadow-inner"><i class="ph-fill ph-star text-yellow-400"></i> <span id="detail-comm-val" class="font-bold text-white">--</span>/10</span>
                                 </div>
                                 <div id="detail-rating-container" class="flex items-center gap-2 star-rating hidden bg-dark-900/50 px-4 py-2 rounded-xl w-max">
                                     <span class="text-xs text-gray-400 uppercase font-bold">Tu Nota:</span>
@@ -348,7 +349,7 @@
                         </div>
                     </div>
 
-                    <!-- Tabs Nav -->
+                    <!-- Tabs Nav inside Show Detail -->
                     <div class="px-6 md:px-10 pt-4">
                         <div class="flex gap-4 border-b border-white/10 pb-3 overflow-x-auto snap-x custom-scrollbar">
                             <button onclick="switchDetailTab('eps')" id="tab-det-eps" class="text-accent-purple font-bold border-b-2 border-accent-purple pb-2 px-2 whitespace-nowrap flex items-center gap-2 transition-colors"><i class="ph-bold ph-list-numbers"></i> Episodios</button>
@@ -379,7 +380,7 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- Right: Heatmap Ratings -->
+                        <!-- Right: Heatmap Ratings Matrix -->
                         <div class="glass-card p-6 rounded-2xl border border-white/5 overflow-x-auto w-full custom-scrollbar">
                             <h3 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="ph-fill ph-squares-four text-yellow-400"></i> Valoraciones de episodios</h3>
                             <div id="show-ratings-chart"></div>
@@ -466,9 +467,8 @@
         let trackedShows = {}; let followingUsers = {}; let allPublicUsers = []; let userSettings = { history: [], background: '' };
         let currentDetailShowId = null, currentDetailEpisodesData = []; 
         let tvmazeCache = {}; let currentLibraryFilter = 'watching'; let currentActiveView = 'dashboard';
-        let currentModalEpId = null, unsubscribeCurrentEpComm = null, unsubscribeCurrentShowComm = null, unsubscribeShowComm = null;
+        let currentModalEpId = null, unsubscribeCurrentEpComm = null, unsubscribeShowComm = null;
         let currentShowCommData = null; 
-        let dashboardRenderId = 0;
         let hasLoadedInitialData = false;
 
         const $ = (id) => document.getElementById(id);
@@ -538,7 +538,6 @@
                         
                         if(!hasLoadedInitialData) {
                             hasLoadedInitialData = true;
-                            // Datos confirmados por Firebase. Ya es seguro mostrar la App y el Inicio.
                             $('auth-screen').classList.add('hidden'); $('init-screen').classList.add('hidden');
                             $('app-container').classList.remove('hidden'); setTimeout(() => $('app-container').classList.remove('opacity-0'), 50);
                             switchView('dashboard');
@@ -594,9 +593,9 @@
         window.renderAvatarOptions = () => {
             const grid = $('profile-avatar-grid'); if(!grid) return;
             const defs = [
-                'https://static.tvmaze.com/uploads/images/medium_portrait/497/1244306.jpg', // One Piece
-                'https://static.tvmaze.com/uploads/images/medium_portrait/397/993710.jpg', // Stranger Things
-                'https://static.tvmaze.com/uploads/images/medium_portrait/402/1007479.jpg', // Cyberpunk
+                'https://static.tvmaze.com/uploads/images/medium_portrait/497/1244306.jpg', 
+                'https://static.tvmaze.com/uploads/images/medium_portrait/397/993710.jpg', 
+                'https://static.tvmaze.com/uploads/images/medium_portrait/402/1007479.jpg', 
                 'https://images.unsplash.com/photo-1568602471122-7832951cc4c5?q=80&w=200&auto=format&fit=crop',
                 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop'
             ];
@@ -673,7 +672,6 @@
         async function renderDashboard() {
             if(!user || currentActiveView !== 'dashboard') return; 
             const allShows = Object.values(trackedShows);
-            const myRenderId = ++dashboardRenderId;
             
             $('dash-continue-empty').classList.add('hidden'); $('dash-upcoming-empty').classList.add('hidden');
             
@@ -714,7 +712,6 @@
                     }
                 });
                 await Promise.all(promises);
-                if(myRenderId !== dashboardRenderId) return;
                 
                 if(upcoming.length > 0) {
                     upcoming.sort((a,b) => new Date(a.ep.airdate) - new Date(b.ep.airdate)).slice(0,6).forEach(ev => {
@@ -726,10 +723,8 @@
                 if(!hasCont) $('dash-continue-empty').classList.remove('hidden');
                 
             } catch (err) {} finally { 
-                if(myRenderId === dashboardRenderId) {
-                    $('dash-loading').classList.add('hidden'); 
-                    $('dash-content').classList.remove('hidden');
-                }
+                $('dash-loading').classList.add('hidden'); 
+                $('dash-content').classList.remove('hidden');
             }
         }
 
@@ -787,7 +782,7 @@
                     $('discover-loading').classList.remove('hidden');
                     try { const res = await fetch('https://api.tvmaze.com/schedule?country=US'); const data = await res.json();
                         const showsMap = {}; data.forEach(item => { if(item.show?.image) showsMap[item.show.id] = item.show; });
-                        $('discover-grid').innerHTML = Object.values(showsMap).slice(0, 12).map(show => `<div class="glass-card rounded-2xl overflow-hidden cursor-pointer group relative hover:scale-[1.03] transition-transform" onclick="openShowDetail(${show.id})"><div class="relative aspect-[2/3] bg-dark-800"><img src="${show.image.medium}" class="w-full h-full object-cover group-hover:scale-105 transition-transform"><div class="absolute bottom-0 w-full p-3 bg-gradient-to-t from-dark-900 to-transparent flex justify-between"><span class="text-xs font-bold text-yellow-400 drop-shadow"><i class="ph-fill ph-star"></i> ${show.rating?.average||'-'}</span></div></div><div class="p-3 bg-dark-800/80"><h3 class="font-bold text-sm line-clamp-1">${show.name}</h3></div></div>`).join('');
+                        $('discover-grid').innerHTML = Object.values(showsMap).slice(0, 12).map(show => `<div class="glass-card rounded-2xl overflow-hidden cursor-pointer group relative hover:scale-[1.03] transition-transform flex-none w-44" onclick="openShowDetail(${show.id})"><div class="relative aspect-[2/3] bg-dark-800"><img src="${show.image.medium}" class="w-full h-full object-cover group-hover:scale-105 transition-transform"><div class="absolute bottom-0 w-full p-3 bg-gradient-to-t from-dark-900 to-transparent flex justify-between"><span class="text-xs font-bold text-yellow-400 drop-shadow"><i class="ph-fill ph-star"></i> ${show.rating?.average||'-'}</span></div></div><div class="p-3 bg-dark-800/80"><h3 class="font-bold text-sm line-clamp-1">${show.name}</h3></div></div>`).join('');
                         $('discover-loading').classList.add('hidden'); $('discover-grid').classList.remove('hidden');
                     } catch(e) {}
                 }
@@ -916,7 +911,13 @@
                 $('detail-genres').innerHTML = (apiData.genres||[]).map(g=>`<span class="px-3 py-1 border border-white/20 bg-dark-900/50 rounded-full text-xs font-bold shadow-inner">${g}</span>`).join('');
                 
                 const rCont = $('detail-rating-container');
-                if(isTracked) { rCont.classList.remove('hidden'); const mRat = trackedShows[apiData.id].rating || 0; rCont.querySelectorAll('.ph-star').forEach((s, i) => { s.classList.toggle('ph-fill', i < mRat); s.onclick = () => rateShow(apiData.id, i + 1); });
+                if(isTracked) { 
+                    rCont.classList.remove('hidden'); 
+                    const mRat = trackedShows[apiData.id].rating || 0; 
+                    rCont.querySelectorAll('.ph-star').forEach((s, i) => { 
+                        s.classList.toggle('ph-fill', i < mRat); 
+                        s.onclick = () => rateShow(apiData.id, i + 1); 
+                    });
                     $('detail-status-select').value = trackedShows[apiData.id].status || 'planned';
                 } else { rCont.classList.add('hidden'); }
 
@@ -954,7 +955,7 @@
                     const head = document.createElement('div'); head.className = "bg-dark-700/50 p-4 flex items-center justify-between cursor-pointer group"; head.id = `sh-${sNum}`;
                     head.innerHTML = `
                         <div class="flex items-center gap-3"><i class="ph-bold ph-caret-down text-gray-400 transition-transform group-hover:text-white"></i><h4 class="font-bold">Temporada ${sNum}</h4><span class="text-xs text-gray-400">(${seasonWatched}/${seasonAired.length} vistos)</span></div>
-                        ${isTracked ? `<button onclick="event.stopPropagation(); toggleSeason(${apiData.id}, ${sNum}, ${isSeasonComplete})" class="w-8 h-8 rounded-full border-2 ${isSeasonComplete?'border-accent-emerald bg-accent-emerald text-white hover:bg-red-500 hover:border-red-500 hover:text-white':'border-white/20 text-gray-400 hover:border-white hover:text-white'} flex items-center justify-center transition-all group-btn"><i class="ph-bold ${isSeasonComplete?'ph-check group-btn-hover:ph-x':'ph-check'}"></i></button>` : ''}
+                        ${isTracked ? `<button onclick="event.stopPropagation(); toggleSeason(${apiData.id}, ${sNum}, ${isSeasonComplete})" class="w-8 h-8 rounded-full border-2 ${isSeasonComplete?'border-red-500 bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white':'border-accent-emerald bg-emerald-500/20 text-emerald-400 hover:bg-accent-emerald hover:text-white'} flex items-center justify-center transition-all group-btn"><i class="ph-bold ${isSeasonComplete?'ph-x':'ph-check'}"></i></button>` : ''}
                     `;
                     
                     const list = document.createElement('div'); list.className = "grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 p-4 hidden";
@@ -1007,6 +1008,7 @@
                 showToast("Serie eliminada", "info"); closeDetailView(); if(currentActiveView==='library') renderLibrary(); renderAvatarOptions();
             });
         };
+
         window.rateShow = async (id, val) => {
             if(!user || !trackedShows[id]) return; 
             const oldVal = trackedShows[id].rating || 0;
@@ -1017,7 +1019,6 @@
             const rCont = $('detail-rating-container'); 
             if(rCont) rCont.querySelectorAll('.ph-star').forEach((s, i) => s.classList.toggle('ph-fill', i < val));
             
-            // Actualizar nota global de la Serie en la base de datos comunitaria
             const sDocRef = doc(db, 'artifacts', firebaseConfig.appId, 'public', 'data', `shows_comm_global`, id.toString());
             const sDoc = await getDoc(sDocRef);
             let curSum = 0, curCount = 0;
@@ -1027,22 +1028,24 @@
             }
             
             let newSum, newCount;
-            // Si es la primera nota comunitaria registrada, reiniciamos el contador pase lo que pase
-            if (curCount === 0) {
+            if (curCount === 0 || isNaN(curSum) || isNaN(curCount)) {
                 newSum = val;
                 newCount = 1;
+            } else if (oldVal === 0) {
+                newSum = curSum + val;
+                newCount = curCount + 1;
             } else {
                 newSum = curSum - oldVal + val;
-                newCount = oldVal === 0 ? curCount + 1 : curCount;
+                newCount = curCount;
             }
             
-            // Salvaguardas anti-bugs (Infinity o NaN)
             if (newSum < 0) newSum = val;
             if (newCount <= 0) newCount = 1;
 
             await setDoc(sDocRef, { sum: newSum, count: newCount }, {merge: true});
             
-            $('detail-comm-val').innerText = ((newSum / newCount) * 2).toFixed(1);
+            const avg = (newSum / newCount) * 2;
+            $('detail-comm-val').innerText = isNaN(avg) ? "--" : avg.toFixed(1);
             showToast("Valoración general guardada", "success");
         };
 
@@ -1060,6 +1063,10 @@
                             unviewed.forEach(ue => { sData.episodesWatched[ue.id] = 1; });
                             sData.episodesWatched[epId] = next;
                             await updateDoc(doc(db, 'users', user.uid, 'shows', sId.toString()), { episodesWatched: sData.episodesWatched });
+                            checkAutoStatus(sId); openShowDetail(sId); renderDashboard(); logHistory(sId, sData.name, epId, targetEp.name, targetEp.season, targetEp.number, targetEp.image?.medium);
+                        }, () => {
+                            sData.episodesWatched[epId] = next;
+                            updateDoc(doc(db, 'users', user.uid, 'shows', sId.toString()), { [`episodesWatched.${epId}`]: next });
                             checkAutoStatus(sId); openShowDetail(sId); renderDashboard(); logHistory(sId, sData.name, epId, targetEp.name, targetEp.season, targetEp.number, targetEp.image?.medium);
                         });
                         return;
@@ -1118,7 +1125,6 @@
             const list = $('show-comments-list'); list.innerHTML = `<div class="spinner mx-auto my-10 border-t-accent-purple"></div>`;
             if(unsubscribeShowComm) unsubscribeShowComm();
             
-            // 1. Cargar Comentarios de la serie
             unsubscribeShowComm = onSnapshot(collection(db, 'artifacts', firebaseConfig.appId, 'public', 'data', `shows_comm_${showId}_comments`), (snapshot) => {
                 const comments = []; snapshot.forEach(d => comments.push(d.data()));
                 comments.sort((a,b) => new Date(b.date) - new Date(a.date));
@@ -1126,21 +1132,19 @@
                 list.innerHTML = comments.map(c => `<div class="flex gap-3 bg-dark-900/60 p-3 rounded-xl border border-white/5"><div class="w-9 h-9 rounded-full overflow-hidden shrink-0 bg-dark-800">${getAvatarHTML(c.userPhoto, c.userName)}</div><div class="flex-1 min-w-0"><div class="flex justify-between items-center mb-1"><h5 class="font-bold text-xs text-purple-300 truncate">${c.userName}</h5><span class="text-[9px] text-gray-500">${new Date(c.date).toLocaleDateString('es-ES')}</span></div><p class="text-xs text-gray-200 leading-relaxed">${c.text}</p></div></div>`).join('');
             });
 
-            // 2. Cargar Nota Global de la Serie
             getDoc(doc(db, 'artifacts', firebaseConfig.appId, 'public', 'data', `shows_comm_global`, showId.toString())).then(docSnap => {
                 if(docSnap.exists() && docSnap.data().count > 0) {
-                    $('detail-comm-val').innerText = ((docSnap.data().sum / docSnap.data().count) * 2).toFixed(1);
+                    const avg = (docSnap.data().sum / docSnap.data().count) * 2;
+                    $('detail-comm-val').innerText = isNaN(avg) ? "--" : avg.toFixed(1);
                 } else {
                     $('detail-comm-val').innerText = "--";
                 }
             });
 
-            // 3. Cargar Esquema de Notas (Heatmap de Episodios)
             getDocs(collection(db, 'artifacts', firebaseConfig.appId, 'public', 'data', `shows_comm_${showId}_ratings`)).then(snap => {
                 const ratingsMap = {};
                 snap.forEach(d => { ratingsMap[d.id] = d.data(); });
                 currentShowCommData = ratingsMap;
-                // Importante: No lleva #
                 if(!$('det-tab-comm').classList.contains('hidden')) renderHeatmap();
             });
         }
@@ -1179,7 +1183,7 @@
                         valStr = avg.toFixed(1);
                         if(avg >= 9.0) bg = "bg-[#0ea5e9] text-white font-bold shadow-lg"; 
                         else if(avg >= 7.5) bg = "bg-[#10b981] text-white font-bold"; 
-                        else if(avg >= 6.0) bg = "bg-[#f59e0b] text-white font-bold text-gray-900"; 
+                        else if(avg >= 6.0) bg = "bg-[#f59e0b] text-gray-900 font-bold"; 
                         else bg = "bg-[#8b5cf6] text-white font-bold"; 
                     } else if (ep.airdate && new Date(ep.airdate) <= new Date()) {
                         bg = "bg-dark-800 border border-white/5 text-gray-600"; valStr = "-";
@@ -1189,7 +1193,7 @@
                 html += `</tr>`;
             }
 
-            html += `<tr><td class="p-2 text-gray-400 font-bold text-[10px] text-right pr-2 uppercase mt-2 block">Prom.</td>`;
+            html += `<tr><td class="p-2 text-gray-400 font-bold text-[10px] text-right pr-2 uppercase mt-2 block">PROM.</td>`;
             seasons.forEach(s => {
                 let sum = 0, count = 0;
                 sMap[s].forEach(ep => {
@@ -1255,15 +1259,14 @@
                 list.innerHTML = comments.map(c => `<div class="flex gap-3 bg-dark-900/60 p-3 rounded-xl border border-white/5"><div class="w-9 h-9 rounded-full overflow-hidden shrink-0 bg-dark-800">${getAvatarHTML(c.userPhoto, c.userName)}</div><div class="flex-1 min-w-0"><div class="flex justify-between items-center mb-1"><h5 class="font-bold text-xs text-purple-300 truncate">${c.userName}</h5><span class="text-[9px] text-gray-500">${new Date(c.date).toLocaleDateString('es-ES')}</span></div><p class="text-xs text-gray-200 leading-relaxed">${c.text}</p></div></div>`).join('');
             });
 
-            // Get Episode rating doc
             const rDocRef = doc(db, 'artifacts', firebaseConfig.appId, 'public', 'data', `shows_comm_${currentDetailShowId}_ratings`, epId.toString());
             const rDoc = await getDoc(rDocRef);
             if(rDoc.exists()) {
                 const d = rDoc.data();
-                $('ep-modal-comm-rating').innerText = d.count > 0 ? ((d.sum / d.count) * 2).toFixed(1) : "--";
+                const avg = d.count > 0 ? (d.sum / d.count) * 2 : null;
+                $('ep-modal-comm-rating').innerText = (avg !== null && !isNaN(avg) && avg !== Infinity) ? avg.toFixed(1) : "--";
             } else { $('ep-modal-comm-rating').innerText = "--"; }
 
-            // User rating stars (Episode)
             const userRatingRef = doc(db, 'users', user.uid, 'episode_ratings', epId.toString());
             const uRatingDoc = await getDoc(userRatingRef);
             let userVal = uRatingDoc.exists() ? uRatingDoc.data().rating : 0;
@@ -1274,18 +1277,33 @@
                     const stars = i + 1;
                     await setDoc(userRatingRef, { rating: stars });
                     
-                    // Fetch fresh document to avoid desync
                     const freshRDoc = await getDoc(rDocRef);
-                    const curSum = freshRDoc.exists() ? freshRDoc.data().sum : 0;
-                    const curCount = freshRDoc.exists() ? freshRDoc.data().count : 0;
+                    let curSum = 0, curCount = 0;
+                    if (freshRDoc.exists()) {
+                        curSum = freshRDoc.data().sum || 0;
+                        curCount = freshRDoc.data().count || 0;
+                    }
                     
-                    const newSum = curSum - userVal + stars;
-                    const newCount = userVal === 0 ? curCount + 1 : curCount;
+                    let newSum, newCount;
+                    if (curCount === 0 || isNaN(curSum) || isNaN(curCount) || curSum === null) {
+                        newSum = stars;
+                        newCount = 1;
+                    } else if (userVal === 0) {
+                        newSum = curSum + stars;
+                        newCount = curCount + 1;
+                    } else {
+                        newSum = curSum - userVal + stars;
+                        newCount = curCount;
+                    }
                     
+                    if(newSum < 0) newSum = stars;
+                    if(newCount <= 0) newCount = 1;
+
                     await setDoc(rDocRef, { sum: newSum, count: newCount });
-                    userVal = stars; // Local update
+                    userVal = stars;
                     
-                    $('ep-modal-comm-rating').innerText = ((newSum / newCount) * 2).toFixed(1);
+                    const avg = (newSum / newCount) * 2;
+                    $('ep-modal-comm-rating').innerText = (isNaN(avg) || avg === Infinity) ? "--" : avg.toFixed(1);
                     $('ep-modal-user-rating').querySelectorAll('.ph-star').forEach((st, idx) => st.classList.toggle('ph-fill', idx < stars));
                     showToast("Valoración de episodio guardada", "success");
                     setupShowCommunity(currentDetailShowId); 
@@ -1401,7 +1419,6 @@
 
         window.closePublicProfile = () => { $('view-public-profile').classList.add('translate-x-full'); };
 
-        // Start App
         init();
     </script>
 </body>
