@@ -1,33 +1,25 @@
 {
-"name": "BingeTracker",
-"short_name": "BingeTracker",
-"start_url": "./?source=pwa",
-"scope": "./",
-"display": "standalone",
-"background_color": "#0B0F19",
-"theme_color": "#0B0F19",
-"description": "Tu gestor personal para registrar series, anime y películas. Control de episodios, estadísticas en tiempo real y comunidad.",
-"orientation": "portrait",
-"icons": [
-{
-"src": "BingeTracker.png",
-"sizes": "192x192",
-"type": "image/png",
-"purpose": "any maskable"
-},
-{
-"src": "BingeTracker.png",
-"sizes": "512x512",
-"type": "image/png",
-"purpose": "any maskable"
-}
-],
-"screenshots": [
-{
-"src": "screenshot1.png",
-"sizes": "1280x720",
-"type": "image/png",
-"form_factor": "wide"
-}
-]
+  "name": "BingeTracker",
+  "short_name": "BingeTracker",
+  "start_url": "/BingeTracker/bingetracker.html",
+  "scope": "/BingeTracker/",
+  "display": "standalone",
+  "background_color": "#0B0F19",
+  "theme_color": "#0B0F19",
+  "description": "Tu gestor personal para registrar series, anime y películas.",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/BingeTracker/BingeTracker.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/BingeTracker/BingeTracker.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
 }
