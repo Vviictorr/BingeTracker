@@ -1,7 +1,8 @@
 {
 "name": "BingeTracker",
 "short_name": "BingeTracker",
-"start_url": "/",
+"start_url": "./?source=pwa",
+"scope": "./",
 "display": "standalone",
 "background_color": "#0B0F19",
 "theme_color": "#0B0F19",
