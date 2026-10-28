@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="icon" href="BingeTracker.png">
     <title>BingeTracker - Tu Gestor de Series</title>
-    
+
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0B0F19">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -40,16 +40,16 @@
         .glass-card { background: linear-gradient(145deg, rgba(31, 41, 63, 0.5) 0%, rgba(21, 28, 44, 0.7) 100%); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); transition: transform 0.2s ease, box-shadow 0.2s ease; }
         .glass-card:hover { transform: translateY(-4px); box-shadow: 0 10px 30px -10px rgba(139, 92, 246, 0.3); border: 1px solid rgba(139, 92, 246, 0.3); }
         .text-gradient { background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-image: linear-gradient(to right, #8B5CF6, #10B981); }
-        
+
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: rgba(11, 15, 25, 0.5); border-radius: 10px; }
         ::-webkit-scrollbar-thumb { background: #1F293F; border-radius: 10px; border: 2px solid #0B0F19; }
         ::-webkit-scrollbar-thumb:hover { background: #8B5CF6; }
         .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
-        
+
         .snap-x { scroll-snap-type: x mandatory; overflow-x: auto; padding-bottom: 12px; }
-        
+
         /* Number Input Reset */
         input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         input[type=number] { -moz-appearance: textfield; }
@@ -62,7 +62,7 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .star-rating .ph-star { transition: color 0.2s, transform 0.1s; cursor: pointer; }
         .star-rating .ph-star:hover { transform: scale(1.2); }
-        
+
         /* Translate Overrides */
         .goog-te-banner-frame.skiptranslate, .skiptranslate iframe { display: none !important; }
         body { top: 0px !important; }
@@ -71,7 +71,7 @@
         .goog-logo-link { display: none !important; }
         .goog-te-gadget { color: transparent !important; font-size: 0 !important; }
         .goog-te-gadget .goog-te-combo { margin: 0; }
-        
+
         #custom-bg { background-size: cover; background-position: center; opacity: 1; z-index: -1; mix-blend-mode: color-dodge; }
     </style>
 </head>
@@ -93,19 +93,19 @@
             </div>
         </div>
     </div>
-    
+
     <div id="toast-container" class="fixed top-4 left-1/2 transform -translate-x-1/2 z-[160] flex flex-col gap-2 pointer-events-none"></div>
 
     <!-- Auth Screens -->
     <div id="init-screen" class="fixed inset-0 z-[100] bg-dark-900 flex flex-col items-center justify-center transition-opacity duration-500">
-        <i class="ph-fill ph-television-simple text-6xl text-accent-purple mb-4 animate-pulse"></i>
+        <img src="BingeTracker.png" alt="Logo" class="w-20 h-20 rounded-2xl mb-4 animate-pulse shadow-xl object-cover border border-white/10">
         <h1 class="text-3xl font-bold text-gradient mb-6">BingeTracker</h1>
         <div class="spinner"></div>
     </div>
 
     <div id="auth-screen" class="fixed inset-0 z-[90] bg-dark-900 flex flex-col items-center justify-center hidden">
         <div class="glass-card p-8 rounded-3xl w-[90%] max-w-md flex flex-col relative z-10 animate-slide-up">
-            <div class="flex justify-center mb-4"><i class="ph-fill ph-television-simple text-5xl text-accent-emerald"></i></div>
+            <div class="flex justify-center mb-4"><img src="BingeTracker.png" alt="Logo" class="w-16 h-16 rounded-2xl shadow-xl object-cover border border-white/10"></div>
             <h2 class="text-3xl font-bold mb-6 text-center text-white" id="auth-title">Bienvenido</h2>
             <form id="auth-form" class="flex flex-col gap-4">
                 <input type="email" id="auth-email" placeholder="Correo Electrónico" class="w-full bg-dark-800/80 border border-white/10 focus:border-accent-purple rounded-xl py-3 px-4 outline-none text-white" required>
@@ -119,10 +119,10 @@
     </div>
 
     <div id="app-container" class="hidden opacity-0 transition-opacity duration-500">
-        
+
         <!-- Navigation (5 Tabs) -->
         <nav class="glass-panel fixed bottom-0 w-full md:w-24 md:h-screen md:left-0 md:top-0 z-40 flex md:flex-col items-center justify-around md:justify-start md:pt-8 md:gap-6 pb-safe pt-2 md:pb-8 border-t md:border-t-0 md:border-r border-white/10 bg-dark-900/80">
-            <div class="hidden md:flex flex-col items-center mb-4"><i class="ph-fill ph-television-simple text-3xl text-accent-purple"></i></div>
+            <div class="hidden md:flex flex-col items-center mb-4"><img src="BingeTracker.png" alt="Logo" class="w-10 h-10 rounded-xl object-cover border border-white/10 shadow"></div>
 
             <button onclick="switchView('dashboard')" id="nav-dashboard" class="nav-btn flex flex-col items-center gap-1 p-2 md:p-3 text-gray-400 hover:text-white group active">
                 <i class="ph ph-house text-2xl group-[.active]:text-accent-emerald group-[.active]:ph-fill transition-all"></i><span class="text-[10px] font-medium uppercase group-[.active]:text-white">Inicio</span>
@@ -146,7 +146,7 @@
         </nav>
 
         <main class="main-content scroll-smooth relative">
-            
+
             <!-- VIEW: DASHBOARD -->
             <section id="view-dashboard" class="view-section hidden p-4 md:p-8 max-w-7xl mx-auto w-full">
                 <header class="mb-8 flex justify-between items-center mt-2 md:mt-0">
@@ -154,10 +154,14 @@
                         <h1 class="text-3xl md:text-4xl font-bold mb-1">Hola, <span class="text-gradient" id="dash-user-name">Maratonista</span></h1>
                         <p class="text-gray-400 text-sm">Aquí tienes tu resumen del día.</p>
                     </div>
+                    <!-- Botón de Instalación PWA (Oculto por defecto hasta que sea instalable) -->
+                    <button id="install-btn" class="hidden bg-accent-emerald/20 hover:bg-accent-emerald/30 border border-accent-emerald/40 text-emerald-300 px-4 py-2.5 rounded-xl font-bold text-xs items-center gap-2 transition-transform hover:scale-105 active:scale-95 shadow-lg">
+                        <i class="ph-bold ph-download-simple text-base">></i> Instalar App
+                    </button>
                 </header>
-                
+
                 <div id="dash-loading" class="flex flex-col items-center justify-center py-12"><div class="spinner mb-4 border-t-accent-emerald"></div></div>
-                
+
                 <div id="dash-content" class="space-y-10 hidden">
                     <!-- Continuar Viendo -->
                     <div>
@@ -213,22 +217,22 @@
                     </div>
                     <div class="glass-card p-6 rounded-2xl"><p class="text-xs text-gray-400 mb-2 font-bold uppercase">Géneros</p><div id="search-genre-chips" class="flex flex-wrap gap-2"></div></div>
                 </header>
-                
+
                 <div id="search-loading" class="hidden justify-center items-center flex-col py-12 gap-4"><div class="spinner w-10 h-10 border-4"></div><p class="text-blue-400 text-sm animate-pulse" id="search-loading-text">Buscando...</p></div>
-                
+
                 <!-- Discover (Shown when Search is empty) -->
                 <div id="search-initial" class="w-full pb-10">
                     <div class="flex items-center gap-2 mb-6"><i class="ph-fill ph-sparkle text-2xl text-yellow-400"></i><h2 class="text-2xl font-bold">Estrenos y Tendencias</h2></div>
                     <div id="discover-loading" class="flex justify-center py-12"><div class="spinner border-t-yellow-400"></div></div>
                     <div id="discover-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 hidden custom-scrollbar overflow-x-auto pb-4"></div>
                 </div>
-                
+
                 <div id="search-no-results" class="hidden flex-col items-center justify-center py-20 text-center"><i class="ph-duotone ph-ghost text-5xl text-gray-500 mb-3"></i><p class="text-gray-400">Sin resultados.</p></div>
                 <div id="search-results" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4"></div>
-                
+
                 <div id="search-pagination" class="hidden justify-center items-center gap-4 mt-10 mb-8 w-full">
                     <button id="btn-prev-page" class="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex justify-center items-center disabled:opacity-30 transition"><i class="ph-bold ph-caret-left text-xl"></i></button>
-                    
+
                     <div class="flex items-center gap-2">
                         <span class="text-sm text-gray-400 font-bold uppercase">Pág</span>
                         <input type="number" id="search-page-input" value="1" min="1" class="w-14 h-12 bg-dark-800/80 border border-white/10 focus:border-blue-400 rounded-xl text-center text-white font-bold text-lg outline-none appearance-none transition">
@@ -265,16 +269,17 @@
                 </header>
 
                 <!-- Stats Grid -->
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
                     <div class="glass-card p-6 rounded-3xl flex flex-col items-center text-center"><i class="ph-fill ph-television-simple text-4xl text-accent-purple mb-3"></i><h3 class="text-gray-400 text-xs font-bold uppercase mb-1">Series</h3><span id="stat-shows" class="text-4xl font-black text-white">0</span></div>
-                    <div class="glass-card p-6 rounded-3xl flex flex-col items-center text-center"><i class="ph-fill ph-popcorn text-4xl text-yellow-400 mb-3"></i><h3 class="text-gray-400 text-xs font-bold uppercase mb-1">Episodios</h3><span id="stat-episodes" class="text-4xl font-black text-white">0</span></div>
-                    <div class="glass-card p-6 rounded-3xl flex flex-col items-center text-center"><i class="ph-fill ph-clock text-4xl text-accent-emerald mb-3"></i><h3 class="text-gray-400 text-xs font-bold uppercase mb-1">Tiempo Total</h3><div class="flex items-end justify-center gap-1"><span id="stat-time-days" class="text-4xl font-black text-white">0</span><span class="text-gray-400 text-xs mb-1.5 mr-1 font-bold">d</span><span id="stat-time-hours" class="text-4xl font-black text-white">0</span><span class="text-gray-400 text-xs mb-1.5 font-bold">h</span></div></div>
+                    <div class="glass-card p-6 rounded-3xl flex flex-col items-center text-center"><i class="ph-fill ph-popcorn text-4xl text-yellow-400 mb-3"></i><h3 class="text-gray-400 text-xs font-bold uppercase mb-1">Episodios Vistos</h3><span id="stat-episodes" class="text-4xl font-black text-white">0</span></div>
+                    <div class="glass-card p-6 rounded-3xl flex flex-col items-center text-center"><i class="ph-fill ph-clock text-4xl text-accent-emerald mb-3"></i><h3 class="text-gray-400 text-xs font-bold uppercase mb-1">Tiempo Visto</h3><div class="flex items-end justify-center gap-1"><span id="stat-time-days" class="text-3xl font-black text-white">0</span><span class="text-gray-400 text-xs mb-1.5 mr-1 font-bold">d</span><span id="stat-time-hours" class="text-3xl font-black text-white">0</span><span class="text-gray-400 text-xs mb-1.5 font-bold">h</span></div></div>
+                    <div class="glass-card p-6 rounded-3xl flex flex-col items-center text-center border-accent-purple/30"><i class="ph-fill ph-hourglass-high text-4xl text-purple-400 mb-3"></i><h3 class="text-gray-400 text-xs font-bold uppercase mb-1">Pendiente (Al Día)</h3><div class="flex items-end justify-center gap-1"><span id="stat-pending-days" class="text-3xl font-black text-white">0</span><span class="text-gray-400 text-xs mb-1.5 mr-1 font-bold">d</span><span id="stat-pending-hours" class="text-3xl font-black text-white">0</span><span class="text-gray-400 text-xs mb-1.5 font-bold">h</span></div></div>
                 </div>
 
                 <div class="space-y-6">
                     <!-- Datos -->
                     <div class="glass-card p-6 rounded-2xl"><div class="flex items-center gap-3 mb-4"><i class="ph-fill ph-identification-card text-2xl text-blue-400"></i><h2 class="text-xl font-bold">Datos Personales</h2></div><div class="flex gap-3"><input type="text" id="profile-name-input" class="flex-1 bg-dark-800/80 rounded-xl py-3 px-4 text-white border border-white/10 outline-none focus:border-blue-400"><button onclick="updateUserProfile()" class="bg-blue-500 text-white px-6 py-3 rounded-xl font-bold transition-transform hover:scale-105 active:scale-95">Actualizar</button></div></div>
-                    
+
                     <!-- Avatar Customization -->
                     <div class="glass-card p-6 rounded-2xl">
                         <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-4"><h2 class="text-xl font-bold flex items-center gap-2"><i class="ph-fill ph-user-circle text-2xl text-accent-purple"></i> Foto de Perfil</h2><div class="relative bg-white/10 hover:bg-white/20 transition-all rounded-xl px-4 py-2 border border-white/20 cursor-pointer"><span class="text-sm font-bold text-white flex items-center gap-2"><i class="ph-bold ph-upload-simple"></i> Subir foto</span><input type="file" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="uploadCustomAvatar(event)"></div></div>
@@ -288,11 +293,15 @@
                     </div>
 
                     <!-- Translate -->
-                    <div class="glass-card p-6 rounded-2xl"><div class="flex items-center gap-3 mb-4"><i class="ph-fill ph-translate text-2xl text-accent-emerald"></i><h2 class="text-xl font-bold">Traductor Global</h2></div><p class="text-sm text-gray-400 mb-3">Si seleccionas español, traducirá todas las descripciones de series que vienen en inglés.</p><div id="google_translate_element" class="bg-dark-800/50 p-4 rounded-xl border border-white/10 inline-block"></div></div>
+                    <div class="glass-card p-6 rounded-2xl">
+                        <div class="flex items-center gap-3 mb-4"><i class="ph-fill ph-translate text-2xl text-accent-emerald"></i><h2 class="text-xl font-bold">Traductor Global</h2></div>
+                        <p class="text-sm text-gray-400 mb-3">Selecciona tu idioma para traducir automáticamente todas las descripciones e información de las series.</p>
+                        <div id="google_translate_element" class="bg-dark-800/50 p-4 rounded-xl border border-white/10 inline-block"></div>
+                    </div>
 
                     <!-- Security -->
                     <div class="glass-card p-6 rounded-2xl border border-red-500/10 bg-red-500/5"><div class="flex items-center gap-3 mb-4"><i class="ph-fill ph-lock-key text-2xl text-red-400"></i><h2 class="text-xl font-bold text-red-100">Seguridad</h2></div><div class="flex gap-3"><input type="password" id="profile-password-input" placeholder="Nueva contraseña..." class="flex-1 bg-dark-900 border border-red-500/20 rounded-xl py-3 px-4 text-white outline-none focus:border-red-400"><button onclick="updateUserPassword()" class="bg-red-500 text-white px-6 py-3 rounded-xl font-bold transition-transform hover:scale-105 active:scale-95">Cambiar</button></div></div>
-                    
+
                     <button onclick="handleSignOut()" class="w-full bg-red-500/10 hover:bg-red-500/20 transition-colors text-red-400 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 border border-red-500/20"><i class="ph-bold ph-sign-out"></i> Cerrar Sesión</button>
                 </div>
             </section>
@@ -303,9 +312,9 @@
                     <button onclick="closeDetailView()" class="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors"><i class="ph-bold ph-caret-left text-xl"></i></button>
                     <div id="detail-actions" class="flex gap-2"></div>
                 </div>
-                
+
                 <div id="detail-loading" class="flex-1 flex items-center justify-center hidden"><div class="spinner w-12 h-12 border-4 border-t-accent-purple"></div></div>
-                
+
                 <div id="detail-content" class="pb-24 max-w-5xl mx-auto w-full hidden">
                     <!-- Hero -->
                     <div class="relative w-full h-[45vh] md:h-[55vh]">
@@ -368,7 +377,7 @@
                         <div id="detail-seasons" class="space-y-6"></div>
                     </div>
 
-                    <!-- TAB: COMMUNITY & HEATMAP (Comments Left, Scores Right) -->
+                    <!-- TAB: COMMUNITY & HEATMAP -->
                     <div id="det-tab-comm" class="px-6 md:px-10 pb-10 pt-6 hidden grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
                         <!-- Left: Comments -->
                         <div class="flex flex-col h-[520px]">
@@ -421,7 +430,7 @@
                     <div id="pub-shows-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6"></div>
                 </div>
             </section>
-            
+
             <!-- OVERLAY: EPISODE MODAL -->
             <section id="ep-modal" class="fixed inset-0 z-[100] bg-dark-900/95 backdrop-blur-xl transform translate-y-full transition-transform duration-300 overflow-y-auto flex flex-col md:pl-24">
                 <button onclick="closeEpisodeModal()" class="fixed top-4 right-4 md:top-6 md:right-10 w-12 h-12 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center z-[110] backdrop-blur transition-all hover:scale-110"><i class="ph-bold ph-x text-xl"></i></button>
@@ -429,7 +438,7 @@
                 <div class="relative w-full h-64 md:h-80 bg-dark-800 shrink-0 border-b border-white/10 group">
                     <button id="ep-modal-prev-btn" class="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center z-[110] backdrop-blur transition-all hover:scale-110 shadow-xl border border-white/10"><i class="ph-bold ph-caret-left text-2xl"></i></button>
                     <button id="ep-modal-next-btn" class="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center z-[110] backdrop-blur transition-all hover:scale-110 shadow-xl border border-white/10"><i class="ph-bold ph-caret-right text-2xl"></i></button>
-                    
+
                     <img id="ep-modal-img" src="" class="w-full h-full object-cover opacity-50">
                     <div class="absolute inset-0 bg-gradient-to-t from-dark-900 to-transparent"></div>
                     <div class="absolute bottom-0 left-0 w-full p-6 md:p-10 pb-4">
@@ -456,6 +465,18 @@
         </main>
     </div>
 
+    <!-- Google Translate Script -->
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'es',
+                includedLanguages: 'es,en,fr,de,it,pt',
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+            }, 'google_translate_element');
+        }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
     <!-- Firebase & Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -463,7 +484,7 @@
         import { getFirestore, doc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, getDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = { apiKey: "AIzaSyBttVULbQniX91bFT1bbk7D9O523GfXZAA", authDomain: "bingetracker-669c9.firebaseapp.com", projectId: "bingetracker-669c9", storageBucket: "bingetracker-669c9.firebasestorage.app", messagingSenderId: "483090339853", appId: "1:483090339853:web:8a77c757213888410edd44" };
-        
+
         let app, db, auth, user = null;
         let trackedShows = {}; let followingUsers = {}; let allPublicUsers = []; let userSettings = { history: [], background: '' };
         let currentDetailShowId = null, currentDetailEpisodesData = []; 
@@ -472,8 +493,33 @@
         let currentShowCommData = null; 
         let hasLoadedInitialData = false;
 
+        // PWA Install Prompt Variable
+        let deferredPrompt = null;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            const installBtn = $('install-btn');
+            if(installBtn) installBtn.classList.remove('hidden');
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const installBtn = $('install-btn');
+            if(installBtn) {
+                installBtn.addEventListener('click', async () => {
+                    if(deferredPrompt) {
+                        deferredPrompt.prompt();
+                        const { outcome } = await deferredPrompt.userChoice;
+                        if(outcome === 'accepted') {
+                            installBtn.classList.add('hidden');
+                        }
+                        deferredPrompt = null;
+                    }
+                });
+            }
+        });
+
         const $ = (id) => document.getElementById(id);
-        
+
         window.showToast = (msg, type='info') => {
             const container = $('toast-container'), t = document.createElement('div');
             const colors = { success: 'bg-accent-emerald/25 border-accent-emerald/50 text-emerald-200', error: 'bg-red-500/25 border-red-500/50 text-red-200', info: 'bg-blue-500/25 border-blue-500/50 text-blue-200' };
@@ -512,7 +558,7 @@
 
         async function init() {
             app = initializeApp(firebaseConfig); db = getFirestore(app); auth = getAuth(app);
-            
+
             $('auth-form').addEventListener('submit', async (e) => {
                 e.preventDefault(); const em = $('auth-email').value, pw = $('auth-password').value, btn = $('auth-submit-btn');
                 const isReg = btn.innerText.includes('Registrar');
@@ -531,12 +577,12 @@
                     user = u; const dName = u.displayName || u.email.split('@')[0];
                     $('dash-user-name').innerText = dName; if($('profile-name-input')) $('profile-name-input').value = dName;
                     const navAv = $('user-avatar-nav'); navAv.className = "w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white overflow-hidden shrink-0 " + (u.photoURL?"":"bg-gradient-to-tr from-rose-500 to-purple-600"); navAv.innerHTML = getAvatarHTML(u.photoURL, dName);
-                    
+
                     setDoc(doc(db, 'public_users', u.uid), { uid: u.uid, displayName: dName, photoURL: u.photoURL || null }, { merge: true }).catch(()=>{});
-                    
+
                     onSnapshot(collection(db, 'users', u.uid, 'shows'), (snap) => {
                         trackedShows = {}; snap.forEach(d => trackedShows[d.id] = d.data());
-                        
+
                         if(!hasLoadedInitialData) {
                             hasLoadedInitialData = true;
                             $('auth-screen').classList.add('hidden'); $('init-screen').classList.add('hidden');
@@ -549,7 +595,7 @@
                             if($('view-detail').classList.contains('translate-x-full') === false) renderDetailProgressUI();
                         }
                     });
-                    
+
                     onSnapshot(collection(db, 'users', u.uid, 'following'), (snap) => { followingUsers = {}; snap.forEach(d => followingUsers[d.id] = d.data()); if(currentActiveView === 'community') renderCommunity(); });
                     onSnapshot(doc(db, 'users', u.uid), (docSnap) => {
                         if(docSnap.exists()) { userSettings = { ...userSettings, ...docSnap.data() }; applyCustomBg(userSettings.background); if(currentActiveView === 'dashboard') renderHistoryUI(); }
@@ -562,7 +608,7 @@
         }
 
         window.handleSignOut = async () => { if (auth) await signOut(auth); };
-        
+
         let discoverLoaded = false;
         window.switchView = (v) => {
             currentActiveView = v; document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active')); const b = $(`nav-${v}`); if(b) b.classList.add('active');
@@ -607,7 +653,7 @@
                 return `<div onclick="updateUserAvatar('${url}')" class="w-16 h-16 shrink-0 rounded-full cursor-pointer border-2 transition-transform hover:scale-110 ${isSel ? 'border-accent-purple shadow-lg opacity-100' : 'border-transparent opacity-70'}"><img src="${url}" class="w-full h-full rounded-full object-cover"></div>`;
             }).join('');
         };
-        
+
         const defBgs = [
             'https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=1000&auto=format&fit=crop', 
             'https://images.unsplash.com/photo-1618336306543-cb41427181c8?q=80&w=1000&auto=format&fit=crop', 
@@ -641,18 +687,48 @@
                 return `<div class="flex-none w-56 glass-card rounded-2xl overflow-hidden cursor-pointer group" onclick="openShowDetail(${h.showId})"><div class="h-28 relative"><img src="${h.img||'https://placehold.co/300x170/1F293F/ffffff'}" class="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform"><div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-dark-900/40 to-transparent"></div><div class="absolute bottom-2 left-3"><h4 class="font-bold text-sm text-white drop-shadow truncate w-40">${h.showName}</h4><span class="text-[10px] text-gray-300 font-bold bg-black/80 px-1.5 py-0.5 rounded mr-1">T${String(h.s).padStart(2,'0')}E${String(h.e).padStart(2,'0')}</span><span class="text-[8px] text-gray-400">${dateStr}</span></div></div></div>`;
             }).join('');
         }
-        function renderStats() {
-            const arr = Object.values(trackedShows); let e=0, t=0;
+        
+        async function renderStats() {
+            const arr = Object.values(trackedShows); let e=0, t=0, pendingMins=0;
+            const today = new Date();
+
+            // Calcular en paralelo los episodios emitidos pendientes de ver para cada serie
+            const statsPromises = arr.map(async (s) => {
+                if(s.status === 'dropped') return;
+                const apiData = await fetchTVMaze(s.showId);
+                if(!apiData || !apiData._embedded || !apiData._embedded.episodes) return;
+                const rt = s.runtime || apiData.averageRuntime || apiData.runtime || 30;
+                const map = s.episodesWatched || {};
+                
+                apiData._embedded.episodes.forEach(ep => {
+                    const isAired = ep.airdate && new Date(ep.airdate) <= today;
+                    const watchedCount = map[ep.id] || 0;
+                    if(isAired && watchedCount === 0) {
+                        pendingMins += rt;
+                    }
+                });
+            });
+
+            await Promise.all(statsPromises);
+
             arr.forEach(s => { const rt = s.runtime||30; Object.values(s.episodesWatched||{}).forEach(v => { if(v>0) { e+=v; t+=(v*rt); } }); });
+            
             const h = Math.floor(t/60), d = Math.floor(h/24), rh = h%24;
-            if($('stat-shows')) $('stat-shows').innerText = arr.length; if($('stat-episodes')) $('stat-episodes').innerText = e;
-            if($('stat-time-days')) $('stat-time-days').innerText = d; if($('stat-time-hours')) $('stat-time-hours').innerText = rh;
+            const ph = Math.floor(pendingMins/60), pd = Math.floor(ph/24), prh = ph%24;
+
+            if($('stat-shows')) $('stat-shows').innerText = arr.length; 
+            if($('stat-episodes')) $('stat-episodes').innerText = e;
+            if($('stat-time-days')) $('stat-time-days').innerText = d; 
+            if($('stat-time-hours')) $('stat-time-hours').innerText = rh;
+            if($('stat-pending-days')) $('stat-pending-days').innerText = pd; 
+            if($('stat-pending-hours')) $('stat-pending-hours').innerText = prh;
+
             renderAvatarOptions(); renderBgOptions();
         }
 
         // --- Core TVMaze ---
         async function fetchTVMaze(showId) { if(tvmazeCache[showId]) return tvmazeCache[showId]; try { const res = await fetch(`https://api.tvmaze.com/shows/${showId}?embed=episodes`); if(!res.ok) return null; const data = await res.json(); tvmazeCache[showId] = data; return data; } catch (err) { return null; } }
-        
+
         function checkAutoStatus(sId) {
             const data = trackedShows[sId]; if(!data) return;
             const map = data.episodesWatched || {}; const airedEps = currentDetailEpisodesData.filter(ep => ep.airdate && new Date(ep.airdate) <= new Date());
@@ -662,7 +738,7 @@
             if(watched === 0) newStatus = 'planned';
             else if(watched === airedEps.length && airedEps.length > 0) newStatus = 'completed';
             else newStatus = 'watching';
-            
+
             if(newStatus !== data.status) {
                 data.status = newStatus; updateDoc(doc(db, 'users', user.uid, 'shows', sId.toString()), { status: newStatus }).catch(()=>{});
                 if(newStatus==='completed') showToast("¡Serie Completada!", "success");
@@ -673,18 +749,18 @@
         async function renderDashboard() {
             if(!user || currentActiveView !== 'dashboard') return; 
             const allShows = Object.values(trackedShows);
-            
+
             $('dash-continue-empty').classList.add('hidden'); $('dash-upcoming-empty').classList.add('hidden');
-            
+
             if(allShows.length===0) { 
                 $('dash-continue-empty').classList.remove('hidden'); $('dash-upcoming-empty').classList.remove('hidden'); 
                 $('dash-loading').classList.add('hidden'); $('dash-content').classList.remove('hidden');
                 return; 
             }
-            
+
             $('dash-loading').classList.remove('hidden'); $('dash-content').classList.add('hidden');
             $('dash-continue-grid').innerHTML = ''; $('dash-upcoming-list').innerHTML = '';
-            
+
             let hasCont = false, upcoming = [];
             try {
                 const promises = allShows.map(async (dbShow) => {
@@ -713,16 +789,16 @@
                     }
                 });
                 await Promise.all(promises);
-                
+
                 if(upcoming.length > 0) {
                     upcoming.sort((a,b) => new Date(a.ep.airdate) - new Date(b.ep.airdate)).slice(0,6).forEach(ev => {
                         const dObj = new Date(ev.ep.airdate);
                         $('dash-upcoming-list').innerHTML += `<div class="glass-card p-4 rounded-xl flex items-center gap-4 cursor-pointer flex-none w-64 hover:scale-[1.02] transition-transform" onclick="openShowDetail(${ev.showId})"><div class="w-12 h-16 rounded overflow-hidden shrink-0"><img src="${ev.img||'https://placehold.co/210x295'}" class="w-full h-full object-cover"></div><div class="flex-1 min-w-0"><h4 class="font-bold text-sm text-white truncate">${ev.showName}</h4><p class="text-[10px] text-gray-400 truncate mb-1">T${ev.ep.season}E${ev.ep.number}: ${ev.ep.name}</p><span class="text-[9px] bg-accent-purple/20 text-purple-300 border border-purple-500/30 font-bold px-2 py-0.5 rounded uppercase shadow-inner">${dObj.toLocaleDateString('es-ES', { weekday:'short', day:'numeric', month:'short' })}</span></div></div>`;
                     });
                 } else $('dash-upcoming-empty').classList.remove('hidden');
-                
+
                 if(!hasCont) $('dash-continue-empty').classList.remove('hidden');
-                
+
             } catch (err) {} finally { 
                 $('dash-loading').classList.add('hidden'); 
                 $('dash-content').classList.remove('hidden');
@@ -733,7 +809,7 @@
             if(!user) return; const data = trackedShows[sId]; if(!data) return;
             const cur = (data.episodesWatched && data.episodesWatched[epId]) || 0;
             if(!data.episodesWatched) data.episodesWatched = {}; data.episodesWatched[epId] = cur + 1;
-            
+
             updateDoc(doc(db, 'users', user.uid, 'shows', sId.toString()), { [`episodesWatched.${epId}`]: cur + 1 }).catch(()=>{});
             logHistory(sId, sName, epId, epName, s, e, epImg);
             renderDashboard(); 
@@ -759,7 +835,7 @@
         const availableGenres = ["Action", "Adventure", "Anime", "Comedy", "Crime", "Drama", "Fantasy", "Horror", "Mystery", "Romance", "Science-Fiction", "Thriller"];
         const selectedGenres = new Set(); let searchTimeout; let currentScanId = 0, tvmazePage = 0, filteredResults = [], endOfTvmaze = false, currentSearchPage = 1;
         const ITEMS_PER_PAGE = 30;
-        
+
         function renderGenreChips() {
             const container = $('search-genre-chips'); container.innerHTML = '';
             availableGenres.forEach(genre => {
@@ -771,12 +847,12 @@
             });
         }
         function resetSearchEngine() { tvmazePage = 0; filteredResults = []; endOfTvmaze = false; currentSearchPage = 1; $('search-results').innerHTML = ''; $('search-pagination').classList.add('hidden'); $('search-pagination').classList.remove('flex'); }
-        
+
         const performSearch = async () => {
             const q = $('search-input').value.trim(), statusVal = $('filter-status').value, typeVal = $('filter-type').value;
             const hasAdv = selectedGenres.size > 0 || statusVal !== "" || typeVal !== "";
             $('search-clear').classList.toggle('hidden', q.length === 0); clearTimeout(searchTimeout);
-            
+
             if (q.length === 0 && !hasAdv) { 
                 resetSearchEngine(); $('search-initial').classList.remove('hidden'); $('search-no-results').classList.add('hidden'); $('search-loading').classList.add('hidden');
                 if($('discover-grid').innerHTML === '') {
@@ -789,10 +865,10 @@
                 }
                 return;
             }
-            
+
             resetSearchEngine(); $('search-initial').classList.add('hidden'); $('search-no-results').classList.add('hidden');
             $('search-loading').classList.remove('hidden'); $('search-loading').classList.add('flex');
-            
+
             if(q.length > 0) {
                 $('search-loading-text').textContent = 'Buscando título...';
                 searchTimeout = setTimeout(async () => {
@@ -883,7 +959,7 @@
             if(tab === 'sim') loadSimilarShows();
             if(tab === 'comm' && currentShowCommData) renderHeatmap();
         }
-        
+
         $('detail-status-select').addEventListener('change', (e) => {
             if(!user || !currentDetailShowId) return;
             const data = trackedShows[currentDetailShowId]; if(!data) return;
@@ -895,22 +971,22 @@
         window.openShowDetail = async (id) => {
             if($('view-detail').classList.contains('translate-x-full') === false) { $('detail-content').classList.add('hidden'); $('detail-loading').classList.remove('hidden'); } 
             else { $('view-detail').classList.remove('translate-x-full'); $('detail-content').classList.add('hidden'); $('detail-loading').classList.remove('hidden'); $('detail-actions').innerHTML = ''; }
-            
+
             currentDetailShowId = id.toString(); switchDetailTab('eps'); 
-            
+
             try {
                 const apiData = await fetchTVMaze(id); if(!apiData) { showToast("Error TVMaze.", "error"); closeDetailView(); return; }
                 currentDetailEpisodesData = apiData._embedded.episodes;
                 let gCount = 1; currentDetailEpisodesData.forEach(ep => { if (ep.season > 0 && ep.number !== null && ep.airdate) ep.globalNumber = gCount++; });
-                
+
                 $('detail-loading').classList.add('hidden'); $('detail-content').classList.remove('hidden');
                 const isTracked = trackedShows[apiData.id] !== undefined; const img = apiData.image?.original || apiData.image?.medium || '';
-                
+
                 $('detail-hero-img').style.backgroundImage = `url(${img})`; $('detail-poster').src = apiData.image?.medium || 'https://placehold.co/210x295';
                 $('detail-title').textContent = apiData.name; $('detail-summary').innerHTML = apiData.summary || 'Sin sinopsis.';
                 $('detail-status').textContent = apiData.status; $('detail-runtime-val').textContent = apiData.averageRuntime || apiData.runtime || 0;
                 $('detail-genres').innerHTML = (apiData.genres||[]).map(g=>`<span class="px-3 py-1 border border-white/20 bg-dark-900/50 rounded-full text-xs font-bold shadow-inner">${g}</span>`).join('');
-                
+
                 const rCont = $('detail-rating-container');
                 if(isTracked) { 
                     rCont.classList.remove('hidden'); 
@@ -933,11 +1009,11 @@
 
                 const sMap = {}; currentDetailEpisodesData.forEach(ep=>{ if(!sMap[ep.season]) sMap[ep.season]=[]; sMap[ep.season].push(ep); });
                 const sCont = $('detail-seasons'); sCont.innerHTML = ''; const today = new Date();
-                
+
                 const airedEpsAll = currentDetailEpisodesData.filter(ep => ep.airdate && new Date(ep.airdate) <= today);
                 const watchedCountAll = isTracked ? airedEpsAll.filter(ep => (trackedShows[apiData.id]?.episodesWatched?.[ep.id]||0)>0).length : 0;
                 const isAllComplete = watchedCountAll === airedEpsAll.length && airedEpsAll.length > 0;
-                
+
                 if(isTracked) {
                     $('detail-mass-actions').innerHTML = `
                         <button onclick="toggleAllSeries(${apiData.id}, ${isAllComplete})" class="px-4 py-2 rounded-xl border-2 ${isAllComplete?'border-red-500 text-red-500 hover:bg-red-500 hover:text-white':'border-accent-emerald text-accent-emerald hover:bg-accent-emerald hover:text-white'} bg-transparent text-xs font-bold transition-all transform hover:scale-105 active:scale-95 flex items-center gap-1.5"><i class="ph-bold ${isAllComplete?'ph-x':'ph-check-square'}"></i> ${isAllComplete?'Desmarcar Serie':'Marcar Serie'}</button>
@@ -948,7 +1024,7 @@
                 Object.keys(sMap).sort((a,b)=>a-b).forEach(sNum => {
                     const eps = sMap[sNum];
                     const block = document.createElement('div'); block.className = "bg-dark-800/40 rounded-2xl border border-white/5 overflow-hidden";
-                    
+
                     const seasonAired = eps.filter(ep => ep.airdate && new Date(ep.airdate) <= today);
                     const seasonWatched = isTracked ? seasonAired.filter(ep => (trackedShows[apiData.id]?.episodesWatched?.[ep.id]||0)>0).length : 0;
                     const isSeasonComplete = seasonAired.length > 0 && seasonWatched === seasonAired.length;
@@ -958,17 +1034,17 @@
                         <div class="flex items-center gap-3"><i class="ph-bold ph-caret-down text-gray-400 transition-transform group-hover:text-white"></i><h4 class="font-bold">Temporada ${sNum}</h4><span class="text-xs text-gray-400">(${seasonWatched}/${seasonAired.length} vistos)</span></div>
                         ${isTracked ? `<button onclick="event.stopPropagation(); toggleSeason(${apiData.id}, ${sNum}, ${isSeasonComplete})" class="w-8 h-8 rounded-full border-2 ${isSeasonComplete?'border-red-500 bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white':'border-accent-emerald bg-emerald-500/20 text-emerald-400 hover:bg-accent-emerald hover:text-white'} flex items-center justify-center transition-all group-btn"><i class="ph-bold ${isSeasonComplete?'ph-x':'ph-check'}"></i></button>` : ''}
                     `;
-                    
+
                     const list = document.createElement('div'); list.className = "grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 p-4 hidden";
                     head.onclick = (e) => { if(e.target.closest('button')) return; list.classList.toggle('hidden'); const icon = head.querySelector('.ph-caret-down'); if(icon) icon.classList.toggle('rotate-180'); };
-                    
+
                     eps.forEach(ep => {
                         const epId = ep.id.toString(), isAired = ep.airdate && new Date(ep.airdate) <= today;
                         const count = isTracked ? (trackedShows[apiData.id]?.episodesWatched?.[epId] || 0) : 0;
                         const row = document.createElement('div'); row.id = `ep-row-${epId}`;
                         row.className = `glass-card rounded-xl border border-white/5 overflow-hidden flex flex-col cursor-pointer hover:scale-[1.03] transition-all group ${!isAired?'opacity-50 grayscale hover:scale-100 pointer-events-none':''} ${count>0?'ring-1 ring-accent-emerald shadow-[0_0_15px_rgba(16,185,129,0.15)]':''}`;
                         row.onclick = () => { if(isAired) openEpisodeModal(epId); }
-                        
+
                         row.innerHTML = `
                             <div class="relative aspect-video bg-dark-900 border-b border-white/5"><img src="${ep.image?.medium || apiData.image?.medium || 'https://placehold.co/300x170/1F293F/ffffff'}" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"><div class="absolute inset-0 bg-gradient-to-t from-dark-900 to-transparent opacity-50 group-hover:opacity-20 transition-opacity"></div><div class="absolute top-2 left-2 bg-accent-purple/90 text-white text-[10px] font-bold px-2 py-1 rounded shadow-lg backdrop-blur">T${String(ep.season).padStart(2,'0')}E${String(ep.number).padStart(2,'0')} <span class="bg-black/70 px-1 py-0.5 rounded ml-1 text-[9px]">• #${ep.globalNumber||'?'}</span></div>${count>0?`<div class="absolute top-2 right-2 bg-accent-emerald text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-lg">${count}x</div>`:''}</div>
                             <div class="p-3 flex-1 flex flex-col pointer-events-none"><h4 class="font-bold text-xs line-clamp-2 mb-1 group-hover:text-accent-emerald transition-colors">${ep.name}</h4><p class="text-[9px] text-gray-400 font-bold uppercase mb-2">${ep.airdate ? new Date(ep.airdate).toLocaleDateString('es-ES') : 'Por anunciar'}</p></div>
@@ -1014,12 +1090,12 @@
             if(!user || !trackedShows[id]) return; 
             const oldVal = trackedShows[id].rating || 0;
             trackedShows[id].rating = val;
-            
+
             await updateDoc(doc(db, 'users', user.uid, 'shows', id.toString()), { rating: val });
-            
+
             const rCont = $('detail-rating-container'); 
             if(rCont) rCont.querySelectorAll('.ph-star').forEach((s, i) => s.classList.toggle('ph-fill', i < val));
-            
+
             const sDocRef = doc(db, 'artifacts', firebaseConfig.appId, 'public', 'data', `shows_comm_global`, id.toString());
             const sDoc = await getDoc(sDocRef);
             let curSum = 0, curCount = 0;
@@ -1027,7 +1103,7 @@
                 curSum = sDoc.data().sum || 0; 
                 curCount = sDoc.data().count || 0; 
             }
-            
+
             let newSum, newCount;
             if (curCount === 0 || isNaN(curSum) || isNaN(curCount)) {
                 newSum = val;
@@ -1039,12 +1115,12 @@
                 newSum = curSum - oldVal + val;
                 newCount = curCount;
             }
-            
+
             if (newSum < 0) newSum = val;
             if (newCount <= 0) newCount = 1;
 
             await setDoc(sDocRef, { sum: newSum, count: newCount }, {merge: true});
-            
+
             const avg = (newSum / newCount) * 2;
             $('detail-comm-val').innerText = isNaN(avg) ? "--" : avg.toFixed(1);
             showToast("Valoración general guardada", "success");
@@ -1054,7 +1130,7 @@
             if(!user || !trackedShows[sId]) return;
             const sData = trackedShows[sId]; if(!sData.episodesWatched) sData.episodesWatched={};
             const cur = sData.episodesWatched[epId] || 0; const next = Math.max(0, cur + delta);
-            
+
             if(delta > 0 && cur === 0) {
                 const targetEp = currentDetailEpisodesData.find(e => e.id.toString() === epId);
                 if(targetEp) {
@@ -1078,7 +1154,7 @@
             sData.episodesWatched[epId] = next;
             await updateDoc(doc(db, 'users', user.uid, 'shows', sId.toString()), { [`episodesWatched.${epId}`]: next });
             checkAutoStatus(sId); 
-            
+
             if(delta > 0) {
                 const targetEp = currentDetailEpisodesData.find(e => e.id.toString() === epId);
                 if(targetEp) logHistory(sId, sData.name, epId, targetEp.name, targetEp.season, targetEp.number, targetEp.image?.medium);
@@ -1125,7 +1201,7 @@
         function setupShowCommunity(showId) {
             const list = $('show-comments-list'); list.innerHTML = `<div class="spinner mx-auto my-10 border-t-accent-purple"></div>`;
             if(unsubscribeShowComm) unsubscribeShowComm();
-            
+
             unsubscribeShowComm = onSnapshot(collection(db, 'artifacts', firebaseConfig.appId, 'public', 'data', `shows_comm_${showId}_comments`), (snapshot) => {
                 const comments = []; snapshot.forEach(d => comments.push(d.data()));
                 comments.sort((a,b) => new Date(b.date) - new Date(a.date));
@@ -1178,7 +1254,7 @@
                     if(!ep) { html += `<td class="p-1"></td>`; return; }
                     const rData = currentShowCommData[ep.id.toString()];
                     const avg = rData && rData.count > 0 ? (rData.sum / rData.count) * 2 : null; 
-                    
+
                     let bg = "bg-dark-800 text-transparent", valStr = "";
                     if(avg !== null) {
                         valStr = avg.toFixed(1);
@@ -1215,10 +1291,10 @@
             try {
                 const apiData = await fetchTVMaze(currentDetailShowId); if(!apiData) return;
                 const genres = apiData.genres || []; const type = apiData.type; const network = apiData.network?.name;
-                
+
                 const promises = [1, 2, 3].map(p => fetch(`https://api.tvmaze.com/shows?page=${p}`).then(r => r.json()).catch(()=>[]));
                 const pages = await Promise.all(promises); let allShows = []; pages.forEach(arr => { allShows = allShows.concat(arr); });
-                
+
                 let scored = allShows.filter(s => s.id.toString() !== currentDetailShowId && s.image).map(s => {
                     let score = 0;
                     const sGenres = s.genres || [];
@@ -1227,7 +1303,7 @@
                     if(s.network?.name === network) score += 1;
                     return { show: s, score };
                 });
-                
+
                 scored.sort((a,b) => b.score - a.score);
                 const topSimilar = scored.slice(0, 10).map(item => item.show);
 
@@ -1240,11 +1316,11 @@
         window.openEpisodeModal = async (epId) => {
             currentModalEpId = epId; const ep = currentDetailEpisodesData.find(e => e.id.toString() === epId); if(!ep) return;
             const modal = $('ep-modal'); modal.classList.remove('translate-y-full');
-            
+
             $('ep-modal-title').textContent = ep.name; $('ep-modal-summary').innerHTML = ep.summary || 'Sin sinopsis.';
             $('ep-modal-badge').textContent = `Temporada ${ep.season} • Episodio ${ep.number} (#${ep.globalNumber||'?'})`;
             $('ep-modal-img').src = ep.image?.original || ep.image?.medium || $('detail-hero-img').style.backgroundImage.slice(5, -2) || '';
-            
+
             const curIdx = currentDetailEpisodesData.findIndex(e => e.id.toString() === epId);
             const prevBtn = $('ep-modal-prev-btn'), nextBtn = $('ep-modal-next-btn');
             prevBtn.onclick = () => { if(curIdx > 0) openEpisodeModal(currentDetailEpisodesData[curIdx-1].id.toString()); };
@@ -1271,20 +1347,20 @@
             const userRatingRef = doc(db, 'users', user.uid, 'episode_ratings', epId.toString());
             const uRatingDoc = await getDoc(userRatingRef);
             let userVal = uRatingDoc.exists() ? uRatingDoc.data().rating : 0;
-            
+
             $('ep-modal-user-rating').querySelectorAll('.ph-star').forEach((s, i) => {
                 s.classList.toggle('ph-fill', i < userVal);
                 s.onclick = async () => {
                     const stars = i + 1;
                     await setDoc(userRatingRef, { rating: stars });
-                    
+
                     const freshRDoc = await getDoc(rDocRef);
                     let curSum = 0, curCount = 0;
                     if (freshRDoc.exists()) {
                         curSum = freshRDoc.data().sum || 0;
                         curCount = freshRDoc.data().count || 0;
                     }
-                    
+
                     let newSum, newCount;
                     if (curCount === 0 || isNaN(curSum) || isNaN(curCount) || curSum === null) {
                         newSum = stars;
@@ -1296,13 +1372,13 @@
                         newSum = curSum - userVal + stars;
                         newCount = curCount;
                     }
-                    
+
                     if(newSum < 0) newSum = stars;
                     if(newCount <= 0) newCount = 1;
 
                     await setDoc(rDocRef, { sum: newSum, count: newCount });
                     userVal = stars;
-                    
+
                     const avg = (newSum / newCount) * 2;
                     $('ep-modal-comm-rating').innerText = (isNaN(avg) || avg === Infinity) ? "--" : avg.toFixed(1);
                     $('ep-modal-user-rating').querySelectorAll('.ph-star').forEach((st, idx) => st.classList.toggle('ph-fill', idx < stars));
@@ -1328,7 +1404,7 @@
         function renderCommunity() {
             const fGrid = $('comm-following-grid'), sGrid = $('comm-search-grid');
             fGrid.innerHTML = ''; sGrid.innerHTML = '';
-            
+
             const fList = Object.values(followingUsers);
             if(fList.length === 0) { fGrid.innerHTML = `<p class="text-gray-500 text-sm col-span-full">No sigues a nadie todavía. ¡Usa el buscador para encontrar amigos!</p>`; }
             else {
@@ -1370,13 +1446,13 @@
         window.openPublicProfile = async (uid) => {
             $('view-public-profile').classList.remove('translate-x-full');
             $('pub-profile-content').classList.add('hidden'); $('pub-profile-loading').classList.remove('hidden');
-            
+
             try {
                 const uDoc = await getDoc(doc(db, 'public_users', uid));
                 const uData = uDoc.exists() ? uDoc.data() : { displayName: 'Usuario' };
                 $('pub-name').innerText = uData.displayName; $('pub-name-short').innerText = uData.displayName;
                 $('pub-avatar').innerHTML = getAvatarHTML(uData.photoURL, uData.displayName);
-                
+
                 const fBtn = $('btn-follow-user'); fBtn.classList.remove('hidden');
                 const isFollowing = followingUsers[uid] !== undefined;
                 fBtn.className = isFollowing ? "px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg transition-transform hover:scale-105 active:scale-95 bg-red-500/20 text-red-400 border border-red-500/30" : "px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg transition-transform hover:scale-105 active:scale-95 bg-rose-500 text-white";
@@ -1394,7 +1470,7 @@
 
                 const showsSnap = await getDocs(collection(db, 'users', uid, 'shows'));
                 let shows = []; showsSnap.forEach(d => shows.push(d.data()));
-                
+
                 let eCount = 0, tMins = 0;
                 shows.forEach(s => { const rt = s.runtime || 30; Object.values(s.episodesWatched||{}).forEach(v => { if(v>0) { eCount+=v; tMins+=(v*rt); } }); });
                 const th = Math.floor(tMins/60), td = Math.floor(th/24), trh = th%24;
