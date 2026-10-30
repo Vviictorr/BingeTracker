@@ -695,7 +695,8 @@
         }
         
         async function renderStats() {
-            const arr = Object.values(trackedShows); let e=0, t=0, pendingMins=0;
+            const arr = Object.values(trackedShows); 
+            let e=0, t=0, pendingMins=0, pendingEps=0; // Se añade pendingEps
             const today = new Date();
 
             // Calcular en paralelo los episodios emitidos pendientes de ver para cada serie
@@ -711,6 +712,7 @@
                     const watchedCount = map[ep.id] || 0;
                     if(isAired && watchedCount === 0) {
                         pendingMins += rt;
+                        pendingEps += 1; // Sumamos 1 episodio pendiente a la cuenta global
                     }
                 });
             });
@@ -726,6 +728,10 @@
             if($('stat-episodes')) $('stat-episodes').innerText = e;
             if($('stat-time-days')) $('stat-time-days').innerText = d; 
             if($('stat-time-hours')) $('stat-time-hours').innerText = rh;
+            
+            // Renderiza el nuevo contador en el HTML
+            if($('stat-pending-episodes')) $('stat-pending-episodes').innerText = pendingEps;
+            
             if($('stat-pending-days')) $('stat-pending-days').innerText = pd; 
             if($('stat-pending-hours')) $('stat-pending-hours').innerText = prh;
 
